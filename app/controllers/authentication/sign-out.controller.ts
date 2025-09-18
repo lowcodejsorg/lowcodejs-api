@@ -6,15 +6,41 @@ import { Controller, POST } from 'fastify-decorators';
 @Controller({
   route: 'authentication',
 })
-export default class SignOutController {
+export default class {
   @POST({
     url: '/sign-out',
     options: {
       onRequest: [AuthenticationMiddleware],
       schema: {
         tags: ['Authentication'],
-        summary: 'Authentication Sign Out',
-        description: 'Authentication Sign Out',
+        summary: 'User sign out',
+        description: 'Signs out the current user by clearing authentication cookies. Requires valid access token.',
+        security: [{ cookieAuth: [] }],
+        response: {
+          200: {
+            description: 'Successfully signed out',
+            type: 'object',
+            properties: {
+              message: { type: 'string', enum: ['Successfully signed out'] }
+            }
+          },
+          401: {
+            description: 'Unauthorized - Invalid or missing access token',
+            type: 'object',
+            properties: {
+              message: { type: 'string', enum: ['Authentication required'] },
+              code: { type: 'number', enum: [401] },
+              cause: { type: 'string', enum: ['AUTHENTICATION_REQUIRED'] }
+            },
+            examples: [
+              {
+                message: 'Authentication required',
+                code: 401,
+                cause: 'AUTHENTICATION_REQUIRED'
+              }
+            ]
+          }
+        }
       },
     },
   })
@@ -36,6 +62,6 @@ export default class SignOutController {
         maxAge: 0,
       });
 
-    return response.status(200).send();
+    return response.status(200).send({ message: 'Successfully signed out' });
   }
 }

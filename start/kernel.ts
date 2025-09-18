@@ -129,6 +129,15 @@ kernel.register(swagger, {
         description: 'Develop server',
       },
     ],
+    components: {
+      securitySchemes: {
+        cookieAuth: {
+          type: 'apiKey',
+          in: 'cookie',
+          name: 'accessToken',
+        },
+      },
+    },
   },
 });
 
@@ -138,8 +147,6 @@ kernel.register(scalar, {
     title: 'LowCodeJs API',
     description: 'LowCodeJs API Documentation',
     version: '1.0.0',
-    /* theme?: 'alternate' | 'default' | 'moon' | 'purple' | 'solarized' |
-'bluePlanet' | 'saturn' | 'kepler' | 'mars' | 'deepSpace' | 'laserwave' | 'none' */
     theme: 'bluePlanet',
   },
 });
@@ -147,6 +154,11 @@ kernel.register(scalar, {
 kernel.register(bootstrap, {
   directory: resolve(process.cwd(), 'app', 'controllers'),
   mask: /\.controller\.(t|j)s$/,
+});
+
+// Serve an OpenAPI file
+kernel.get('/openapi.json', async (request, reply) => {
+  return kernel.swagger();
 });
 
 export { kernel };

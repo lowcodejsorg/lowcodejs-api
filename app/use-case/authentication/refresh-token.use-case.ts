@@ -9,22 +9,31 @@ type Response = Either<ApplicationException, Entity>;
 @Service()
 export default class RefreshTokenUseCase {
   async execute({ userId }: { userId: string }): Promise<Response> {
-    const user = await Model.findOne({ _id: userId });
+    try {
+      const user = await Model.findOne({ _id: userId });
 
-    if (!user) {
+      if (!user) {
+        return left(
+          ApplicationException.Unauthorized('User not found', 'USER_NOT_FOUND'),
+        );
+      }
+
+      // Opcional: verificar se o usuário ainda está ativo
+      // if (!user.active) {
+      //   return left(ApplicationException.Unauthorized('Usuário inativo'));
+      // }
+
+      return right({
+        ...user.toJSON(),
+        _id: user._id.toString(),
+      });
+    } catch (error) {
       return left(
-        ApplicationException.Unauthorized('User not found', 'USER_NOT_FOUND'),
+        ApplicationException.InternalServerError(
+          'Internal server error',
+          'REFRESH_TOKEN_ERROR',
+        ),
       );
     }
-
-    // Opcional: verificar se o usuário ainda está ativo
-    // if (!user.active) {
-    //   return left(ApplicationException.Unauthorized('Usuário inativo'));
-    // }
-
-    return right({
-      ...user.toJSON(),
-      _id: user._id.toString(),
-    });
   }
 }

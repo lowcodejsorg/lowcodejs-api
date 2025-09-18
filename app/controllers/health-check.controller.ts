@@ -19,18 +19,12 @@ export default class {
                   type: 'object',
                   properties: {
                     status: {
-                      type: 'string',
-                      example: 'ok',
+                      type: 'string'
                     },
                     timestamp: {
-                      type: 'string',
-                      example: '2025-09-14T10:30:00.000Z',
+                      type: 'string'
                     },
                   },
-                },
-                example: {
-                  status: 'ok',
-                  timestamp: '2025-09-14T10:30:00.000Z',
                 },
               },
             },

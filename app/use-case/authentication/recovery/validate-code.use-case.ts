@@ -14,54 +14,63 @@ export default class ValidateCodeUseCase {
   async execute(
     payload: z.infer<typeof AuthenticationRecoveryValidateCodeSchema>,
   ): Promise<Response> {
-    const token = await ValidationToken.findOne({
-      code: payload.code,
-    });
+    try {
+      const token = await ValidationToken.findOne({
+        code: payload.code,
+      });
 
-    if (!token)
-      return left(
-        ApplicationException.NotFound(
-          'Validation token not found',
-          'VALIDATION_TOKEN_NOT_FOUND',
-        ),
+      if (!token)
+        return left(
+          ApplicationException.NotFound(
+            'Validation token not found',
+            'VALIDATION_TOKEN_NOT_FOUND',
+          ),
+        );
+
+      if (token.status === TOKEN_STATUS.EXPIRED)
+        return left(
+          ApplicationException.BadRequest('Code expired', 'CODE_EXPIRED'),
+        );
+
+      const TIME_EXPIRATION_IN_MINUTES = 10;
+
+      const diferenceTimeInMinutes = differenceInMinutes(
+        new Date(),
+        token.createdAt,
       );
 
-    if (token.status === TOKEN_STATUS.EXPIRED)
-      return left(
-        ApplicationException.BadRequest('Code expired', 'CODE_EXPIRED'),
-      );
+      if (diferenceTimeInMinutes > TIME_EXPIRATION_IN_MINUTES) {
+        await token
+          .set({
+            ...token?.toJSON(),
+            status: TOKEN_STATUS.EXPIRED,
+          })
+          .save();
+        return left(
+          ApplicationException.BadRequest(
+            'Validation token code expired',
+            'VALIDATION_TOKEN_EXPIRED',
+          ),
+        );
+      }
 
-    const TIME_EXPIRATION_IN_MINUTES = 10;
-
-    const diferenceTimeInMinutes = differenceInMinutes(
-      new Date(),
-      token.createdAt,
-    );
-
-    if (diferenceTimeInMinutes > TIME_EXPIRATION_IN_MINUTES) {
       await token
         .set({
           ...token?.toJSON(),
-          status: TOKEN_STATUS.EXPIRED,
+          status: TOKEN_STATUS.VALIDATED,
         })
         .save();
+
+      return right({
+        userId: token.user,
+      });
+    } catch (error) {
       return left(
-        ApplicationException.BadRequest(
-          'Validation token code expired',
-          'VALIDATION_TOKEN_EXPIRED',
+        ApplicationException.InternalServerError(
+          'Internal server error',
+          'GET_USER_BY_ID_ERROR',
         ),
       );
     }
-
-    await token
-      .set({
-        ...token?.toJSON(),
-        status: TOKEN_STATUS.VALIDATED,
-      })
-      .save();
-
-    return right({
-      userId: token.user,
-    });
   }
 }

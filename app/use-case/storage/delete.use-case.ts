@@ -15,16 +15,28 @@ export default class DeleteStorageUseCase {
   ) {}
 
   async execute({ _id }: { _id: string }): Promise<Response> {
-    const storage = await Model.findByIdAndDelete({ _id });
+    try {
+      const storage = await Model.findByIdAndDelete({ _id });
 
-    if (!storage) {
+      if (!storage) {
+        return left(
+          ApplicationException.NotFound(
+            'Storage not found',
+            'STORAGE_NOT_FOUND',
+          ),
+        );
+      }
+
+      await this.service.delete(storage.filename);
+
+      return right(null);
+    } catch (error) {
       return left(
-        ApplicationException.NotFound('Storage not found', 'STORAGE_NOT_FOUND'),
+        ApplicationException.InternalServerError(
+          'Internal server error',
+          'STORAGE_UPLOAD_ERROR',
+        ),
       );
     }
-
-    await this.service.delete(storage.filename);
-
-    return right(null);
   }
 }

@@ -15,83 +15,92 @@ export default class MagicLinkUseCase {
   async execute(
     payload: z.infer<typeof AuthenticationMagicLinkSchema>,
   ): Promise<Response> {
-    const token = await ValidationToken.findOne({
-      code: payload.code,
-    });
+    try {
+      const token = await ValidationToken.findOne({
+        code: payload.code,
+      });
 
-    if (!token)
-      return left(
-        ApplicationException.NotFound(
-          'Validation token not found',
-          'VALIDATION_TOKEN_NOT_FOUND',
-        ),
+      if (!token)
+        return left(
+          ApplicationException.NotFound(
+            'Validation token not found',
+            'VALIDATION_TOKEN_NOT_FOUND',
+          ),
+        );
+
+      if (token.status === TOKEN_STATUS.VALIDATED)
+        return left(
+          ApplicationException.BadRequest(
+            'Validation token code already used',
+            'VALIDATION_TOKEN_ALREADY_USED',
+          ),
+        );
+
+      if (token.status === TOKEN_STATUS.EXPIRED)
+        return left(
+          ApplicationException.BadRequest(
+            'Validation token code expired',
+            'VALIDATION_TOKEN_EXPIRED',
+          ),
+        );
+
+      const TIME_EXPIRATION_IN_MINUTES = 10;
+
+      const diferenceTimeInMinutes = differenceInMinutes(
+        new Date(),
+        token.createdAt,
       );
 
-    if (token.status === TOKEN_STATUS.VALIDATED)
-      return left(
-        ApplicationException.BadRequest(
-          'Validation token code already used',
-          'VALIDATION_TOKEN_ALREADY_USED',
-        ),
-      );
+      if (diferenceTimeInMinutes > TIME_EXPIRATION_IN_MINUTES) {
+        await token
+          .set({
+            ...token?.toJSON(),
+            status: TOKEN_STATUS.EXPIRED,
+          })
+          .save();
 
-    if (token.status === TOKEN_STATUS.EXPIRED)
-      return left(
-        ApplicationException.BadRequest(
-          'Validation token code expired',
-          'VALIDATION_TOKEN_EXPIRED',
-        ),
-      );
+        return left(
+          ApplicationException.BadRequest(
+            'Validation token code expired',
+            'VALIDATION_TOKEN_EXPIRED',
+          ),
+        );
+      }
 
-    const TIME_EXPIRATION_IN_MINUTES = 10;
-
-    const diferenceTimeInMinutes = differenceInMinutes(
-      new Date(),
-      token.createdAt,
-    );
-
-    if (diferenceTimeInMinutes > TIME_EXPIRATION_IN_MINUTES) {
       await token
         .set({
-          ...token?.toJSON(),
-          status: TOKEN_STATUS.EXPIRED,
+          ...token.toJSON(),
+          status: TOKEN_STATUS.VALIDATED,
         })
         .save();
 
+      const user = await User.findOne({ _id: token.user?.toString() });
+
+      if (!user)
+        return left(
+          ApplicationException.NotFound('User not found', 'USER_NOT_FOUND'),
+        );
+
+      if (user.status === 'inactive') {
+        await user
+          .set({
+            ...user.toJSON(),
+            status: 'active',
+          })
+          .save();
+      }
+
+      return right({
+        ...user.toJSON(),
+        _id: user._id.toString(),
+      });
+    } catch (error) {
       return left(
-        ApplicationException.BadRequest(
-          'Validation token code expired',
-          'VALIDATION_TOKEN_EXPIRED',
+        ApplicationException.InternalServerError(
+          'Internal server error',
+          'MAGIC_LINK_ERROR',
         ),
       );
     }
-
-    await token
-      .set({
-        ...token.toJSON(),
-        status: TOKEN_STATUS.VALIDATED,
-      })
-      .save();
-
-    const user = await User.findOne({ _id: token.user?.toString() });
-
-    if (!user)
-      return left(
-        ApplicationException.NotFound('User not found', 'USER_NOT_FOUND'),
-      );
-
-    if (user.status === 'inactive') {
-      await user
-        .set({
-          ...user.toJSON(),
-          status: 'active',
-        })
-        .save();
-    }
-
-    return right({
-      ...user.toJSON(),
-      _id: user._id.toString(),
-    });
   }
 }

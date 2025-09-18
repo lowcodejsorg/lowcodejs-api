@@ -1,34 +1,40 @@
 import { AuthenticationMiddleware } from '@middlewares/authentication.middleware';
+import ListPermissionsUseCase from '@use-case/permissions/list.use-case';
 import type { FastifyReply, FastifyRequest } from 'fastify';
-import { Controller, GET } from 'fastify-decorators';
-import { readdir } from 'fs/promises';
-import { join } from 'path';
+import { Controller, GET, getInstanceByToken } from 'fastify-decorators';
 
 @Controller({
-  route: '/locales',
+  route: 'permissions',
 })
 export default class {
+  constructor(
+    private readonly useCase: ListPermissionsUseCase = getInstanceByToken(
+      ListPermissionsUseCase,
+    ),
+  ) {}
+
   @GET({
-    url: '/',
+    url: '',
     options: {
       onRequest: [AuthenticationMiddleware],
       schema: {
-        tags: ['Locale'],
-        summary: 'Get list of available locales',
-        description: 'Retrieves a list of all available system locales for internationalization',
+        tags: ['Permissions'],
+        summary: 'List permissions',
+        description: 'Get list of all available permissions in the system',
         security: [{ cookieAuth: [] }],
         response: {
           200: {
-            description: 'List of available system locales',
+            description: 'List of all permissions',
             type: 'array',
             items: {
               type: 'object',
               properties: {
-                locale: {
-                  type: 'string',
-                  description: 'Locale code (ISO 639-1 language code)',
-                  examples: ['en', 'pt', 'es', 'fr']
-                }
+                _id: { type: 'string' },
+                name: { type: 'string' },
+                slug: { type: 'string' },
+                description: { type: 'string', nullable: true },
+                createdAt: { type: 'string', format: 'date-time' },
+                updatedAt: { type: 'string', format: 'date-time' }
               }
             }
           },
@@ -49,18 +55,18 @@ export default class {
             ]
           },
           500: {
-            description: 'Internal server error - Unable to read locale files',
+            description: 'Internal server error',
             type: 'object',
             properties: {
               message: { type: 'string', enum: ['Internal server error'] },
               code: { type: 'number', enum: [500] },
-              cause: { type: 'string', enum: ['LOCALES_READ_ERROR'] }
+              cause: { type: 'string', enum: ['LIST_PERMISSIONS_ERROR'] }
             },
             examples: [
               {
                 message: 'Internal server error',
                 code: 500,
-                cause: 'LOCALES_READ_ERROR'
+                cause: 'LIST_PERMISSIONS_ERROR'
               }
             ]
           }
@@ -69,9 +75,18 @@ export default class {
     },
   })
   async handle(request: FastifyRequest, response: FastifyReply): Promise<void> {
-    const pathname = join(process.cwd(), '_system', 'locales');
-    const files = await readdir(pathname);
-    const locales = files.map((file) => ({ locale: file.split('.')[0] }));
-    return response.send(locales);
+    const result = await this.useCase.execute();
+
+    if (result.isLeft()) {
+      const error = result.value;
+
+      return response.status(error.code).send({
+        message: error.message,
+        code: error.code,
+        cause: error.cause,
+      });
+    }
+
+    return response.status(200).send(result.value);
   }
 }

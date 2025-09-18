@@ -18,74 +18,83 @@ export default class EvaluationRowCollectionUseCase {
     payload: z.infer<typeof EvaluationRowCollectionSchema> &
       z.infer<typeof GetRowCollectionByIdSchema>,
   ): Promise<Response> {
-    const collection = await Collection.findOne({
-      slug: payload.collectionSlug,
-    });
+    try {
+      const collection = await Collection.findOne({
+        slug: payload.collectionSlug,
+      });
 
-    if (!collection)
-      return left(
-        ApplicationException.NotFound(
-          'Collection not found',
-          'COLLECTION_NOT_FOUND',
-        ),
+      if (!collection)
+        return left(
+          ApplicationException.NotFound(
+            'Collection not found',
+            'COLLECTION_NOT_FOUND',
+          ),
+        );
+
+      const c = await buildCollection({
+        ...collection.toJSON(),
+        _id: collection._id.toString(),
+      });
+
+      const populate = await buildPopulate(
+        collection.fields as import('@core/entity.core').Field[],
       );
 
-    const c = await buildCollection({
-      ...collection.toJSON(),
-      _id: collection._id.toString(),
-    });
+      const row = await c
+        .findOne({
+          _id: payload._id,
+        })
+        .populate(populate);
 
-    const populate = await buildPopulate(
-      collection.fields as import('@core/entity.core').Field[],
-    );
+      if (!row)
+        return left(
+          ApplicationException.NotFound('Row not found', 'ROW_NOT_FOUND'),
+        );
 
-    const row = await c
-      .findOne({
-        _id: payload._id,
-      })
-      .populate(populate);
-
-    if (!row)
-      return left(
-        ApplicationException.NotFound('Row not found', 'ROW_NOT_FOUND'),
-      );
-
-    let evaluation = await Evaluation.findOne({
-      user: payload.userId,
-    });
-
-    if (!evaluation) {
-      evaluation = await Evaluation.create({
-        value: payload.value,
+      let evaluation = await Evaluation.findOne({
         user: payload.userId,
       });
-    }
 
-    if (evaluation) {
-      await evaluation
-        .set({
-          ...evaluation.toJSON(),
+      if (!evaluation) {
+        evaluation = await Evaluation.create({
           value: payload.value,
-        })
-        .save();
+          user: payload.userId,
+        });
+      }
+
+      if (evaluation) {
+        await evaluation
+          .set({
+            ...evaluation.toJSON(),
+            value: payload.value,
+          })
+          .save();
+      }
+
+      const evaluations = row[payload.fieldSlug] ?? [];
+      const evaluationId = evaluation?._id?.toString();
+
+      if (!evaluations.includes(evaluationId))
+        await row
+          ?.set({
+            ...row?.toJSON(),
+            [payload.fieldSlug]: [...evaluations, evaluationId],
+          })
+          .save();
+
+      const populated = await row?.populate(populate);
+
+      return right({
+        ...populated?.toJSON(),
+        _id: populated?._id?.toString(),
+      });
+    } catch (error) {
+      return left(
+        ApplicationException.InternalServerError(
+          'Internal server error',
+          'EVALUATION_ROW_COLLECTION_ERROR',
+        ),
+      );
     }
-
-    const evaluations = row[payload.fieldSlug] ?? [];
-    const evaluationId = evaluation?._id?.toString();
-
-    if (!evaluations.includes(evaluationId))
-      await row
-        ?.set({
-          ...row?.toJSON(),
-          [payload.fieldSlug]: [...evaluations, evaluationId],
-        })
-        .save();
-
-    const populated = await row?.populate(populate);
-
-    return right({
-      ...populated?.toJSON(),
-      _id: populated?._id?.toString(),
-    });
   }
 }

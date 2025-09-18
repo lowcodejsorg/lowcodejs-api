@@ -10,7 +10,7 @@ import RefreshTokenUseCase from '@use-case/authentication/refresh-token.use-case
 @Controller({
   route: 'authentication',
 })
-export default class RefreshTokenController {
+export default class {
   constructor(
     private readonly useCase: RefreshTokenUseCase = getInstanceByToken(
       RefreshTokenUseCase,
@@ -23,8 +23,55 @@ export default class RefreshTokenController {
       onRequest: [AuthenticationMiddleware],
       schema: {
         tags: ['Authentication'],
-        summary: 'Authentication Refresh Token',
-        description: 'Authentication Refresh Token',
+        summary: 'Refresh authentication tokens',
+        description: 'Refreshes access and refresh tokens using the current refresh token from cookies. Requires valid refresh token cookie.',
+        security: [{ cookieAuth: [] }],
+        response: {
+          200: {
+            description: 'Tokens refreshed successfully',
+            type: 'object',
+            properties: {
+              message: { type: 'string', enum: ['Tokens refreshed successfully'] }
+            }
+          },
+          401: {
+            description: 'Unauthorized - Missing or invalid refresh token',
+            type: 'object',
+            properties: {
+              message: { type: 'string', description: 'Error message' },
+              code: { type: 'number', enum: [401] },
+              cause: { type: 'string', enum: ['MISSING_REFRESH_TOKEN', 'INVALID_REFRESH_TOKEN'] }
+            },
+            examples: [
+              {
+                message: 'Missing refresh token',
+                code: 401,
+                cause: 'MISSING_REFRESH_TOKEN'
+              },
+              {
+                message: 'Refresh token inválido ou expirado',
+                code: 401,
+                cause: 'INVALID_REFRESH_TOKEN'
+              }
+            ]
+          },
+          500: {
+            description: 'Internal server error',
+            type: 'object',
+            properties: {
+              message: { type: 'string', enum: ['Internal server error'] },
+              code: { type: 'number', enum: [500] },
+              cause: { type: 'string', enum: ['REFRESH_TOKEN_ERROR'] }
+            },
+            examples: [
+              {
+                message: 'Internal server error',
+                code: 500,
+                cause: 'REFRESH_TOKEN_ERROR'
+              }
+            ]
+          }
+        }
       },
     },
   })
@@ -104,7 +151,7 @@ export default class RefreshTokenController {
           maxAge: 7 * 24 * 60 * 60 * 1000, // 7 dias
         });
 
-      return response.status(200).send();
+      return response.status(200).send({ message: 'Tokens refreshed successfully' });
     } catch (error) {
       // Token inválido, expirado ou malformado
       return response.status(401).send({

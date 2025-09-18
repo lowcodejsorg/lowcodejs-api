@@ -1,16 +1,16 @@
 import { AuthenticationMiddleware } from '@middlewares/authentication.middleware';
-import ListUserPaginatedUseCase from '@use-case/users/list-paginated.use-case';
-import { ListUserPaginatedSchema } from '@validators/users';
+import ListUserGroupPaginatedUseCase from '@use-case/user-group/list-paginated.use-case';
+import { ListCollectionPaginatedSchema } from '@validators/collections.validator';
 import type { FastifyReply, FastifyRequest } from 'fastify';
 import { Controller, GET, getInstanceByToken } from 'fastify-decorators';
 
 @Controller({
-  route: '/users',
+  route: 'user-group',
 })
 export default class {
   constructor(
-    private readonly useCase: ListUserPaginatedUseCase = getInstanceByToken(
-      ListUserPaginatedUseCase,
+    private readonly useCase: ListUserGroupPaginatedUseCase = getInstanceByToken(
+      ListUserGroupPaginatedUseCase,
     ),
   ) {}
 
@@ -19,9 +19,9 @@ export default class {
     options: {
       onRequest: [AuthenticationMiddleware],
       schema: {
-        tags: ['Users'],
-        summary: 'List users with pagination',
-        description: 'Retrieves a paginated list of users with optional search functionality',
+        tags: ['User Group'],
+        summary: 'List user groups with pagination',
+        description: 'Retrieves a paginated list of user groups with optional search functionality',
         security: [{ cookieAuth: [] }],
         querystring: {
           type: 'object',
@@ -30,34 +30,24 @@ export default class {
               type: 'number',
               minimum: 1,
               default: 1,
-              description: 'Page number (starts from 1)',
-              examples: [1, 2, 5]
+              description: 'Page number'
             },
             perPage: {
               type: 'number',
               minimum: 1,
               maximum: 100,
               default: 50,
-              description: 'Number of items per page (max 100)',
-              examples: [10, 25, 50, 100]
+              description: 'Items per page'
             },
             search: {
               type: 'string',
-              minLength: 1,
-              description: 'Search term for filtering users by name or email (optional)',
-              examples: ['john', 'john@example.com', 'doe']
-            },
-            sub: {
-              type: 'string',
-              description: 'User ID for filtering specific user (optional, used internally)',
-              examples: ['507f1f77bcf86cd799439011']
+              description: 'Search term for filtering groups'
             }
-          },
-          additionalProperties: false
+          }
         },
         response: {
           200: {
-            description: 'Paginated list of users',
+            description: 'Paginated list of user groups',
             type: 'object',
             properties: {
               data: {
@@ -67,15 +57,8 @@ export default class {
                   properties: {
                     _id: { type: 'string' },
                     name: { type: 'string' },
-                    email: { type: 'string' },
-                    group: {
-                      type: 'object',
-                      properties: {
-                        _id: { type: 'string' },
-                        name: { type: 'string' }
-                      }
-                    },
-                    status: { type: 'string' },
+                    description: { type: 'string' },
+                    permissions: { type: 'array', items: { type: 'string' } },
                     createdAt: { type: 'string', format: 'date-time' },
                     updatedAt: { type: 'string', format: 'date-time' }
                   }
@@ -96,13 +79,13 @@ export default class {
             description: 'Unauthorized - Authentication required',
             type: 'object',
             properties: {
-              message: { type: 'string', enum: ['Unauthorized'] },
+              message: { type: 'string', enum: ['Authentication required'] },
               code: { type: 'number', enum: [401] },
               cause: { type: 'string', enum: ['AUTHENTICATION_REQUIRED'] }
             },
             examples: [
               {
-                message: 'Unauthorized',
+                message: 'Authentication required',
                 code: 401,
                 cause: 'AUTHENTICATION_REQUIRED'
               }
@@ -114,13 +97,13 @@ export default class {
             properties: {
               message: { type: 'string', enum: ['Internal server error'] },
               code: { type: 'number', enum: [500] },
-              cause: { type: 'string', enum: ['LIST_USERS_ERROR'] }
+              cause: { type: 'string', enum: ['INTERNAL_SERVER_ERROR'] }
             },
             examples: [
               {
                 message: 'Internal server error',
                 code: 500,
-                cause: 'LIST_USERS_ERROR'
+                cause: 'INTERNAL_SERVER_ERROR'
               }
             ]
           }
@@ -129,12 +112,9 @@ export default class {
     },
   })
   async handle(request: FastifyRequest, response: FastifyReply): Promise<void> {
-    const query = ListUserPaginatedSchema.parse(request.query);
+    const query = ListCollectionPaginatedSchema.parse(request.query);
 
-    const result = await this.useCase.execute({
-      ...query,
-      sub: request?.user?.sub,
-    });
+    const result = await this.useCase.execute(query);
 
     if (result.isLeft()) {
       const error = result.value;

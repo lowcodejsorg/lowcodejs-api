@@ -16,8 +16,7 @@ export default class {
             headers: {
               location: {
                 type: 'string',
-                description: 'URL de destino do redirecionamento',
-                example: '/documentation',
+                description: 'URL de destino do redirecionamento'
               },
             },
             content: {
@@ -26,13 +25,9 @@ export default class {
                   type: 'object',
                   properties: {
                     message: {
-                      type: 'string',
-                      example: 'LowCodeJs API',
+                      type: 'string'
                     },
                   },
-                },
-                example: {
-                  message: 'LowCodeJs API',
                 },
               },
             },
