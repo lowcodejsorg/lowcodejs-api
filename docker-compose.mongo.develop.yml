@@ -1,0 +1,18 @@
+services:
+  develop-mongo:
+    image: bitnami/mongodb:latest
+    container_name: develop-mongo
+    restart: unless-stopped
+    environment:
+      MONGODB_ROOT_USER: develop
+      MONGODB_ROOT_PASSWORD: develop
+    volumes:
+      - ./database-data:/data/db
+    ports:
+      - '27018:27017'
+    networks:
+      - traefik-network
+
+networks:
+  traefik-network:
+    external: true

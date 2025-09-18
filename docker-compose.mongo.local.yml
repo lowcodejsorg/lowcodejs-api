@@ -1,0 +1,18 @@
+services:
+  local-mongo:
+    image: bitnami/mongodb:latest
+    container_name: local-mongo
+    restart: unless-stopped
+    environment:
+      MONGODB_ROOT_USER: local
+      MONGODB_ROOT_PASSWORD: local
+    volumes:
+      - ./database-data:/data/db
+    ports:
+      - '27017:27017'
+    networks:
+      - traefik-network
+
+networks:
+  traefik-network:
+    external: true

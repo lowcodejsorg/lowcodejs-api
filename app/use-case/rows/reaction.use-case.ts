@@ -1,0 +1,92 @@
+import { Either, left, right } from '@core/either.core';
+import { buildCollection, buildPopulate } from '@core/util.core';
+import ApplicationException from '@exceptions/application.exception';
+import { Collection } from '@model/collection.model';
+import { Reaction } from '@model/reaction.model';
+import {
+  GetRowCollectionByIdSchema,
+  ReactionRowCollectionSchema,
+} from '@validators/row-collection.validator';
+import { Service } from 'fastify-decorators';
+import z from 'zod';
+
+type Response = Either<ApplicationException, import('@core/entity.core').Row>;
+
+@Service()
+export default class ReactionRowCollectionUseCase {
+  async execute(
+    payload: z.infer<typeof ReactionRowCollectionSchema> &
+      z.infer<typeof GetRowCollectionByIdSchema>,
+  ): Promise<Response> {
+    const collection = await Collection.findOne({
+      slug: payload.collectionSlug,
+    });
+
+    if (!collection)
+      return left(
+        ApplicationException.NotFound(
+          'Collection not found',
+          'COLLECTION_NOT_FOUND',
+        ),
+      );
+
+    const c = await buildCollection({
+      ...collection.toJSON(),
+      _id: collection._id.toString(),
+    });
+
+    const populate = await buildPopulate(
+      collection.fields as import('@core/entity.core').Field[],
+    );
+
+    const row = await c
+      .findOne({
+        _id: payload._id,
+      })
+      .populate(populate);
+
+    if (!row)
+      return left(
+        ApplicationException.NotFound('Row not found', 'ROW_NOT_FOUND'),
+      );
+
+    let reaction = await Reaction.findOne({
+      user: payload.userId,
+    });
+
+    if (!reaction) {
+      reaction = await Reaction.create({
+        type: payload.type,
+        user: payload.userId,
+      });
+    }
+
+    if (reaction) {
+      await reaction
+        .set({
+          ...reaction.toJSON(),
+          type: payload.type,
+        })
+        .save();
+    }
+
+    const reactions = row[payload.fieldSlug] ?? [];
+    const reactionId = reaction?._id?.toString();
+
+    // se não existir a reação adiciona o id na propriedade do registro
+    if (!reactions.includes(reactionId))
+      await row
+        ?.set({
+          ...row?.toJSON(),
+          [payload.fieldSlug]: [...reactions, reactionId],
+        })
+        .save();
+
+    const populated = await row?.populate(populate);
+
+    return right({
+      ...populated?.toJSON(),
+      _id: populated?._id.toString(),
+    });
+  }
+}
