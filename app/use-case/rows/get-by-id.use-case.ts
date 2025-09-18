@@ -4,7 +4,11 @@ import { Either, left, right } from '@core/either.core';
 import { buildCollection, buildPopulate } from '@core/util.core';
 import ApplicationException from '@exceptions/application.exception';
 import { Collection } from '@model/collection.model';
-import { GetRowCollectionByIdSchema } from '@validators/row-collection.validator';
+import {
+  GetRowCollectionByIdSchema,
+  GetRowCollectionQuerySchema,
+  GetRowCollectionSlugSchema,
+} from '@validators/row-collection.validator';
 import z from 'zod';
 
 type Response = Either<ApplicationException, import('@core/entity.core').Row>;
@@ -12,11 +16,13 @@ type Response = Either<ApplicationException, import('@core/entity.core').Row>;
 @Service()
 export default class GetRowCollectionByIdUseCase {
   async execute(
-    payload: z.infer<typeof GetRowCollectionByIdSchema>,
+    payload: z.infer<typeof GetRowCollectionByIdSchema> &
+      z.infer<typeof GetRowCollectionSlugSchema> &
+      z.infer<typeof GetRowCollectionQuerySchema>,
   ): Promise<Response> {
     try {
       const collection = await Collection.findOne({
-        slug: payload.collectionSlug,
+        slug: payload.slug,
       }).populate([
         {
           path: 'fields',

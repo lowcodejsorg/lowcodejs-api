@@ -2,9 +2,9 @@ import { Either, left, right } from '@core/either.core';
 import { Field } from '@core/entity.core';
 import { buildCollection, buildSchema } from '@core/util.core';
 import ApplicationException from '@exceptions/application.exception';
-import { Collection as Model } from '@model/collection.model';
+import { Collection } from '@model/collection.model';
 import {
-  GetCollectionByIdSchema,
+  GetCollectionBySlugSchema,
   UpdateCollectionSchema,
 } from '@validators/collections.validator';
 import { Service } from 'fastify-decorators';
@@ -20,10 +20,10 @@ type Response = Either<
 export default class UpdateCollectionUseCase {
   async execute(
     payload: z.infer<typeof UpdateCollectionSchema> &
-      z.infer<typeof GetCollectionByIdSchema>,
+      z.infer<typeof GetCollectionBySlugSchema>,
   ): Promise<Response> {
     try {
-      const collection = await Model.findOne({ _id: payload._id });
+      const collection = await Collection.findOne({ slug: payload.slug });
 
       if (!collection)
         return left(

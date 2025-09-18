@@ -12,28 +12,23 @@ Collections (7 controllers)
 
 Fields (5 controllers)
 
-- create.controller.ts - POST /collections/:collectionSlug/fields
-- update.controller.ts - PUT /collections/:collectionSlug/fields/:id
-- get-by-id.controller.ts - GET /collections/:collectionSlug/fields/:id
-- send-to-trash.controller.ts - PATCH
-  /collections/:collectionSlug/fields/:id/trash
-- remove-from-trash.controller.ts - PATCH
-  /collections/:collectionSlug/fields/:id/restore
+- create.controller.ts - POST /collections/:slug/fields
+- update.controller.ts - PUT /collections/:slug/fields/:id
+- get-by-id.controller.ts - GET /collections/:slug/fields/:id
+- send-to-trash.controller.ts - PATCH /collections/:slug/fields/:id/trash
+- remove-from-trash.controller.ts - PATCH /collections/:slug/fields/:id/restore
 
 Rows (9 controllers)
 
-- create.controller.ts - POST /collections/:collectionSlug/rows
-- update.controller.ts - PUT /collections/:collectionSlug/rows/:id
-- get-by-id.controller.ts - GET /collections/:collectionSlug/rows/:id
-- list-paginated.controller.ts - GET /collections/:collectionSlug/rows
-- delete.controller.ts - DELETE /collections/:collectionSlug/rows/:id
-- send-to-trash.controller.ts - PATCH
-  /collections/:collectionSlug/rows/:id/trash
-- remove-from-trash.controller.ts - PATCH
-  /collections/:collectionSlug/rows/:id/restore
-- reaction.controller.ts - POST /collections/:collectionSlug/rows/:id/reaction
-- evaluation.controller.ts - POST
-  /collections/:collectionSlug/rows/:id/evaluation
+- create.controller.ts - POST /collections/:slug/rows
+- update.controller.ts - PUT /collections/:slug/rows/:id
+- get-by-id.controller.ts - GET /collections/:slug/rows/:id
+- list-paginated.controller.ts - GET /collections/:slug/rows
+- delete.controller.ts - DELETE /collections/:slug/rows/:id
+- send-to-trash.controller.ts - PATCH /collections/:slug/rows/:id/trash
+- remove-from-trash.controller.ts - PATCH /collections/:slug/rows/:id/restore
+- reaction.controller.ts - POST /collections/:slug/rows/:id/reaction
+- evaluation.controller.ts - POST /collections/:slug/rows/:id/evaluation
 
 Profile (2 controllers)
 

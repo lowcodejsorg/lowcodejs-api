@@ -3,7 +3,11 @@ import { FIELD_TYPE } from '@core/entity.core';
 import { buildCollection, buildPopulate } from '@core/util.core';
 import ApplicationException from '@exceptions/application.exception';
 import { Collection } from '@model/collection.model';
-import { UpdateRowCollectionSchema } from '@validators/row-collection.validator';
+import {
+  GetRowCollectionByIdSchema,
+  GetRowCollectionSlugSchema,
+  UpdateRowCollectionSchema,
+} from '@validators/row-collection.validator';
 import { Service } from 'fastify-decorators';
 import z from 'zod';
 
@@ -12,11 +16,13 @@ type Response = Either<ApplicationException, import('@core/entity.core').Row>;
 @Service()
 export default class UpdateRowCollectionUseCase {
   async execute(
-    payload: z.infer<typeof UpdateRowCollectionSchema>,
+    payload: z.infer<typeof UpdateRowCollectionSchema> &
+      z.infer<typeof GetRowCollectionByIdSchema> &
+      z.infer<typeof GetRowCollectionSlugSchema>,
   ): Promise<Response> {
     try {
       const collection = await Collection.findOne({
-        slug: payload.collectionSlug,
+        slug: payload.slug,
       });
 
       if (!collection)

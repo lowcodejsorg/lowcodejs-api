@@ -2,7 +2,10 @@ import { Either, left, right } from '@core/either.core';
 import { buildCollection, buildPopulate } from '@core/util.core';
 import ApplicationException from '@exceptions/application.exception';
 import { Collection } from '@model/collection.model';
-import { GetRowCollectionByIdSchema } from '@validators/row-collection.validator';
+import {
+  GetRowCollectionByIdSchema,
+  GetRowCollectionSlugSchema,
+} from '@validators/row-collection.validator';
 import { Service } from 'fastify-decorators';
 import z from 'zod';
 
@@ -11,11 +14,13 @@ type Response = Either<ApplicationException, import('@core/entity.core').Row>;
 @Service()
 export default class SendRowCollectionToTrashUseCase {
   async execute(
-    payload: z.infer<typeof GetRowCollectionByIdSchema>,
+    payload: z.infer<typeof GetRowCollectionByIdSchema> &
+      z.infer<typeof GetRowCollectionByIdSchema> &
+      z.infer<typeof GetRowCollectionSlugSchema>,
   ): Promise<Response> {
     try {
       const collection = await Collection.findOne({
-        slug: payload.collectionSlug,
+        slug: payload.slug,
       });
 
       if (!collection)

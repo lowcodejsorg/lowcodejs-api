@@ -3,6 +3,7 @@ import { buildCollection, buildSchema } from '@core/util.core';
 import ApplicationException from '@exceptions/application.exception';
 import { Collection } from '@model/collection.model';
 import { Field } from '@model/field.model';
+import { GetCollectionBySlugSchema } from '@validators/collections.validator';
 import {
   GetFieldCollectionByIdSchema,
   UpdateFieldCollectionSchema,
@@ -20,11 +21,12 @@ type Response = Either<
 export default class UpdateFieldCollectionUseCase {
   async execute(
     payload: z.infer<typeof UpdateFieldCollectionSchema> &
-      z.infer<typeof GetFieldCollectionByIdSchema>,
+      z.infer<typeof GetFieldCollectionByIdSchema> &
+      z.infer<typeof GetCollectionBySlugSchema>,
   ): Promise<Response> {
     try {
       const collection = await Collection.findOne({
-        slug: payload.collectionSlug,
+        slug: payload.slug,
       }).populate([
         {
           path: 'fields',

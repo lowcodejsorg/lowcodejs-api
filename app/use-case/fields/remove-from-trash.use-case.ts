@@ -3,6 +3,7 @@ import { buildSchema } from '@core/util.core';
 import ApplicationException from '@exceptions/application.exception';
 import { Collection } from '@model/collection.model';
 import { Field } from '@model/field.model';
+import { GetCollectionBySlugSchema } from '@validators/collections.validator';
 import { GetFieldCollectionByIdSchema } from '@validators/field-collection.validator';
 import { Service } from 'fastify-decorators';
 import z from 'zod';
@@ -12,11 +13,12 @@ type Response = Either<ApplicationException, import('@core/entity.core').Field>;
 @Service()
 export default class RemoveFieldFromTrashUseCase {
   async execute(
-    payload: z.infer<typeof GetFieldCollectionByIdSchema>,
+    payload: z.infer<typeof GetFieldCollectionByIdSchema> &
+      z.infer<typeof GetCollectionBySlugSchema>,
   ): Promise<Response> {
     try {
       const collection = await Collection.findOne({
-        slug: payload.collectionSlug,
+        slug: payload.slug,
       }).populate([
         {
           path: 'fields',

@@ -5,6 +5,7 @@ import { Collection } from '@model/collection.model';
 import { Reaction } from '@model/reaction.model';
 import {
   GetRowCollectionByIdSchema,
+  GetRowCollectionSlugSchema,
   ReactionRowCollectionSchema,
 } from '@validators/row-collection.validator';
 import { Service } from 'fastify-decorators';
@@ -16,11 +17,12 @@ type Response = Either<ApplicationException, import('@core/entity.core').Row>;
 export default class ReactionRowCollectionUseCase {
   async execute(
     payload: z.infer<typeof ReactionRowCollectionSchema> &
-      z.infer<typeof GetRowCollectionByIdSchema>,
+      z.infer<typeof GetRowCollectionByIdSchema> &
+      z.infer<typeof GetRowCollectionSlugSchema>,
   ): Promise<Response> {
     try {
       const collection = await Collection.findOne({
-        slug: payload.collectionSlug,
+        slug: payload.slug,
       });
 
       if (!collection)
@@ -52,13 +54,13 @@ export default class ReactionRowCollectionUseCase {
         );
 
       let reaction = await Reaction.findOne({
-        user: payload.userId,
+        user: payload.user,
       });
 
       if (!reaction) {
         reaction = await Reaction.create({
           type: payload.type,
-          user: payload.userId,
+          user: payload.user,
         });
       }
 
@@ -71,7 +73,7 @@ export default class ReactionRowCollectionUseCase {
           .save();
       }
 
-      const reactions = row[payload.fieldSlug] ?? [];
+      const reactions = row[payload.field] ?? [];
       const reactionId = reaction?._id?.toString();
 
       // se não existir a reação adiciona o id na propriedade do registro
@@ -79,7 +81,7 @@ export default class ReactionRowCollectionUseCase {
         await row
           ?.set({
             ...row?.toJSON(),
-            [payload.fieldSlug]: [...reactions, reactionId],
+            [payload.field]: [...reactions, reactionId],
           })
           .save();
 

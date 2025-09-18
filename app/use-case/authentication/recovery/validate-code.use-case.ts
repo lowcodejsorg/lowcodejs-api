@@ -7,7 +7,7 @@ import { differenceInMinutes } from 'date-fns';
 import { Service } from 'fastify-decorators';
 import z from 'zod';
 
-type Response = Either<ApplicationException, { userId: string }>;
+type Response = Either<ApplicationException, { user: string }>;
 
 @Service()
 export default class ValidateCodeUseCase {
@@ -62,7 +62,7 @@ export default class ValidateCodeUseCase {
         .save();
 
       return right({
-        userId: token.user,
+        user: token.user,
       });
     } catch (error) {
       return left(

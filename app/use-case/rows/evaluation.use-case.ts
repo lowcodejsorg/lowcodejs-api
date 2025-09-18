@@ -6,6 +6,7 @@ import { Evaluation } from '@model/evaluation.model';
 import {
   EvaluationRowCollectionSchema,
   GetRowCollectionByIdSchema,
+  GetRowCollectionSlugSchema,
 } from '@validators/row-collection.validator';
 import { Service } from 'fastify-decorators';
 import z from 'zod';
@@ -16,11 +17,12 @@ type Response = Either<ApplicationException, import('@core/entity.core').Row>;
 export default class EvaluationRowCollectionUseCase {
   async execute(
     payload: z.infer<typeof EvaluationRowCollectionSchema> &
-      z.infer<typeof GetRowCollectionByIdSchema>,
+      z.infer<typeof GetRowCollectionByIdSchema> &
+      z.infer<typeof GetRowCollectionSlugSchema>,
   ): Promise<Response> {
     try {
       const collection = await Collection.findOne({
-        slug: payload.collectionSlug,
+        slug: payload.slug,
       });
 
       if (!collection)
@@ -52,13 +54,13 @@ export default class EvaluationRowCollectionUseCase {
         );
 
       let evaluation = await Evaluation.findOne({
-        user: payload.userId,
+        user: payload.user,
       });
 
       if (!evaluation) {
         evaluation = await Evaluation.create({
           value: payload.value,
-          user: payload.userId,
+          user: payload.user,
         });
       }
 
@@ -71,14 +73,14 @@ export default class EvaluationRowCollectionUseCase {
           .save();
       }
 
-      const evaluations = row[payload.fieldSlug] ?? [];
+      const evaluations = row[payload.field] ?? [];
       const evaluationId = evaluation?._id?.toString();
 
       if (!evaluations.includes(evaluationId))
         await row
           ?.set({
             ...row?.toJSON(),
-            [payload.fieldSlug]: [...evaluations, evaluationId],
+            [payload.field]: [...evaluations, evaluationId],
           })
           .save();
 

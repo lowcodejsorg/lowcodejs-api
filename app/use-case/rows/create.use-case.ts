@@ -5,7 +5,7 @@ import ApplicationException from '@exceptions/application.exception';
 import { Collection } from '@model/collection.model';
 import {
   CreateRowCollectionSchema,
-  GetRowCollectionByIdSchema,
+  GetRowCollectionSlugSchema,
 } from '@validators/row-collection.validator';
 import { Service } from 'fastify-decorators';
 import z from 'zod';
@@ -15,11 +15,11 @@ type Response = Either<ApplicationException, import('@core/entity.core').Row>;
 export default class CreateRowUseCase {
   async execute(
     payload: z.infer<typeof CreateRowCollectionSchema> &
-      z.infer<typeof GetRowCollectionByIdSchema>,
+      z.infer<typeof GetRowCollectionSlugSchema>,
   ): Promise<Response> {
     try {
       const collection = await Collection.findOne({
-        slug: payload.collectionSlug,
+        slug: payload.slug,
       }).populate([
         {
           path: 'fields',

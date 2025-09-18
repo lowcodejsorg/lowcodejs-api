@@ -9,7 +9,8 @@ import {
 import ApplicationException from '@exceptions/application.exception';
 import { Collection } from '@model/collection.model';
 import {
-  GetRowCollectionByIdSchema,
+  GetRowCollectionQuerySchema,
+  GetRowCollectionSlugSchema,
   ListRowCollectionPaginatedSchema,
 } from '@validators/row-collection.validator';
 import { Service } from 'fastify-decorators';
@@ -24,13 +25,14 @@ type Response = Either<
 export default class ListRowCollectionPaginatedUseCase {
   async execute(
     payload: z.infer<typeof ListRowCollectionPaginatedSchema> &
-      z.infer<typeof GetRowCollectionByIdSchema>,
+      z.infer<typeof GetRowCollectionSlugSchema> &
+      z.infer<typeof GetRowCollectionQuerySchema>,
   ): Promise<Response> {
     try {
       const skip = (payload.page - 1) * payload.perPage;
 
       const collection = await Collection.findOne({
-        slug: payload.collectionSlug,
+        slug: payload.slug,
       }).populate([
         {
           path: 'fields',

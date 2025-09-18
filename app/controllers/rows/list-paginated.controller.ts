@@ -1,6 +1,10 @@
 import { AuthenticationMiddleware } from '@middlewares/authentication.middleware';
 import ListRowPaginatedUseCase from '@use-case/rows/list-paginated.use-case';
-import { ListRowCollectionPaginatedSchema } from '@validators/row-collection.validator';
+import {
+  GetRowCollectionQuerySchema,
+  GetRowCollectionSlugSchema,
+  ListRowCollectionPaginatedSchema,
+} from '@validators/row-collection.validator';
 import type { FastifyReply, FastifyRequest } from 'fastify';
 import { Controller, GET, getInstanceByToken } from 'fastify-decorators';
 
@@ -15,7 +19,7 @@ export default class {
   ) {}
 
   @GET({
-    url: '/:collectionSlug/rows/paginated',
+    url: '/:slug/rows/paginated',
     options: {
       onRequest: [AuthenticationMiddleware],
       schema: {
@@ -26,9 +30,9 @@ export default class {
         security: [{ cookieAuth: [] }],
         params: {
           type: 'object',
-          required: ['collectionSlug'],
+          required: ['slug'],
           properties: {
-            collectionSlug: {
+            slug: {
               type: 'string',
               description: 'Slug of the collection to list rows from',
               examples: ['users', 'products', 'blog-posts'],
@@ -67,6 +71,13 @@ export default class {
               description: 'Include trashed rows (optional)',
               examples: ['true', 'false'],
             },
+            public: {
+              type: 'string',
+              enum: ['true', 'false'],
+              default: 'false',
+              description: 'Filter by public visibility only (optional)',
+              examples: ['true', 'false'],
+            },
           },
           additionalProperties: false,
         },
@@ -84,13 +95,23 @@ export default class {
                   additionalProperties: true,
                 },
               },
-              pagination: {
+              meta: {
                 type: 'object',
                 properties: {
-                  page: { type: 'number' },
-                  perPage: { type: 'number' },
-                  total: { type: 'number' },
-                  totalPages: { type: 'number' },
+                  total: {
+                    type: 'number',
+                    description: 'Total number of rows',
+                  },
+                  perPage: {
+                    type: 'number',
+                    description: 'Number of items per page',
+                  },
+                  page: { type: 'number', description: 'Current page number' },
+                  lastPage: { type: 'number', description: 'Last page number' },
+                  firstPage: {
+                    type: 'number',
+                    description: 'First page number',
+                  },
                 },
               },
             },
@@ -128,20 +149,16 @@ export default class {
             ],
           },
           500: {
-            description: 'Internal server error',
+            description: 'Internal server error - Database or server issues',
             type: 'object',
             properties: {
               message: { type: 'string', enum: ['Internal server error'] },
               code: { type: 'number', enum: [500] },
-              cause: { type: 'string', enum: ['LIST_ROWS_ERROR'] },
-            },
-            examples: [
-              {
-                message: 'Internal server error',
-                code: 500,
-                cause: 'LIST_ROWS_ERROR',
+              cause: {
+                type: 'string',
+                enum: ['LIST_ROW_COLLECTION_PAGINATED_ERROR'],
               },
-            ],
+            },
           },
         },
       },
@@ -149,10 +166,12 @@ export default class {
   })
   async handle(request: FastifyRequest, response: FastifyReply): Promise<void> {
     const query = ListRowCollectionPaginatedSchema.parse(request.query);
-    const { collectionSlug } = request.params as { collectionSlug: string };
+    const params = {
+      ...GetRowCollectionSlugSchema.parse(request.params),
+      ...GetRowCollectionQuerySchema.parse(request.query),
+    };
 
-    // @ts-ignore
-    const result = await this.useCase.execute({ ...query, collectionSlug });
+    const result = await this.useCase.execute({ ...query, ...params });
 
     if (result.isLeft()) {
       const error = result.value;

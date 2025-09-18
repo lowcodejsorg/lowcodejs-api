@@ -34,7 +34,7 @@ export default class DeleteStorageUseCase {
       return left(
         ApplicationException.InternalServerError(
           'Internal server error',
-          'STORAGE_UPLOAD_ERROR',
+          'STORAGE_DELETE_ERROR',
         ),
       );
     }

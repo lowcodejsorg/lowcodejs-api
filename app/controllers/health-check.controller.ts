@@ -7,27 +7,31 @@ export default class {
     url: '/health-check',
     options: {
       schema: {
-        description: 'Verifica o status da aplicação',
+        description: 'Checks the application health status',
         tags: ['Health'],
-        summary: 'Health Check',
+        summary: 'Application health check',
         response: {
           200: {
-            description: 'Aplicação funcionando corretamente',
-            content: {
-              'application/json': {
-                schema: {
-                  type: 'object',
-                  properties: {
-                    status: {
-                      type: 'string'
-                    },
-                    timestamp: {
-                      type: 'string'
-                    },
-                  },
-                },
+            description: 'Application is running correctly',
+            type: 'object',
+            properties: {
+              status: {
+                type: 'string',
+                enum: ['ok'],
+                description: 'Health status indicator'
+              },
+              timestamp: {
+                type: 'string',
+                format: 'date-time',
+                description: 'Current server timestamp'
               },
             },
+            examples: [
+              {
+                status: 'ok',
+                timestamp: '2023-12-01T10:30:00.000Z'
+              }
+            ]
           },
         },
       },

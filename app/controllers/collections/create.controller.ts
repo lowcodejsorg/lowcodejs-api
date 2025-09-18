@@ -21,7 +21,8 @@ export default class {
       schema: {
         tags: ['Collections'],
         summary: 'Create a new collection',
-        description: 'Creates a new collection with fields, configuration and permissions settings',
+        description:
+          'Creates a new collection with fields, configuration and permissions settings',
         security: [{ cookieAuth: [] }],
         body: {
           type: 'object',
@@ -29,28 +30,129 @@ export default class {
           properties: {
             name: {
               type: 'string',
-              description: 'Collection name'
+              description: 'Collection name',
             },
             description: {
               type: 'string',
               nullable: true,
-              description: 'Collection description'
+              description: 'Collection description',
             },
             logo: {
               type: 'string',
               nullable: true,
-              description: 'Collection logo URL'
+              description: 'Collection logo URL',
             },
             fields: {
               type: 'array',
               description: 'Array of field definitions for the collection',
+              default: [],
               items: {
                 type: 'object',
+                required: ['name', 'type', 'configuration'],
                 properties: {
-                  name: { type: 'string' },
-                  type: { type: 'string' },
-                  required: { type: 'boolean' }
-                }
+                  name: {
+                    type: 'string',
+                    description:
+                      'Field name (will be slugified for internal use)',
+                  },
+                  type: {
+                    type: 'string',
+                    enum: [
+                      'TEXT_SHORT',
+                      'TEXT_LONG',
+                      'DROPDOWN',
+                      'DATE',
+                      'RELATIONSHIP',
+                      'FILE',
+                      'FIELD_GROUP',
+                      'REACTION',
+                      'EVALUATION',
+                      'CATEGORY',
+                    ],
+                    description: 'Field type from FIELD_TYPE enum',
+                  },
+                  configuration: {
+                    type: 'object',
+                    required: ['required', 'multiple'],
+                    properties: {
+                      required: {
+                        type: 'boolean',
+                        description: 'Field is required',
+                      },
+                      multiple: {
+                        type: 'boolean',
+                        description: 'Field accepts multiple values',
+                      },
+                      listing: {
+                        type: 'boolean',
+                        description: 'Show field in list view',
+                      },
+                      filtering: {
+                        type: 'boolean',
+                        description: 'Allow filtering by this field',
+                      },
+                      format: {
+                        type: 'string',
+                        nullable: true,
+                        description:
+                          'Field format (for TEXT_SHORT and DATE types)',
+                      },
+                      default_value: {
+                        type: 'string',
+                        nullable: true,
+                        description: 'Default field value',
+                      },
+                      dropdown: {
+                        type: 'array',
+                        items: { type: 'string' },
+                        description: 'Options for DROPDOWN type',
+                      },
+                      relationship: {
+                        type: 'object',
+                        nullable: true,
+                        description: 'Configuration for RELATIONSHIP type',
+                        properties: {
+                          collection: {
+                            type: 'object',
+                            properties: {
+                              _id: { type: 'string' },
+                              slug: { type: 'string' },
+                            },
+                          },
+                          field: {
+                            type: 'object',
+                            properties: {
+                              _id: { type: 'string' },
+                              slug: { type: 'string' },
+                            },
+                          },
+                          order: { type: 'string', enum: ['asc', 'desc'] },
+                        },
+                      },
+                      group: {
+                        type: 'object',
+                        nullable: true,
+                        description: 'Configuration for FIELD_GROUP type',
+                        properties: {
+                          _id: { type: 'string' },
+                          slug: { type: 'string' },
+                        },
+                      },
+                      category: {
+                        type: 'array',
+                        description: 'Categories for CATEGORY type',
+                        items: {
+                          type: 'object',
+                          properties: {
+                            id: { type: 'string' },
+                            label: { type: 'string' },
+                            children: { type: 'array' },
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
               },
             },
             configuration: {
@@ -61,43 +163,45 @@ export default class {
                   type: 'string',
                   enum: ['gallery', 'list'],
                   default: 'list',
-                  description: 'Display style'
+                  description: 'Display style',
                 },
                 visibility: {
                   type: 'string',
-                  enum: ['public', 'restricted'],
+                  enum: ['public', 'restrict'],
                   default: 'public',
-                  description: 'Visibility setting'
+                  description:
+                    'Visibility setting (note: restrict not restricted)',
                 },
                 collaboration: {
                   type: 'string',
-                  enum: ['open', 'restricted'],
+                  enum: ['open', 'restrict'],
                   default: 'open',
-                  description: 'Collaboration setting'
+                  description:
+                    'Collaboration setting (note: restrict not restricted)',
                 },
                 administrators: {
                   type: 'array',
                   items: { type: 'string' },
                   description: 'Array of administrator user IDs',
-                    },
+                },
                 fields: {
                   type: 'object',
                   properties: {
-                    order_list: {
+                    orderList: {
                       type: 'array',
                       items: { type: 'string' },
                       description: 'Field order for list view',
-                            },
-                    order_form: {
+                    },
+                    orderForm: {
                       type: 'array',
                       items: { type: 'string' },
                       description: 'Field order for form view',
-                            }
-                  }
-                }
-              }
-            }
-          }
+                    },
+                  },
+                },
+              },
+            },
+          },
         },
         response: {
           201: {
@@ -109,74 +213,138 @@ export default class {
               description: { type: 'string' },
               slug: { type: 'string' },
               logo: { type: 'string' },
-              fields: { type: 'array', items: { type: 'object' } },
-              configuration: { type: 'object' },
-              owner: { type: 'string' },
+              fields: {
+                type: 'array',
+                items: {
+                  type: 'object',
+                  properties: {
+                    _id: { type: 'string', description: 'Field ID' },
+                    name: { type: 'string', description: 'Field name' },
+                    slug: {
+                      type: 'string',
+                      description: 'Field slug (generated from name)',
+                    },
+                    type: {
+                      type: 'string',
+                      description: 'Field type from FIELD_TYPE enum',
+                    },
+                    configuration: {
+                      type: 'object',
+                      description: 'Field configuration',
+                    },
+                  },
+                },
+                description: 'Collection fields (processed with slugs)',
+              },
+              configuration: {
+                type: 'object',
+                properties: {
+                  style: { type: 'string', enum: ['gallery', 'list'] },
+                  visibility: { type: 'string', enum: ['public', 'restrict'] },
+                  collaboration: { type: 'string', enum: ['open', 'restrict'] },
+                  administrators: { type: 'array', items: { type: 'string' } },
+                  owner: { type: 'string', description: 'Owner user ID' },
+                  fields: {
+                    type: 'object',
+                    properties: {
+                      orderList: { type: 'array', items: { type: 'string' } },
+                      orderForm: { type: 'array', items: { type: 'string' } },
+                    },
+                  },
+                },
+                description: 'Collection configuration with populated owner',
+              },
+              type: {
+                type: 'string',
+                enum: ['collection'],
+                description: 'Collection type (always collection)',
+              },
+              _schema: {
+                type: 'object',
+                description: 'Generated MongoDB schema based on fields',
+              },
               createdAt: { type: 'string', format: 'date-time' },
-              updatedAt: { type: 'string', format: 'date-time' }
-            }
+              updatedAt: { type: 'string', format: 'date-time' },
+            },
           },
           400: {
-            description: 'Bad request - Validation error',
+            description: 'Bad request - Owner required or validation error',
             type: 'object',
             properties: {
-              message: { type: 'string', enum: ['Invalid collection name', 'Invalid field configuration', 'Required fields missing'] },
+              message: {
+                type: 'string',
+                enum: [
+                  'Owner required',
+                  'Invalid collection name',
+                  'Invalid field configuration',
+                  'Required fields missing',
+                ],
+              },
               code: { type: 'number', enum: [400] },
-              cause: { type: 'string', enum: ['INVALID_PARAMETERS', 'INVALID_FIELD_CONFIG'] }
+              cause: {
+                type: 'string',
+                enum: [
+                  'OWNER_REQUIRED',
+                  'INVALID_PARAMETERS',
+                  'INVALID_FIELD_CONFIG',
+                ],
+              },
             },
             examples: [
               {
-                message: 'Invalid collection name',
+                message: 'Owner required',
                 code: 400,
-                cause: 'INVALID_PARAMETERS'
+                cause: 'OWNER_REQUIRED',
               },
               {
-                message: 'Invalid field configuration',
+                message: 'Invalid collection name',
                 code: 400,
-                cause: 'INVALID_FIELD_CONFIG'
-              }
-            ]
+                cause: 'INVALID_PARAMETERS',
+              },
+            ],
           },
           401: {
             description: 'Unauthorized - Authentication required',
             type: 'object',
             properties: {
-              message: { type: 'string', enum: ['Authentication required'] },
+              message: { type: 'string', enum: ['Unauthorized'] },
               code: { type: 'number', enum: [401] },
-              cause: { type: 'string', enum: ['AUTHENTICATION_REQUIRED'] }
+              cause: { type: 'string', enum: ['AUTHENTICATION_REQUIRED'] },
+            },
+          },
+          409: {
+            description: 'Conflict - Collection with this name already exists',
+            type: 'object',
+            properties: {
+              message: { type: 'string', enum: ['Collection already exists'] },
+              code: { type: 'number', enum: [409] },
+              cause: { type: 'string', enum: ['COLLECTION_ALREADY_EXISTS'] },
             },
             examples: [
               {
-                message: 'Authentication required',
-                code: 401,
-                cause: 'AUTHENTICATION_REQUIRED'
-              }
-            ]
+                message: 'Collection already exists',
+                code: 409,
+                cause: 'COLLECTION_ALREADY_EXISTS',
+              },
+            ],
           },
           500: {
-            description: 'Internal server error',
+            description: 'Internal server error - Database or server issues',
             type: 'object',
             properties: {
               message: { type: 'string', enum: ['Internal server error'] },
               code: { type: 'number', enum: [500] },
-              cause: { type: 'string', enum: ['INTERNAL_SERVER_ERROR'] }
+              cause: { type: 'string', enum: ['CREATE_COLLECTION_ERROR'] },
             },
-            examples: [
-              {
-                message: 'Internal server error',
-                code: 500,
-                cause: 'INTERNAL_SERVER_ERROR'
-              }
-            ]
-          }
-        }
+          },
+        },
       },
     },
   })
   async handle(request: FastifyRequest, response: FastifyReply): Promise<void> {
-    const body = CreateCollectionSchema.parse(request.body);
+    const payload = CreateCollectionSchema.parse(request.body);
 
-    const result = await this.useCase.execute(body);
+    const result = await this.useCase.execute(payload);
 
     if (result.isLeft()) {
       const error = result.value;

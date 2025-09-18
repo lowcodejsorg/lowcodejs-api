@@ -129,8 +129,8 @@ export interface Collection extends Base {
     administrators: string[] | User[];
     owner: string | User;
     fields: {
-      order_list: string[];
-      order_form: string[];
+      orderList: string[];
+      orderForm: string[];
     };
   };
 }
@@ -159,7 +159,7 @@ export interface Field extends Base {
     format: FIELD_FORMAT | null;
     listing: boolean;
     filtering: boolean;
-    default_value: string | null;
+    defaultValue: string | null;
     relationship: FieldConfigurationRelationship | null;
     dropdown: string[];
     category: Category[];

@@ -24,15 +24,19 @@ export default class {
       schema: {
         tags: ['Authentication'],
         summary: 'Refresh authentication tokens',
-        description: 'Refreshes access and refresh tokens using the current refresh token from cookies. Requires valid refresh token cookie.',
+        description:
+          'Refreshes access and refresh tokens using the current refresh token from cookies. Requires valid refresh token cookie.',
         security: [{ cookieAuth: [] }],
         response: {
           200: {
             description: 'Tokens refreshed successfully',
             type: 'object',
             properties: {
-              message: { type: 'string', enum: ['Tokens refreshed successfully'] }
-            }
+              message: {
+                type: 'string',
+                enum: ['Tokens refreshed successfully'],
+              },
+            },
           },
           401: {
             description: 'Unauthorized - Missing or invalid refresh token',
@@ -40,20 +44,23 @@ export default class {
             properties: {
               message: { type: 'string', description: 'Error message' },
               code: { type: 'number', enum: [401] },
-              cause: { type: 'string', enum: ['MISSING_REFRESH_TOKEN', 'INVALID_REFRESH_TOKEN'] }
+              cause: {
+                type: 'string',
+                enum: ['MISSING_REFRESH_TOKEN', 'INVALID_REFRESH_TOKEN'],
+              },
             },
             examples: [
               {
                 message: 'Missing refresh token',
                 code: 401,
-                cause: 'MISSING_REFRESH_TOKEN'
+                cause: 'MISSING_REFRESH_TOKEN',
               },
               {
                 message: 'Refresh token inválido ou expirado',
                 code: 401,
-                cause: 'INVALID_REFRESH_TOKEN'
-              }
-            ]
+                cause: 'INVALID_REFRESH_TOKEN',
+              },
+            ],
           },
           500: {
             description: 'Internal server error',
@@ -61,17 +68,17 @@ export default class {
             properties: {
               message: { type: 'string', enum: ['Internal server error'] },
               code: { type: 'number', enum: [500] },
-              cause: { type: 'string', enum: ['REFRESH_TOKEN_ERROR'] }
+              cause: { type: 'string', enum: ['REFRESH_TOKEN_ERROR'] },
             },
             examples: [
               {
                 message: 'Internal server error',
                 code: 500,
-                cause: 'REFRESH_TOKEN_ERROR'
-              }
-            ]
-          }
-        }
+                cause: 'REFRESH_TOKEN_ERROR',
+              },
+            ],
+          },
+        },
       },
     },
   })
@@ -90,7 +97,7 @@ export default class {
       // Verifica e decodifica o refresh token
       const decoded: JWTPayload = await request.jwtVerify();
 
-      const result = await this.useCase.execute({ userId: decoded.sub });
+      const result = await this.useCase.execute({ user: decoded.sub });
 
       if (result.isLeft()) {
         const error = result.value;
@@ -151,7 +158,9 @@ export default class {
           maxAge: 7 * 24 * 60 * 60 * 1000, // 7 dias
         });
 
-      return response.status(200).send({ message: 'Tokens refreshed successfully' });
+      return response
+        .status(200)
+        .send({ message: 'Tokens refreshed successfully' });
     } catch (error) {
       // Token inválido, expirado ou malformado
       return response.status(401).send({

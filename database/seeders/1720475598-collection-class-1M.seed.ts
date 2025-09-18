@@ -131,8 +131,8 @@ export default async function Seed(): Promise<void> {
       owner: owner._id?.toString(),
       administrators: [],
       fields: {
-        order_list: [],
-        order_form: [],
+        orderList: [],
+        orderForm: [],
       },
     },
     trashed: false,

@@ -10,28 +10,26 @@ const Configuration = z.object({
   collaboration: z.enum(['open', 'restricted']).default('open'),
   administrators: z.array(z.string()).default([]),
   fields: z.object({
-    order_list: z.array(z.string()).default([]),
-    order_form: z.array(z.string()).default([]),
+    orderList: z.array(z.string()).default([]),
+    orderForm: z.array(z.string()).default([]),
   }),
-});
-
-export const GetCollectionByIdSchema = z.object({
-  _id: z.string(),
 });
 
 export const GetCollectionBySlugSchema = z.object({
   slug: z.string(),
 });
 
-export const ListCollectionPaginatedSchema = z.object({
-  page: z.coerce.number().default(1),
-  perPage: z.coerce.number().default(50),
-  search: z.string().optional(),
+export const GetCollectionQuerySchema = z.object({
   trashed: z.enum(['true', 'false']).default('false').optional(),
   public: z.enum(['true', 'false']).default('false').optional(),
   type: z.enum(['collection', 'field-group']).optional(),
   name: z.string().optional(),
-  slug: z.string().optional(),
+});
+
+export const ListCollectionPaginatedSchema = z.object({
+  page: z.coerce.number().default(1),
+  perPage: z.coerce.number().default(50),
+  search: z.string().optional(),
 });
 
 export const CreateCollectionSchema = z.object({
@@ -49,6 +47,5 @@ export const UpdateCollectionSchema = z.object({
   logo: z.string().trim().nullable(),
   fields: z.array(UpdateFieldCollectionSchema).default([]),
   configuration: Configuration,
-  _id: z.string().optional(),
   owner: z.string().optional(),
 });

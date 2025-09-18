@@ -7,30 +7,32 @@ export default class {
     url: '',
     options: {
       schema: {
-        description: 'Redireciona para a documentação da API',
+        description: 'Redirects to the API documentation',
         tags: ['API'],
-        summary: 'Redirect para documentação',
+        summary: 'Welcome page redirect to documentation',
         response: {
           302: {
-            description: 'Redirecionamento para /documentation',
+            description: 'Redirect to /documentation',
             headers: {
               location: {
                 type: 'string',
-                description: 'URL de destino do redirecionamento'
+                description: 'Redirect destination URL',
+                examples: ['/documentation']
               },
             },
-            content: {
-              'application/json': {
-                schema: {
-                  type: 'object',
-                  properties: {
-                    message: {
-                      type: 'string'
-                    },
-                  },
-                },
+            type: 'object',
+            properties: {
+              message: {
+                type: 'string',
+                enum: ['LowCodeJs API'],
+                description: 'Welcome message'
               },
             },
+            examples: [
+              {
+                message: 'LowCodeJs API'
+              }
+            ]
           },
         },
       },

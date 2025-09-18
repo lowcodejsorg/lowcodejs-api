@@ -2,8 +2,8 @@ import { Service } from 'fastify-decorators';
 
 import { Either, left, right } from '@core/either.core';
 import ApplicationException from '@exceptions/application.exception';
-import { Collection as Model } from '@model/collection.model';
-import { GetCollectionByIdSchema } from '@validators/collections.validator';
+import { Collection } from '@model/collection.model';
+import { GetCollectionBySlugSchema } from '@validators/collections.validator';
 import z from 'zod';
 
 type Response = Either<ApplicationException, null>;
@@ -11,10 +11,12 @@ type Response = Either<ApplicationException, null>;
 @Service()
 export default class DeleteCollectionUseCase {
   async execute(
-    payload: z.infer<typeof GetCollectionByIdSchema>,
+    payload: z.infer<typeof GetCollectionBySlugSchema>,
   ): Promise<Response> {
     try {
-      const collection = await Model.findByIdAndDelete({ _id: payload._id });
+      const collection = await Collection.findByIdAndDelete({
+        slug: payload.slug,
+      });
 
       if (!collection)
         return left(

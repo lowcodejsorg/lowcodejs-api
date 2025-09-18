@@ -3,7 +3,10 @@ import { Meta, Paginated } from '@core/entity.core';
 import { normalize } from '@core/util.core';
 import ApplicationException from '@exceptions/application.exception';
 import { Collection as Model } from '@model/collection.model';
-import { ListCollectionPaginatedSchema } from '@validators/collections.validator';
+import {
+  GetCollectionQuerySchema,
+  ListCollectionPaginatedSchema,
+} from '@validators/collections.validator';
 import { Service } from 'fastify-decorators';
 import z from 'zod';
 
@@ -15,7 +18,8 @@ type Response = Either<
 @Service()
 export default class ListCollectionPaginatedUseCase {
   async execute(
-    payload: z.infer<typeof ListCollectionPaginatedSchema>,
+    payload: z.infer<typeof ListCollectionPaginatedSchema> &
+      z.infer<typeof GetCollectionQuerySchema>,
   ): Promise<Response> {
     try {
       const skip = (payload.page - 1) * payload.perPage;
@@ -34,9 +38,6 @@ export default class ListCollectionPaginatedUseCase {
 
       if (payload.name)
         query.name = { $regex: normalize(payload.name), $options: 'i' };
-
-      if (payload.slug)
-        query.slug = { $regex: normalize(payload.slug), $options: 'i' };
 
       if (payload.type) query.type = payload.type;
 

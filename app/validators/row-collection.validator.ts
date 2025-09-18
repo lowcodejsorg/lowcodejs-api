@@ -24,7 +24,14 @@ export const UpdateRowCollectionSchema = CreateRowCollectionSchema.clone();
 
 export const GetRowCollectionByIdSchema = z.object({
   _id: z.string(),
-  collectionSlug: z.string(),
+});
+
+export const GetRowCollectionSlugSchema = z.object({
+  slug: z.string(),
+});
+
+export const GetRowCollectionQuerySchema = z.object({
+  trashed: z.enum(['true', 'false']).default('false').optional(),
   public: z.enum(['true', 'false']).default('false'),
 });
 
@@ -32,17 +39,16 @@ export const ListRowCollectionPaginatedSchema = z.object({
   page: z.coerce.number().default(1),
   perPage: z.coerce.number().default(50),
   search: z.string().optional(),
-  trashed: z.enum(['true', 'false']).default('false').optional(),
 });
 
 export const ReactionRowCollectionSchema = z.object({
   type: z.enum(['like', 'unlike']),
-  fieldSlug: z.string(),
-  userId: z.string(),
+  field: z.string(),
+  user: z.string(),
 });
 
 export const EvaluationRowCollectionSchema = z.object({
   value: z.number(),
-  fieldSlug: z.string(),
-  userId: z.string(),
+  field: z.string(),
+  user: z.string(),
 });

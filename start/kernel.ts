@@ -23,6 +23,7 @@ kernel.register(cors, {
       'https://demo.lowcodejs.org',
       'https://develop.lowcodejs.org',
       'http://localhost:5173',
+      'http://localhost:3000',
     ];
 
     // Permitir requisições sem origin (ex: Postman, mobile apps)
@@ -86,6 +87,7 @@ kernel.register(_static, {
 });
 
 kernel.setErrorHandler((error, _, response) => {
+  console.error('ERROR', error);
   console.error('ERROR', JSON.stringify(error, null, 2));
   if (error instanceof ApplicationException) {
     return response.status(Number(error.code || 500)).send({
@@ -147,7 +149,7 @@ kernel.register(scalar, {
     title: 'LowCodeJs API',
     description: 'LowCodeJs API Documentation',
     version: '1.0.0',
-    theme: 'bluePlanet',
+    theme: 'default',
   },
 });
 

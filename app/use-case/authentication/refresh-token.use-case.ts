@@ -7,10 +7,10 @@ import { Service } from 'fastify-decorators';
 type Response = Either<ApplicationException, Entity>;
 
 @Service()
-export default class RefreshTokenUseCase {
-  async execute({ userId }: { userId: string }): Promise<Response> {
+export default class {
+  async execute(payload: { user: string }): Promise<Response> {
     try {
-      const user = await Model.findOne({ _id: userId });
+      const user = await Model.findOne({ _id: payload.user });
 
       if (!user) {
         return left(

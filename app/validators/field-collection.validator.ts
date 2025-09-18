@@ -25,7 +25,7 @@ const Configuration = z.object({
   format: z.enum(FIELD_FORMAT).nullable().default(null),
   listing: z.boolean().default(false),
   filtering: z.boolean().default(false),
-  default_value: z.string().nullable().default(null),
+  defaultValue: z.string().nullable().default(null),
   relationship: Relacionamento.nullable().default(null),
   dropdown: z.array(z.string()).default([]),
   category: z.array(Category).default([]),
@@ -38,9 +38,12 @@ const Configuration = z.object({
     .default(null),
 });
 
+export const GetFieldCollectionParamsSchema = z.object({
+  slug: z.string(),
+});
+
 export const GetFieldCollectionByIdSchema = z.object({
   _id: z.string(),
-  collectionSlug: z.string(),
 });
 
 export const CreateFieldCollectionSchema = z.object({

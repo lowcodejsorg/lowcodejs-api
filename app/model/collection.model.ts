@@ -7,11 +7,11 @@ interface Entity extends Omit<Core, '_id'>, mongoose.Document {
 
 const FieldConfiguration = new mongoose.Schema(
   {
-    order_list: {
+    orderList: {
       type: [String],
       default: [],
     },
-    order_form: {
+    orderForm: {
       type: [String],
       default: [],
     },
@@ -51,7 +51,7 @@ const Configuration = new mongoose.Schema(
     },
     fields: {
       type: FieldConfiguration,
-      default: { order_list: [], order_form: [] },
+      default: { orderList: [], orderForm: [] },
     },
   },
   {

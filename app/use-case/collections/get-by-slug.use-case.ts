@@ -5,7 +5,7 @@ import ApplicationException from '@exceptions/application.exception';
 import { Collection as Model } from '@model/collection.model';
 import {
   GetCollectionBySlugSchema,
-  ListCollectionPaginatedSchema,
+  GetCollectionQuerySchema,
 } from '@validators/collections.validator';
 import z from 'zod';
 
@@ -17,7 +17,7 @@ type Response = Either<
 @Service()
 export default class GetCollectionBySlugUseCase {
   async execute(
-    payload: z.infer<typeof ListCollectionPaginatedSchema> &
+    payload: z.infer<typeof GetCollectionQuerySchema> &
       z.infer<typeof GetCollectionBySlugSchema>,
   ): Promise<Response> {
     try {

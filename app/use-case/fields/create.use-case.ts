@@ -6,10 +6,8 @@ import { buildCollection, buildSchema } from '@core/util.core';
 import ApplicationException from '@exceptions/application.exception';
 import { Collection } from '@model/collection.model';
 import { Field } from '@model/field.model';
-import {
-  CreateFieldCollectionSchema,
-  GetFieldCollectionByIdSchema,
-} from '@validators/field-collection.validator';
+import { GetCollectionBySlugSchema } from '@validators/collections.validator';
+import { CreateFieldCollectionSchema } from '@validators/field-collection.validator';
 import { Service } from 'fastify-decorators';
 import slugify from 'slugify';
 import z from 'zod';
@@ -20,11 +18,11 @@ type Response = Either<ApplicationException, import('@core/entity.core').Field>;
 export default class CreateFieldCollectionUseCase {
   async execute(
     payload: z.infer<typeof CreateFieldCollectionSchema> &
-      z.infer<typeof GetFieldCollectionByIdSchema>,
+      z.infer<typeof GetCollectionBySlugSchema>,
   ): Promise<Response> {
     try {
       const collection = await Collection.findOne({
-        slug: payload.collectionSlug,
+        slug: payload.slug,
       });
 
       if (!collection)
@@ -67,8 +65,8 @@ export default class CreateFieldCollectionUseCase {
           configuration: {
             administrators: [],
             fields: {
-              order_form: [],
-              order_list: [],
+              orderForm: [],
+              orderList: [],
             },
             collaboration: 'restricted',
             style: 'list',
