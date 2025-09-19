@@ -17,77 +17,105 @@ export default class {
       schema: {
         tags: ['Settings'],
         summary: 'Update system settings',
-        description: 'Updates system configuration settings in the settings properties file. Allows modification of locale, file upload configurations, and pagination settings.',
+        description:
+          'Updates system configuration settings in the settings properties file. Allows modification of locale, file upload configurations, and pagination settings.',
         security: [{ cookieAuth: [] }],
         body: {
           type: 'object',
-          required: ['locale', 'fileUploadMaxSize', 'fileUploadMaxFilesPerUpload', 'fileUploadAccepted', 'fileUploadPath', 'paginationPerPage'],
+          required: [
+            'locale',
+            'fileUploadMaxSize',
+            'fileUploadMaxFilesPerUpload',
+            'fileUploadAccepted',
+            'fileUploadPath',
+            'paginationPerPage',
+          ],
           properties: {
             locale: {
               type: 'string',
               enum: ['pt-br', 'en-us'],
               description: 'System default language/locale',
-              examples: ['en-us', 'pt-br']
+              examples: ['en-us', 'pt-br'],
             },
             fileUploadMaxSize: {
               type: 'string',
               pattern: '^[0-9]+$',
               description: 'Maximum file size in bytes (numeric string)',
-              examples: ['10485760', '52428800']
+              examples: ['10485760', '52428800'],
             },
             fileUploadMaxFilesPerUpload: {
               type: 'string',
               pattern: '^[0-9]+$',
-              description: 'Maximum number of files per upload (numeric string)',
-              examples: ['5', '10', '20']
+              description:
+                'Maximum number of files per upload (numeric string)',
+              examples: ['5', '10', '20'],
             },
             fileUploadAccepted: {
               type: 'string',
               minLength: 1,
               description: 'Comma-separated list of accepted file extensions',
-              examples: ['jpg,jpeg,png,pdf', 'jpg,jpeg,png,pdf,doc,docx,xls,xlsx,txt,zip,rar']
+              examples: [
+                'jpg,jpeg,png,pdf',
+                'jpg,jpeg,png,pdf,doc,docx,xls,xlsx,txt,zip,rar',
+              ],
             },
             fileUploadPath: {
               type: 'string',
               minLength: 1,
               description: 'File storage directory path',
-              examples: ['./_storage', './uploads', '/var/uploads']
+              examples: ['./_storage', './uploads', '/var/uploads'],
             },
             paginationPerPage: {
               type: 'string',
               pattern: '^[0-9]+$',
               description: 'Default number of items per page (numeric string)',
-              examples: ['20', '50', '100']
-            }
-          }
+              examples: ['20', '50', '100'],
+            },
+          },
         },
         response: {
           200: {
             description: 'Settings updated successfully',
             type: 'object',
             properties: {
-              message: { type: 'string', enum: ['Settings updated successfully'] },
-              updatedAt: { type: 'string', format: 'date-time', description: 'Update timestamp' }
-            }
+              message: {
+                type: 'string',
+                enum: ['Settings updated successfully'],
+              },
+              updatedAt: {
+                type: 'string',
+                format: 'date-time',
+                description: 'Update timestamp',
+              },
+            },
           },
           400: {
-            description: 'Bad request - Invalid request data or validation error',
+            description:
+              'Bad request - Invalid request data or validation error',
             type: 'object',
             properties: {
               message: {
                 type: 'string',
-                enum: ['Invalid request data', 'Validation error', 'Invalid file size format', 'Invalid locale']
+                enum: [
+                  'Invalid request data',
+                  'Validation error',
+                  'Invalid file size format',
+                  'Invalid locale',
+                ],
               },
               code: { type: 'number', enum: [400] },
-              cause: { type: 'string', enum: ['INVALID_PARAMETERS', 'VALIDATION_ERROR'] }
+              cause: {
+                type: 'string',
+                enum: ['INVALID_PARAMETERS', 'VALIDATION_ERROR'],
+              },
             },
             examples: [
               {
                 message: 'Invalid request data',
                 code: 400,
-                cause: 'VALIDATION_ERROR'
-              }
-            ]
+                cause: 'VALIDATION_ERROR',
+              },
+            ],
           },
           401: {
             description: 'Unauthorized - Authentication required',
@@ -95,38 +123,48 @@ export default class {
             properties: {
               message: { type: 'string', enum: ['Unauthorized'] },
               code: { type: 'number', enum: [401] },
-              cause: { type: 'string', enum: ['AUTHENTICATION_REQUIRED'] }
-            }
+              cause: { type: 'string', enum: ['AUTHENTICATION_REQUIRED'] },
+            },
           },
           404: {
             description: 'Not found - Configuration file not found',
             type: 'object',
             properties: {
-              message: { type: 'string', enum: ['Configuration file not found'] },
+              message: {
+                type: 'string',
+                enum: ['Configuration file not found'],
+              },
               code: { type: 'number', enum: [404] },
-              cause: { type: 'string', enum: ['SETTINGS_FILE_NOT_FOUND'] }
+              cause: { type: 'string', enum: ['SETTINGS_FILE_NOT_FOUND'] },
             },
             examples: [
               {
                 message: 'Configuration file not found',
                 code: 404,
-                cause: 'SETTINGS_FILE_NOT_FOUND'
-              }
-            ]
+                cause: 'SETTINGS_FILE_NOT_FOUND',
+              },
+            ],
           },
           500: {
-            description: 'Internal server error - File writing or server issues',
+            description:
+              'Internal server error - File writing or server issues',
             type: 'object',
             properties: {
               message: {
                 type: 'string',
-                enum: ['Internal server error while updating settings', 'File write error']
+                enum: [
+                  'Internal server error while updating settings',
+                  'File write error',
+                ],
               },
               code: { type: 'number', enum: [500] },
-              cause: { type: 'string', enum: ['SETTINGS_UPDATE_ERROR', 'FILE_WRITE_ERROR'] }
-            }
-          }
-        }
+              cause: {
+                type: 'string',
+                enum: ['SETTINGS_UPDATE_ERROR', 'FILE_WRITE_ERROR'],
+              },
+            },
+          },
+        },
       },
     },
   })
