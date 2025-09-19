@@ -24,7 +24,8 @@ export default class {
       schema: {
         tags: ['Rows'],
         summary: 'Send row to trash',
-        description: 'Moves a row to trash by setting trashed=true and trashedAt timestamp. The row can be restored later or permanently deleted.',
+        description:
+          'Moves a row to trash by setting trashed=true and trashedAt timestamp. The row can be restored later or permanently deleted.',
         security: [{ cookieAuth: [] }],
         params: {
           type: 'object',
@@ -33,15 +34,15 @@ export default class {
             slug: {
               type: 'string',
               description: 'Collection slug containing the row',
-              examples: ['users', 'products', 'blog-posts']
+              examples: ['users', 'products', 'blog-posts'],
             },
             _id: {
               type: 'string',
               description: 'Row ID to move to trash',
-              examples: ['507f1f77bcf86cd799439011']
-            }
+              examples: ['507f1f77bcf86cd799439011'],
+            },
           },
-          additionalProperties: false
+          additionalProperties: false,
         },
         response: {
           200: {
@@ -49,13 +50,28 @@ export default class {
             type: 'object',
             properties: {
               _id: { type: 'string', description: 'Row ID' },
-              trashed: { type: 'boolean', enum: [true], description: 'Row is now in trash' },
-              trashedAt: { type: 'string', format: 'date-time', description: 'Timestamp when moved to trash' },
-              createdAt: { type: 'string', format: 'date-time', description: 'Creation timestamp' },
-              updatedAt: { type: 'string', format: 'date-time', description: 'Last update timestamp' }
+              trashed: {
+                type: 'boolean',
+                enum: [true],
+                description: 'Row is now in trash',
+              },
+              trashedAt: {
+                type: 'string',
+                format: 'date-time',
+                description: 'Timestamp when moved to trash',
+              },
+              createdAt: {
+                type: 'string',
+                format: 'date-time',
+                description: 'Creation timestamp',
+              },
+              updatedAt: {
+                type: 'string',
+                format: 'date-time',
+                description: 'Last update timestamp',
+              },
             },
             additionalProperties: true,
-            description: 'Response includes all field data with trashed status updated'
           },
           401: {
             description: 'Unauthorized - Authentication required',
@@ -63,8 +79,8 @@ export default class {
             properties: {
               message: { type: 'string', enum: ['Unauthorized'] },
               code: { type: 'number', enum: [401] },
-              cause: { type: 'string', enum: ['AUTHENTICATION_REQUIRED'] }
-            }
+              cause: { type: 'string', enum: ['AUTHENTICATION_REQUIRED'] },
+            },
           },
           404: {
             description: 'Not found - Collection or row does not exist',
@@ -72,21 +88,21 @@ export default class {
             properties: {
               message: {
                 type: 'string',
-                enum: ['Collection not found', 'Row not found']
+                enum: ['Collection not found', 'Row not found'],
               },
               code: { type: 'number', enum: [404] },
               cause: {
                 type: 'string',
-                enum: ['COLLECTION_NOT_FOUND', 'ROW_NOT_FOUND']
-              }
+                enum: ['COLLECTION_NOT_FOUND', 'ROW_NOT_FOUND'],
+              },
             },
             examples: [
               {
                 message: 'Row not found',
                 code: 404,
-                cause: 'ROW_NOT_FOUND'
-              }
-            ]
+                cause: 'ROW_NOT_FOUND',
+              },
+            ],
           },
           500: {
             description: 'Internal server error - Database or server issues',
@@ -94,10 +110,10 @@ export default class {
             properties: {
               message: { type: 'string', enum: ['Internal server error'] },
               code: { type: 'number', enum: [500] },
-              cause: { type: 'string', enum: ['SEND_ROW_TO_TRASH_ERROR'] }
-            }
-          }
-        }
+              cause: { type: 'string', enum: ['SEND_ROW_TO_TRASH_ERROR'] },
+            },
+          },
+        },
       },
     },
   })

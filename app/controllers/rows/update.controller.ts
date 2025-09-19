@@ -25,7 +25,8 @@ export default class {
       schema: {
         tags: ['Rows'],
         summary: 'Update row',
-        description: 'Updates an existing row in a collection with dynamic schema based on collection fields. Handles FIELD_GROUP types by updating nested collection entries.',
+        description:
+          'Updates an existing row in a collection with dynamic schema based on collection fields. Handles FIELD_GROUP types by updating nested collection entries.',
         security: [{ cookieAuth: [] }],
         params: {
           type: 'object',
@@ -34,79 +35,113 @@ export default class {
             slug: {
               type: 'string',
               description: 'Collection slug containing the row',
-              examples: ['users', 'products', 'blog-posts']
+              examples: ['users', 'products', 'blog-posts'],
             },
             _id: {
               type: 'string',
               description: 'Row ID to update',
-              examples: ['507f1f77bcf86cd799439011']
-            }
+              examples: ['507f1f77bcf86cd799439011'],
+            },
           },
-          additionalProperties: false
+          additionalProperties: false,
         },
         body: {
           type: 'object',
-          description: 'Dynamic row data based on collection fields. Keys correspond to field slugs, values depend on field types.',
+          description:
+            'Dynamic row data based on collection fields. Keys correspond to field slugs, values depend on field types.',
           additionalProperties: true,
           examples: [
             {
-              "name": "John Doe Updated",
-              "email": "john.updated@example.com",
-              "age": 31,
-              "active": false,
-              "tags": ["senior-developer", "typescript"],
-              "profile_picture": ["507f1f77bcf86cd799439014"],
-              "related_products": ["507f1f77bcf86cd799439015"]
-            }
+              name: 'John Doe Updated',
+              email: 'john.updated@example.com',
+              age: 31,
+              active: false,
+              tags: ['senior-developer', 'typescript'],
+              profile_picture: ['507f1f77bcf86cd799439014'],
+              related_products: ['507f1f77bcf86cd799439015'],
+            },
           ],
           properties: {
-            "field_slug_example": {
+            field_slug_example: {
               oneOf: [
-                { type: 'string', description: 'For TEXT_SHORT, TEXT_LONG, DROPDOWN fields' },
+                {
+                  type: 'string',
+                  description: 'For TEXT_SHORT, TEXT_LONG, DROPDOWN fields',
+                },
                 { type: 'number', description: 'For number-based fields' },
                 { type: 'boolean', description: 'For boolean fields' },
-                { type: 'array', items: { type: 'string' }, description: 'For multiple values or FILE, RELATIONSHIP fields' },
+                {
+                  type: 'array',
+                  items: { type: 'string' },
+                  description:
+                    'For multiple values or FILE, RELATIONSHIP fields',
+                },
                 {
                   type: 'array',
                   items: {
                     type: 'object',
                     properties: {
-                      _id: { type: 'string', description: 'Optional ID for FIELD_GROUP items' }
+                      _id: {
+                        type: 'string',
+                        description: 'Optional ID for FIELD_GROUP items',
+                      },
                     },
-                    additionalProperties: true
+                    additionalProperties: true,
                   },
-                  description: 'For FIELD_GROUP fields - array of nested objects'
+                  description:
+                    'For FIELD_GROUP fields - array of nested objects',
                 },
-                { type: 'object', description: 'For complex field types' }
-              ]
-            }
-          }
+                { type: 'object', description: 'For complex field types' },
+              ],
+            },
+          },
         },
         response: {
           200: {
-            description: 'Row updated successfully with populated relationships',
+            description:
+              'Row updated successfully with populated relationships',
             type: 'object',
             properties: {
               _id: { type: 'string', description: 'Row ID' },
               trashed: { type: 'boolean', description: 'Is row in trash' },
-              trashedAt: { type: 'string', format: 'date-time', nullable: true, description: 'When row was trashed' },
-              createdAt: { type: 'string', format: 'date-time', description: 'Creation timestamp' },
-              updatedAt: { type: 'string', format: 'date-time', description: 'Last update timestamp' }
+              trashedAt: {
+                type: 'string',
+                format: 'date-time',
+                nullable: true,
+                description: 'When row was trashed',
+              },
+              createdAt: {
+                type: 'string',
+                format: 'date-time',
+                description: 'Creation timestamp',
+              },
+              updatedAt: {
+                type: 'string',
+                format: 'date-time',
+                description: 'Last update timestamp',
+              },
             },
             additionalProperties: true,
-            description: 'Response includes all updated field data with populated relationships'
           },
           400: {
-            description: 'Bad request - Validation error or field requirements not met',
+            description:
+              'Bad request - Validation error or field requirements not met',
             type: 'object',
             properties: {
               message: {
                 type: 'string',
-                enum: ['Validation failed', 'Required field missing', 'Invalid field type']
+                enum: [
+                  'Validation failed',
+                  'Required field missing',
+                  'Invalid field type',
+                ],
               },
               code: { type: 'number', enum: [400] },
-              cause: { type: 'string', enum: ['INVALID_PARAMETERS', 'VALIDATION_ERROR'] }
-            }
+              cause: {
+                type: 'string',
+                enum: ['INVALID_PARAMETERS', 'VALIDATION_ERROR'],
+              },
+            },
           },
           401: {
             description: 'Unauthorized - Authentication required',
@@ -114,8 +149,8 @@ export default class {
             properties: {
               message: { type: 'string', enum: ['Unauthorized'] },
               code: { type: 'number', enum: [401] },
-              cause: { type: 'string', enum: ['AUTHENTICATION_REQUIRED'] }
-            }
+              cause: { type: 'string', enum: ['AUTHENTICATION_REQUIRED'] },
+            },
           },
           404: {
             description: 'Not found - Collection or row does not exist',
@@ -123,21 +158,21 @@ export default class {
             properties: {
               message: {
                 type: 'string',
-                enum: ['Collection not found', 'Row not found']
+                enum: ['Collection not found', 'Row not found'],
               },
               code: { type: 'number', enum: [404] },
               cause: {
                 type: 'string',
-                enum: ['COLLECTION_NOT_FOUND', 'ROW_NOT_FOUND']
-              }
+                enum: ['COLLECTION_NOT_FOUND', 'ROW_NOT_FOUND'],
+              },
             },
             examples: [
               {
                 message: 'Row not found',
                 code: 404,
-                cause: 'ROW_NOT_FOUND'
-              }
-            ]
+                cause: 'ROW_NOT_FOUND',
+              },
+            ],
           },
           500: {
             description: 'Internal server error - Database or server issues',
@@ -145,10 +180,10 @@ export default class {
             properties: {
               message: { type: 'string', enum: ['Internal server error'] },
               code: { type: 'number', enum: [500] },
-              cause: { type: 'string', enum: ['UPDATE_ROW_ERROR'] }
-            }
-          }
-        }
+              cause: { type: 'string', enum: ['UPDATE_ROW_ERROR'] },
+            },
+          },
+        },
       },
     },
   })
