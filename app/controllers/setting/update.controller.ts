@@ -158,7 +158,7 @@ export default class {
       // const pathname = join(process.cwd(), '_system', `${filename}.properties`);
       const pathname = join(process.cwd(), '_system', `setting.properties`);
 
-      // Lê o arquivo atual
+      // Read the current file
       let fileContent: string;
       try {
         // fileContent = readFileSync(pathname, 'utf-8');
@@ -172,7 +172,7 @@ export default class {
         });
       }
 
-      // Atualiza o LOCALE se fornecido
+      // Update the LOCALE if provided
       if (locale) {
         fileContent = fileContent.replace(/LOCALE=.*/, `LOCALE=${locale}`);
       }
@@ -212,11 +212,11 @@ export default class {
         );
       }
 
-      // Salva o arquivo atualizado
+      // Save the updated file
       // writeFileSync(pathname, fileContent);
       await writeFile(pathname, fileContent);
 
-      // Retorna sucesso
+      // Return success
       return response.status(200).send({
         message: 'Settings updated successfully',
         updatedAt: new Date().toISOString(),

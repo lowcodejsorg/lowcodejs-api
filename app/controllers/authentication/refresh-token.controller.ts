@@ -56,7 +56,7 @@ export default class {
                 cause: 'MISSING_REFRESH_TOKEN',
               },
               {
-                message: 'Refresh token inválido ou expirado',
+                message: 'Invalid or expired refresh token',
                 code: 401,
                 cause: 'INVALID_REFRESH_TOKEN',
               },
@@ -94,7 +94,7 @@ export default class {
         });
       }
 
-      // Verifica e decodifica o refresh token
+      // Verifies and decodes the refresh token
       const decoded: JWTPayload = await request.jwtVerify();
 
       const result = await this.useCase.execute({ user: decoded.sub });
@@ -147,24 +147,24 @@ export default class {
         httpOnly: true,
       };
 
-      // Define os novos cookies
+      // Set the new cookies
       response
         .setCookie('accessToken', newAccessToken, {
           ...cookieOptions,
-          maxAge: 24 * 60 * 60 * 1000, // 24 horas
+          maxAge: 24 * 60 * 60 * 1000, // 24 hours
         })
         .setCookie('refreshToken', newRefreshToken, {
           ...cookieOptions,
-          maxAge: 7 * 24 * 60 * 60 * 1000, // 7 dias
+          maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
         });
 
       return response
         .status(200)
         .send({ message: 'Tokens refreshed successfully' });
     } catch (error) {
-      // Token inválido, expirado ou malformado
+      // Invalid, expired or malformed token
       return response.status(401).send({
-        message: 'Refresh token inválido ou expirado',
+        message: 'Invalid or expired refresh token',
         code: 401,
         cause: 'INVALID_REFRESH_TOKEN',
       });

@@ -128,8 +128,8 @@ export default class {
 
     const cookieOptions = {
       path: '/',
-      secure: Env.NODE_ENV === 'production', // Só HTTPS em produção
-      sameSite: 'strict' as const, // Proteção CSRF mais rígida
+      secure: Env.NODE_ENV === 'production', // Only HTTPS in production
+      sameSite: 'strict' as const, // Stricter CSRF protection
       httpOnly: true,
       // domain: Env.NODE_ENV === 'production' ? Env.COOKIE_DOMAIN : undefined,
     };
@@ -137,11 +137,11 @@ export default class {
     response
       .setCookie('accessToken', accessToken, {
         ...cookieOptions,
-        maxAge: 60 * 60 * 24 * 1000, // 1 dia em ms
+        maxAge: 60 * 60 * 24 * 1000, // 1 day in ms
       })
       .setCookie('refreshToken', refreshToken, {
         ...cookieOptions,
-        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 dias em ms
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days in ms
       });
 
     return response
