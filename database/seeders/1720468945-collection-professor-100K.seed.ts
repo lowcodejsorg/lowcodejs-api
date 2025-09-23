@@ -72,7 +72,12 @@ export default async function Seed(): Promise<void> {
 
   const payload: Payload = {
     _schema: buildSchema(
-      fields.map((c) => ({ ...c.toJSON(), _id: c._id?.toString() })),
+      fields.map((c) => ({
+        ...c.toJSON({
+          flattenObjectIds: true,
+        }),
+        _id: c._id?.toString(),
+      })),
     ),
     name: slug,
     slug: slug,
@@ -82,8 +87,8 @@ export default async function Seed(): Promise<void> {
     logo: null,
     configuration: {
       style: 'list',
-      visibility: 'restrict',
-      collaboration: 'restrict',
+      visibility: 'restricted',
+      collaboration: 'restricted',
       owner: owner._id?.toString(),
       administrators: [],
       fields: {
@@ -101,5 +106,5 @@ export default async function Seed(): Promise<void> {
 
   await buildCollection(payload);
 
-  console.log('🌱 \x1b[32m professor 100K \x1b[0m');
+  console.info('🌱 \x1b[32m professor 100K \x1b[0m');
 }

@@ -37,13 +37,17 @@ export default class UpdateUserGroupUseCase {
 
       await group
         .set({
-          ...group?.toJSON(),
+          ...group?.toJSON({
+            flattenObjectIds: true,
+          }),
           ...payload,
         })
         .save();
 
       return right({
-        ...group?.toJSON(),
+        ...group?.toJSON({
+          flattenObjectIds: true,
+        }),
         _id: group?._id.toString(),
       });
     } catch (error) {

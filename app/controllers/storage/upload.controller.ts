@@ -24,19 +24,6 @@ export default class {
         description: 'Uploads one or more files to the server storage system. Files are saved to the configured storage directory and metadata is stored in the database.',
         security: [{ cookieAuth: [] }],
         consumes: ['multipart/form-data'],
-        body: {
-          type: 'object',
-          properties: {
-            files: {
-              type: 'array',
-              items: {
-                type: 'string',
-                format: 'binary'
-              },
-              description: 'Files to upload (multipart form data)'
-            }
-          }
-        },
         response: {
           201: {
             description: 'Files uploaded successfully',

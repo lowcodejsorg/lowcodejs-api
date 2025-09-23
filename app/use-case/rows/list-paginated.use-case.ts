@@ -62,7 +62,9 @@ export default class ListRowCollectionPaginatedUseCase {
       }
 
       const c = await buildCollection({
-        ...collection?.toJSON(),
+        ...collection?.toJSON({
+          flattenObjectIds: true,
+        }),
         _id: collection?._id.toString(),
       });
 
@@ -103,7 +105,9 @@ export default class ListRowCollectionPaginatedUseCase {
       return right({
         meta,
         data: rows?.map((u) => ({
-          ...u?.toJSON(),
+          ...u?.toJSON({
+            flattenObjectIds: true,
+          }),
           _id: u?._id.toString(),
         })),
       });

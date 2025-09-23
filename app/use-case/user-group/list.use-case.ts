@@ -13,7 +13,9 @@ export default class ListUserGroupUseCase {
       const groups = await Model.find();
       return right(
         groups.map((group) => ({
-          ...group.toJSON(),
+          ...group.toJSON({
+            flattenObjectIds: true,
+          }),
           _id: group._id.toString(),
         })),
       );

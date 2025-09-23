@@ -34,7 +34,9 @@ export default class EvaluationRowCollectionUseCase {
         );
 
       const c = await buildCollection({
-        ...collection.toJSON(),
+        ...collection.toJSON({
+          flattenObjectIds: true,
+        }),
         _id: collection._id.toString(),
       });
 
@@ -67,7 +69,9 @@ export default class EvaluationRowCollectionUseCase {
       if (evaluation) {
         await evaluation
           .set({
-            ...evaluation.toJSON(),
+            ...evaluation.toJSON({
+              flattenObjectIds: true,
+            }),
             value: payload.value,
           })
           .save();
@@ -79,7 +83,9 @@ export default class EvaluationRowCollectionUseCase {
       if (!evaluations.includes(evaluationId))
         await row
           ?.set({
-            ...row?.toJSON(),
+            ...row?.toJSON({
+              flattenObjectIds: true,
+            }),
             [payload.field]: [...evaluations, evaluationId],
           })
           .save();
@@ -87,7 +93,9 @@ export default class EvaluationRowCollectionUseCase {
       const populated = await row?.populate(populate);
 
       return right({
-        ...populated?.toJSON(),
+        ...populated?.toJSON({
+          flattenObjectIds: true,
+        }),
         _id: populated?._id?.toString(),
       });
     } catch (error) {

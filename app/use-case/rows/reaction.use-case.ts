@@ -34,7 +34,9 @@ export default class ReactionRowCollectionUseCase {
         );
 
       const c = await buildCollection({
-        ...collection.toJSON(),
+        ...collection.toJSON({
+          flattenObjectIds: true,
+        }),
         _id: collection._id.toString(),
       });
 
@@ -67,7 +69,9 @@ export default class ReactionRowCollectionUseCase {
       if (reaction) {
         await reaction
           .set({
-            ...reaction.toJSON(),
+            ...reaction.toJSON({
+              flattenObjectIds: true,
+            }),
             type: payload.type,
           })
           .save();
@@ -80,7 +84,9 @@ export default class ReactionRowCollectionUseCase {
       if (!reactions.includes(reactionId))
         await row
           ?.set({
-            ...row?.toJSON(),
+            ...row?.toJSON({
+              flattenObjectIds: true,
+            }),
             [payload.field]: [...reactions, reactionId],
           })
           .save();
@@ -88,7 +94,9 @@ export default class ReactionRowCollectionUseCase {
       const populated = await row?.populate(populate);
 
       return right({
-        ...populated?.toJSON(),
+        ...populated?.toJSON({
+          flattenObjectIds: true,
+        }),
         _id: populated?._id.toString(),
       });
     } catch (error) {

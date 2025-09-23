@@ -44,14 +44,41 @@ export default class CreateCollectionUseCase {
         fields: [],
         type: 'collection',
         configuration: {
-          ...payload.configuration,
-          administrators: payload.configuration.administrators || [],
           owner: payload.owner,
+          administrators: [],
+          collaboration: 'restricted',
+          style: 'list',
+          visibility: 'restricted',
+          fields: {
+            orderForm: [],
+            orderList: [],
+          },
         },
       });
 
+      const populated = await created.populate([
+        {
+          path: 'configuration.administrators',
+          select: 'name _id',
+          model: 'User',
+        },
+        {
+          path: 'logo',
+          model: 'Storage',
+        },
+        {
+          path: 'configuration.owner',
+          select: 'name _id',
+          model: 'User',
+        },
+        {
+          path: 'fields',
+          model: 'Field',
+        },
+      ]);
+
       return right({
-        ...created.toJSON(),
+        ...populated.toJSON(),
         _id: created._id.toString(),
       });
     } catch (error) {

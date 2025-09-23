@@ -21,7 +21,8 @@ export default class {
       schema: {
         tags: ['Users'],
         summary: 'List users with pagination',
-        description: 'Retrieves a paginated list of users with optional search functionality',
+        description:
+          'Retrieves a paginated list of users with optional search functionality',
         security: [{ cookieAuth: [] }],
         querystring: {
           type: 'object',
@@ -31,7 +32,7 @@ export default class {
               minimum: 1,
               default: 1,
               description: 'Page number (starts from 1)',
-              examples: [1, 2, 5]
+              examples: [1, 2, 5],
             },
             perPage: {
               type: 'number',
@@ -39,21 +40,23 @@ export default class {
               maximum: 100,
               default: 50,
               description: 'Number of items per page (max 100)',
-              examples: [10, 25, 50, 100]
+              examples: [10, 25, 50, 100],
             },
             search: {
               type: 'string',
               minLength: 1,
-              description: 'Search term for filtering users by name or email (optional)',
-              examples: ['john', 'john@example.com', 'doe']
+              description:
+                'Search term for filtering users by name or email (optional)',
+              examples: ['john', 'john@example.com', 'doe'],
             },
             sub: {
               type: 'string',
-              description: 'User ID for filtering specific user (optional, used internally)',
-              examples: ['507f1f77bcf86cd799439011']
-            }
+              description:
+                'User ID for filtering specific user (optional, used internally)',
+              examples: ['507f1f77bcf86cd799439011'],
+            },
           },
-          additionalProperties: false
+          additionalProperties: false,
         },
         response: {
           200: {
@@ -72,25 +75,26 @@ export default class {
                       type: 'object',
                       properties: {
                         _id: { type: 'string' },
-                        name: { type: 'string' }
-                      }
+                        name: { type: 'string' },
+                      },
                     },
                     status: { type: 'string' },
                     createdAt: { type: 'string', format: 'date-time' },
-                    updatedAt: { type: 'string', format: 'date-time' }
-                  }
-                }
+                    updatedAt: { type: 'string', format: 'date-time' },
+                  },
+                },
               },
-              pagination: {
+              meta: {
                 type: 'object',
                 properties: {
-                  page: { type: 'number' },
-                  perPage: { type: 'number' },
                   total: { type: 'number' },
-                  totalPages: { type: 'number' }
-                }
-              }
-            }
+                  perPage: { type: 'number' },
+                  page: { type: 'number' },
+                  lastPage: { type: 'number' },
+                  firstPage: { type: 'number' },
+                },
+              },
+            },
           },
           401: {
             description: 'Unauthorized - Authentication required',
@@ -98,15 +102,15 @@ export default class {
             properties: {
               message: { type: 'string', enum: ['Unauthorized'] },
               code: { type: 'number', enum: [401] },
-              cause: { type: 'string', enum: ['AUTHENTICATION_REQUIRED'] }
+              cause: { type: 'string', enum: ['AUTHENTICATION_REQUIRED'] },
             },
             examples: [
               {
                 message: 'Unauthorized',
                 code: 401,
-                cause: 'AUTHENTICATION_REQUIRED'
-              }
-            ]
+                cause: 'AUTHENTICATION_REQUIRED',
+              },
+            ],
           },
           500: {
             description: 'Internal server error',
@@ -114,17 +118,17 @@ export default class {
             properties: {
               message: { type: 'string', enum: ['Internal server error'] },
               code: { type: 'number', enum: [500] },
-              cause: { type: 'string', enum: ['LIST_USERS_ERROR'] }
+              cause: { type: 'string', enum: ['LIST_USERS_ERROR'] },
             },
             examples: [
               {
                 message: 'Internal server error',
                 code: 500,
-                cause: 'LIST_USERS_ERROR'
-              }
-            ]
-          }
-        }
+                cause: 'LIST_USERS_ERROR',
+              },
+            ],
+          },
+        },
       },
     },
   })

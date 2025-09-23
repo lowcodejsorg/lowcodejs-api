@@ -47,7 +47,9 @@ export default class UpdateUserUseCase {
       ]);
 
       return right({
-        ...populated?.toJSON(),
+        ...populated?.toJSON({
+          flattenObjectIds: true,
+        }),
         _id: populated?._id.toString(),
       });
     } catch (error) {

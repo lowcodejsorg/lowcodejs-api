@@ -46,9 +46,10 @@ export default class {
                 examples: ['10485760'],
               },
               FILE_UPLOAD_ACCEPTED: {
-                type: 'string',
-                description: 'Accepted file extensions (comma-separated)',
-                examples: ['jpg,jpeg,png,pdf,doc,docx'],
+                type: 'array',
+                items: { type: 'string' },
+                description: 'Accepted file extensions',
+                examples: [['jpg', 'jpeg', 'png', 'pdf', 'doc', 'docx']],
               },
               FILE_UPLOAD_MAX_FILES_PER_UPLOAD: {
                 type: 'string',
@@ -141,19 +142,13 @@ export default class {
       const trimmed = line.trim();
       if (trimmed && !trimmed.startsWith('#')) {
         const [key, ...valueParts] = trimmed.split('=');
-        if (
-          key &&
-          valueParts.length > 0 &&
-          !valueParts.join().trim().includes(',')
-        )
-          settings[key.trim()] = valueParts.join('=').trim();
-        else
-          settings[key.trim()] = valueParts
-            .toString()
-            .trim()
+        const value = valueParts.join('=').trim();
+        if (key && valueParts.length > 0 && value.includes(','))
+          settings[key.trim()] = value
             .split(',')
             .filter(Boolean)
-            .map((value) => value.trim());
+            .map((item) => item.trim());
+        else settings[key.trim()] = value;
       }
     }
 

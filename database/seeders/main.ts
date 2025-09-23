@@ -9,14 +9,14 @@ async function seed(): Promise<void> {
     return a.localeCompare(b);
   });
 
-  console.log('🌱 Seeding...\n');
+  console.info('🌱 Seeding...\n');
 
   for (const seeder of seeders) {
     const { default: main } = await import(seeder);
     await main();
   }
 
-  console.log('\n✅ Seeding complete!');
+  console.info('\n✅ Seeding complete!');
   process.exit(0);
 }
 

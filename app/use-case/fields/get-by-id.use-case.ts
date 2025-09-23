@@ -37,7 +37,9 @@ export default class GetFieldByIdUseCase {
         );
 
       return right({
-        ...field.toJSON(),
+        ...field.toJSON({
+          flattenObjectIds: true,
+        }),
         _id: field._id.toString(),
       });
     } catch (error) {

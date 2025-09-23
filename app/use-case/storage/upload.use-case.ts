@@ -36,7 +36,9 @@ export default class UploadStorageUseCase {
 
       return right(
         storages.map((storage) => ({
-          ...storage.toJSON(),
+          ...storage.toJSON({
+            flattenObjectIds: true,
+          }),
           _id: storage._id.toString(),
         })),
       );

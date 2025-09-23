@@ -1,6 +1,5 @@
 import { Either, left, right } from '@core/either.core';
-import { Field } from '@core/entity.core';
-import { buildCollection, buildSchema } from '@core/util.core';
+import { buildCollection } from '@core/util.core';
 import ApplicationException from '@exceptions/application.exception';
 import { Collection } from '@model/collection.model';
 import {
@@ -8,7 +7,6 @@ import {
   UpdateCollectionSchema,
 } from '@validators/collections.validator';
 import { Service } from 'fastify-decorators';
-import slugify from 'slugify';
 import z from 'zod';
 
 type Response = Either<
@@ -23,7 +21,9 @@ export default class UpdateCollectionUseCase {
       z.infer<typeof GetCollectionBySlugSchema>,
   ): Promise<Response> {
     try {
-      const collection = await Collection.findOne({ slug: payload.slug });
+      const collection = await Collection.findOne({
+        slug: payload.slug,
+      });
 
       if (!collection)
         return left(
@@ -33,42 +33,47 @@ export default class UpdateCollectionUseCase {
           ),
         );
 
-      const fields =
-        payload?.fields?.map(
-          (field) =>
-            ({
-              ...field,
-              slug: slugify(field.name, { lower: true, trim: true }),
-            }) as Field,
-        ) || [];
-
-      const _schema = buildSchema(fields);
-
       await collection
         .set({
           ...collection.toJSON(),
           ...payload,
-          fields,
-          _schema: {
-            ...collection._schema,
-            ..._schema,
-          },
           configuration: {
             ...collection?.toJSON()?.configuration,
             ...payload.configuration,
-            administrators: payload.configuration?.administrators || [],
+            administrators: payload.configuration?.administrators ?? [],
           },
         })
         .save();
 
+      const populated = await collection?.populate([
+        {
+          path: 'configuration.administrators',
+          select: 'name _id',
+          model: 'User',
+        },
+        {
+          path: 'logo',
+          model: 'Storage',
+        },
+        {
+          path: 'configuration.owner',
+          select: 'name _id',
+          model: 'User',
+        },
+        {
+          path: 'fields',
+          model: 'Field',
+        },
+      ]);
+
       await buildCollection({
-        ...collection.toJSON(),
-        _id: collection._id.toString(),
+        ...populated.toJSON(),
+        _id: populated._id.toString(),
       });
 
       return right({
-        ...collection.toJSON(),
-        _id: collection._id.toString(),
+        ...populated?.toJSON(),
+        _id: populated._id.toString(),
       });
     } catch (error) {
       return left(

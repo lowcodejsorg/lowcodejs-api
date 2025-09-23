@@ -24,7 +24,9 @@ export default class {
       // }
 
       return right({
-        ...user.toJSON(),
+        ...user.toJSON({
+          flattenObjectIds: true,
+        }),
         _id: user._id.toString(),
       });
     } catch (error) {

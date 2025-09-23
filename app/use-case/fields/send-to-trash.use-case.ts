@@ -38,9 +38,13 @@ export default class SendFieldToTrashUseCase {
 
       await field
         .set({
-          ...field.toJSON(),
+          ...field.toJSON({
+            flattenObjectIds: true,
+          }),
           configuration: {
-            ...field?.toJSON()?.configuration,
+            ...field?.toJSON({
+              flattenObjectIds: true,
+            })?.configuration,
             listing: false,
             filtering: false,
             required: false,
@@ -55,7 +59,9 @@ export default class SendFieldToTrashUseCase {
       ).map((f) => {
         if (f._id?.toString() === field._id?.toString()) {
           return {
-            ...field?.toJSON(),
+            ...field?.toJSON({
+              flattenObjectIds: true,
+            }),
             _id: field?._id?.toString(),
           };
         }
@@ -67,14 +73,18 @@ export default class SendFieldToTrashUseCase {
 
       await collection
         .set({
-          ...collection.toJSON(),
+          ...collection.toJSON({
+            flattenObjectIds: true,
+          }),
           fields: fields?.flatMap((c) => c?._id?.toString()),
           _schema,
         })
         .save();
 
       return right({
-        ...field.toJSON(),
+        ...field.toJSON({
+          flattenObjectIds: true,
+        }),
         _id: field._id.toString(),
       });
     } catch (error) {

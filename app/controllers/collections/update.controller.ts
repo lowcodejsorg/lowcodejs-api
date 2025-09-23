@@ -57,43 +57,6 @@ export default class {
               nullable: true,
               description: 'Collection logo URL or storage ID',
             },
-            fields: {
-              type: 'array',
-              description: 'Array of field definitions for the collection',
-              items: {
-                type: 'object',
-                required: ['name', 'type', 'configuration'],
-                properties: {
-                  name: {
-                    type: 'string',
-                    description:
-                      'Field name (will be slugified for internal use)',
-                  },
-                  type: {
-                    type: 'string',
-                    enum: [
-                      'TEXT_SHORT',
-                      'TEXT_LONG',
-                      'DROPDOWN',
-                      'DATE',
-                      'RELATIONSHIP',
-                      'FILE',
-                      'FIELD_GROUP',
-                      'REACTION',
-                      'EVALUATION',
-                      'CATEGORY',
-                    ],
-                    description: 'Field type from FIELD_TYPE enum',
-                  },
-                  configuration: {
-                    type: 'object',
-                    required: ['required', 'multiple'],
-                    description:
-                      'Field configuration including required, multiple, format, etc.',
-                  },
-                },
-              },
-            },
             configuration: {
               type: 'object',
               required: ['style', 'visibility', 'collaboration'],
@@ -106,17 +69,17 @@ export default class {
                 },
                 visibility: {
                   type: 'string',
-                  enum: ['public', 'restrict'],
+                  enum: ['public', 'restricted'],
                   default: 'public',
                   description:
-                    'Visibility setting (note: restrict not restricted)',
+                    'Visibility setting (note: restricted not restricted)',
                 },
                 collaboration: {
                   type: 'string',
-                  enum: ['open', 'restrict'],
+                  enum: ['open', 'restricted'],
                   default: 'open',
                   description:
-                    'Collaboration setting (note: restrict not restricted)',
+                    'Collaboration setting (note: restricted not restricted)',
                 },
                 administrators: {
                   type: 'array',
@@ -125,18 +88,22 @@ export default class {
                 },
                 fields: {
                   type: 'object',
+                  required: ['orderList', 'orderForm'],
                   properties: {
                     orderList: {
                       type: 'array',
                       items: { type: 'string' },
+                      default: [],
                       description: 'Field order for list view',
                     },
                     orderForm: {
                       type: 'array',
                       items: { type: 'string' },
+                      default: [],
                       description: 'Field order for form view',
                     },
                   },
+                  additionalProperties: false,
                 },
               },
             },
@@ -156,18 +123,105 @@ export default class {
               },
               slug: { type: 'string', description: 'Collection URL slug' },
               logo: {
-                type: 'string',
+                type: 'object',
                 nullable: true,
-                description: 'Collection logo URL',
+                description: 'Collection logo storage details (populated)',
+                properties: {
+                  _id: { type: 'string', description: 'Storage ID' },
+                  url: { type: 'string', description: 'File URL' },
+                  filename: { type: 'string', description: 'Original filename' },
+                  type: { type: 'string', description: 'MIME type' },
+                },
               },
               fields: {
                 type: 'array',
-                items: { type: 'object' },
-                description: 'Collection fields with generated slugs',
+                description: 'Collection fields',
+                items: {
+                  type: 'object',
+                  properties: {
+                    _id: { type: 'string', description: 'Field ID' },
+                    name: { type: 'string', description: 'Field name' },
+                    slug: { type: 'string', description: 'Field slug' },
+                    type: {
+                      type: 'string',
+                      enum: [
+                        'TEXT_SHORT',
+                        'TEXT_LONG',
+                        'DROPDOWN',
+                        'DATE',
+                        'RELATIONSHIP',
+                        'FILE',
+                        'FIELD_GROUP',
+                        'REACTION',
+                        'EVALUATION',
+                        'CATEGORY',
+                      ],
+                      description: 'Field type',
+                    },
+                    configuration: {
+                      type: 'object',
+                      description: 'Field configuration',
+                      additionalProperties: true,
+                    },
+                    createdAt: { type: 'string', format: 'date-time' },
+                    updatedAt: { type: 'string', format: 'date-time' },
+                  },
+                },
               },
               configuration: {
                 type: 'object',
                 description: 'Collection configuration settings',
+                properties: {
+                  style: {
+                    type: 'string',
+                    enum: ['gallery', 'list'],
+                    description: 'Display style',
+                  },
+                  visibility: {
+                    type: 'string',
+                    enum: ['public', 'restricted'],
+                    description: 'Visibility setting',
+                  },
+                  collaboration: {
+                    type: 'string',
+                    enum: ['open', 'restricted'],
+                    description: 'Collaboration setting',
+                  },
+                  administrators: {
+                    type: 'array',
+                    description: 'Administrator users (populated)',
+                    items: {
+                      type: 'object',
+                      properties: {
+                        _id: { type: 'string', description: 'User ID' },
+                        name: { type: 'string', description: 'User name' },
+                      },
+                    },
+                  },
+                  owner: {
+                    type: 'object',
+                    description: 'Collection owner (populated)',
+                    properties: {
+                      _id: { type: 'string', description: 'User ID' },
+                      name: { type: 'string', description: 'User name' },
+                    },
+                  },
+                  fields: {
+                    type: 'object',
+                    properties: {
+                      orderList: {
+                        type: 'array',
+                        items: { type: 'string' },
+                        description: 'Field order for list view',
+                      },
+                      orderForm: {
+                        type: 'array',
+                        items: { type: 'string' },
+                        description: 'Field order for form view',
+                      },
+                    },
+                  },
+                },
               },
               type: {
                 type: 'string',
@@ -176,7 +230,19 @@ export default class {
               },
               _schema: {
                 type: 'object',
-                description: 'Generated schema for the collection',
+                description:
+                  'Generated MongoDB schema based on fields with trashedAt and trashed properties',
+                additionalProperties: true,
+              },
+              trashed: {
+                type: 'boolean',
+                description: 'Is collection in trash',
+              },
+              trashedAt: {
+                type: 'string',
+                format: 'date-time',
+                nullable: true,
+                description: 'When collection was trashed',
               },
               createdAt: {
                 type: 'string',

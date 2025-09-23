@@ -13,7 +13,9 @@ export default class ListPermissionUseCase {
       const permissions = await Model.find();
       return right(
         permissions.map((permission) => ({
-          ...permission.toJSON(),
+          ...permission.toJSON({
+            flattenObjectIds: true,
+          }),
           _id: permission._id.toString(),
         })),
       );

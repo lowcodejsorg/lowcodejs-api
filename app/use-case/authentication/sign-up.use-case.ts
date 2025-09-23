@@ -50,12 +50,14 @@ export default class SignUpUseCase {
         user: created._id.toString(),
       });
 
-      console.log({ code });
+      console.info({ code });
 
       // enviar email de boas vindas/confirmação de cadastro
 
       return right({
-        ...created.toJSON(),
+        ...created.toJSON({
+          flattenObjectIds: true,
+        }),
         _id: created._id.toString(),
       });
     } catch (error) {

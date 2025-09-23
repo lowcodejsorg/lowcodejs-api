@@ -27,7 +27,9 @@ export default class RecoveryUpdatePasswordUseCase {
 
       await user
         .set({
-          ...user.toJSON(),
+          ...user.toJSON({
+            flattenObjectIds: true,
+          }),
           password: hashedPassword,
         })
         .save();

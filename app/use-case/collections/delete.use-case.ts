@@ -14,7 +14,7 @@ export default class DeleteCollectionUseCase {
     payload: z.infer<typeof GetCollectionBySlugSchema>,
   ): Promise<Response> {
     try {
-      const collection = await Collection.findByIdAndDelete({
+      const collection = await Collection.findOneAndDelete({
         slug: payload.slug,
       });
 
@@ -28,6 +28,7 @@ export default class DeleteCollectionUseCase {
 
       return right(null);
     } catch (error) {
+      console.log(error);
       return left(
         ApplicationException.InternalServerError(
           'Internal server error',

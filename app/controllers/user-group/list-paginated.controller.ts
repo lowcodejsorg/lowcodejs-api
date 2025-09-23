@@ -21,7 +21,8 @@ export default class {
       schema: {
         tags: ['User Group'],
         summary: 'List user groups with pagination',
-        description: 'Retrieves a paginated list of user groups with optional search functionality',
+        description:
+          'Retrieves a paginated list of user groups with optional search functionality',
         security: [{ cookieAuth: [] }],
         querystring: {
           type: 'object',
@@ -30,20 +31,20 @@ export default class {
               type: 'number',
               minimum: 1,
               default: 1,
-              description: 'Page number'
+              description: 'Page number',
             },
             perPage: {
               type: 'number',
               minimum: 1,
               maximum: 100,
               default: 50,
-              description: 'Items per page'
+              description: 'Items per page',
             },
             search: {
               type: 'string',
-              description: 'Search term for filtering groups'
-            }
-          }
+              description: 'Search term for filtering groups',
+            },
+          },
         },
         response: {
           200: {
@@ -60,20 +61,21 @@ export default class {
                     description: { type: 'string' },
                     permissions: { type: 'array', items: { type: 'string' } },
                     createdAt: { type: 'string', format: 'date-time' },
-                    updatedAt: { type: 'string', format: 'date-time' }
-                  }
-                }
+                    updatedAt: { type: 'string', format: 'date-time' },
+                  },
+                },
               },
-              pagination: {
+              meta: {
                 type: 'object',
                 properties: {
-                  page: { type: 'number' },
-                  perPage: { type: 'number' },
                   total: { type: 'number' },
-                  totalPages: { type: 'number' }
-                }
-              }
-            }
+                  perPage: { type: 'number' },
+                  page: { type: 'number' },
+                  lastPage: { type: 'number' },
+                  firstPage: { type: 'number' },
+                },
+              },
+            },
           },
           401: {
             description: 'Unauthorized - Authentication required',
@@ -81,15 +83,15 @@ export default class {
             properties: {
               message: { type: 'string', enum: ['Authentication required'] },
               code: { type: 'number', enum: [401] },
-              cause: { type: 'string', enum: ['AUTHENTICATION_REQUIRED'] }
+              cause: { type: 'string', enum: ['AUTHENTICATION_REQUIRED'] },
             },
             examples: [
               {
                 message: 'Authentication required',
                 code: 401,
-                cause: 'AUTHENTICATION_REQUIRED'
-              }
-            ]
+                cause: 'AUTHENTICATION_REQUIRED',
+              },
+            ],
           },
           500: {
             description: 'Internal server error',
@@ -97,17 +99,17 @@ export default class {
             properties: {
               message: { type: 'string', enum: ['Internal server error'] },
               code: { type: 'number', enum: [500] },
-              cause: { type: 'string', enum: ['INTERNAL_SERVER_ERROR'] }
+              cause: { type: 'string', enum: ['INTERNAL_SERVER_ERROR'] },
             },
             examples: [
               {
                 message: 'Internal server error',
                 code: 500,
-                cause: 'INTERNAL_SERVER_ERROR'
-              }
-            ]
-          }
-        }
+                cause: 'INTERNAL_SERVER_ERROR',
+              },
+            ],
+          },
+        },
       },
     },
   })

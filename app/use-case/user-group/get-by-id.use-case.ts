@@ -29,7 +29,9 @@ export default class GetUserGroupById {
         );
 
       return right({
-        ...group?.toJSON(),
+        ...group?.toJSON({
+          flattenObjectIds: true,
+        }),
         _id: group?._id.toString(),
       });
     } catch (error) {

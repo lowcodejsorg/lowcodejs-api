@@ -16,7 +16,9 @@ export default class RemoveCollectionFromTrashUseCase {
     payload: z.infer<typeof GetCollectionBySlugSchema>,
   ): Promise<Response> {
     try {
-      const collection = await Collection.findOne({ slug: payload.slug });
+      const collection = await Collection.findOne({
+        slug: payload.slug,
+      });
 
       if (!collection)
         return left(
@@ -27,11 +29,37 @@ export default class RemoveCollectionFromTrashUseCase {
         );
 
       await collection
-        .set({ ...collection.toJSON(), trashed: false, trashedAt: null })
+        .set({
+          ...collection.toJSON(),
+          trashed: false,
+          trashedAt: null,
+        })
         .save();
+
+      const populated = await collection?.populate([
+        {
+          path: 'configuration.administrators',
+          select: 'name _id',
+          model: 'User',
+        },
+        {
+          path: 'logo',
+          model: 'Storage',
+        },
+        {
+          path: 'configuration.owner',
+          select: 'name _id',
+          model: 'User',
+        },
+        {
+          path: 'fields',
+          model: 'Field',
+        },
+      ]);
+
       return right({
-        ...collection.toJSON(),
-        _id: collection._id.toString(),
+        ...populated.toJSON(),
+        _id: populated._id.toString(),
       });
     } catch (error) {
       return left(

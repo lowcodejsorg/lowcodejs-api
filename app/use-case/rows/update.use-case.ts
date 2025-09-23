@@ -34,7 +34,9 @@ export default class UpdateRowCollectionUseCase {
         );
 
       const c = await buildCollection({
-        ...collection?.toJSON(),
+        ...collection?.toJSON({
+          flattenObjectIds: true,
+        }),
         _id: collection?._id.toString(),
       });
 
@@ -66,7 +68,9 @@ export default class UpdateRowCollectionUseCase {
         if (!groupCollection) continue;
 
         const cGroup = await buildCollection({
-          ...groupCollection?.toJSON(),
+          ...groupCollection?.toJSON({
+            flattenObjectIds: true,
+          }),
           _id: groupCollection?._id?.toString(),
         });
 
@@ -97,7 +101,9 @@ export default class UpdateRowCollectionUseCase {
         if (row) {
           await row
             .set({
-              ...row.toJSON(),
+              ...row.toJSON({
+                flattenObjectIds: true,
+              }),
               ...item.payload,
             })
             .save();
@@ -112,7 +118,9 @@ export default class UpdateRowCollectionUseCase {
 
       await row
         .set({
-          ...row.toJSON(),
+          ...row.toJSON({
+            flattenObjectIds: true,
+          }),
           ...payload,
         })
         .save();
@@ -120,7 +128,9 @@ export default class UpdateRowCollectionUseCase {
       const updated = await row.populate(populate);
 
       return right({
-        ...updated?.toJSON(),
+        ...updated?.toJSON({
+          flattenObjectIds: true,
+        }),
         _id: updated?._id?.toString(),
       });
     } catch (error) {

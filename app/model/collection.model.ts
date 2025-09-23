@@ -30,13 +30,13 @@ const Configuration = new mongoose.Schema(
     },
     visibility: {
       type: String,
-      enum: ['public', 'restrict'],
-      default: 'restrict',
+      enum: ['public', 'restricted'],
+      default: 'restricted',
     },
     collaboration: {
       type: String,
-      enum: ['open', 'restrict'],
-      default: 'restrict',
+      enum: ['open', 'restricted'],
+      default: 'restricted',
     },
     administrators: [
       {

@@ -54,7 +54,9 @@ export default class MagicLinkUseCase {
       if (diferenceTimeInMinutes > TIME_EXPIRATION_IN_MINUTES) {
         await token
           .set({
-            ...token?.toJSON(),
+            ...token?.toJSON({
+              flattenObjectIds: true,
+            }),
             status: TOKEN_STATUS.EXPIRED,
           })
           .save();
@@ -69,7 +71,9 @@ export default class MagicLinkUseCase {
 
       await token
         .set({
-          ...token.toJSON(),
+          ...token.toJSON({
+            flattenObjectIds: true,
+          }),
           status: TOKEN_STATUS.VALIDATED,
         })
         .save();
@@ -84,14 +88,18 @@ export default class MagicLinkUseCase {
       if (user.status === 'inactive') {
         await user
           .set({
-            ...user.toJSON(),
+            ...user.toJSON({
+              flattenObjectIds: true,
+            }),
             status: 'active',
           })
           .save();
       }
 
       return right({
-        ...user.toJSON(),
+        ...user.toJSON({
+          flattenObjectIds: true,
+        }),
         _id: user._id.toString(),
       });
     } catch (error) {

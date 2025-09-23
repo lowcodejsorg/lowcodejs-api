@@ -80,9 +80,13 @@ export default class CreateFieldCollectionUseCase {
 
         await field
           .set({
-            ...field.toJSON(),
+            ...field.toJSON({
+              flattenObjectIds: true,
+            }),
             configuration: {
-              ...field.toJSON().configuration,
+              ...field.toJSON({
+                flattenObjectIds: true,
+              }).configuration,
               group: {
                 _id: group._id,
                 slug: group.slug,
@@ -95,7 +99,9 @@ export default class CreateFieldCollectionUseCase {
       const fields = [
         ...((collection.fields as import('@core/entity.core').Field[]) ?? []),
         {
-          ...field.toJSON(),
+          ...field.toJSON({
+            flattenObjectIds: true,
+          }),
           _id: field._id.toString(),
         },
       ];
@@ -103,22 +109,30 @@ export default class CreateFieldCollectionUseCase {
 
       await collection
         .set({
-          ...collection.toJSON(),
+          ...collection.toJSON({
+            flattenObjectIds: true,
+          }),
           fields,
           _schema: {
-            ...collection?.toJSON()._schema,
+            ...collection?.toJSON({
+              flattenObjectIds: true,
+            })._schema,
             ..._schema,
           },
         })
         .save();
 
       await buildCollection({
-        ...collection.toJSON(),
+        ...collection.toJSON({
+          flattenObjectIds: true,
+        }),
         _id: collection._id.toString(),
       });
 
       return right({
-        ...field.toJSON(),
+        ...field.toJSON({
+          flattenObjectIds: true,
+        }),
         _id: field._id.toString(),
       });
     } catch (error) {

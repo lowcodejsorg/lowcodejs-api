@@ -54,7 +54,10 @@ export default class ListUserPaginatedUseCase {
 
       return right({
         meta,
-        data: users?.map((u) => ({ ...u?.toJSON(), _id: u?._id.toString() })),
+        data: users?.map((u) => ({
+          ...u?.toJSON(),
+          _id: u?._id.toString(),
+        })),
       });
     } catch (error) {
       return left(

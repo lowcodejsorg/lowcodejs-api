@@ -21,7 +21,8 @@ export default class {
       schema: {
         tags: ['Collections'],
         summary: 'Delete collection',
-        description: 'Permanently deletes a collection and all its associated data. This action cannot be undone.',
+        description:
+          'Permanently deletes a collection and all its associated data. This action cannot be undone.',
         security: [{ cookieAuth: [] }],
         params: {
           type: 'object',
@@ -30,16 +31,16 @@ export default class {
             slug: {
               type: 'string',
               description: 'Collection slug identifier',
-              examples: ['users', 'products', 'blog-posts']
-            }
+              examples: ['users', 'products', 'blog-posts'],
+            },
           },
-          additionalProperties: false
+          additionalProperties: false,
         },
         response: {
           200: {
             description: 'Collection deleted successfully',
             type: 'object',
-            properties: {}
+            properties: {},
           },
           401: {
             description: 'Unauthorized - Authentication required',
@@ -47,24 +48,25 @@ export default class {
             properties: {
               message: { type: 'string', enum: ['Unauthorized'] },
               code: { type: 'number', enum: [401] },
-              cause: { type: 'string', enum: ['AUTHENTICATION_REQUIRED'] }
-            }
+              cause: { type: 'string', enum: ['AUTHENTICATION_REQUIRED'] },
+            },
           },
           404: {
-            description: 'Not found - Collection with specified slug does not exist',
+            description:
+              'Not found - Collection with specified slug does not exist',
             type: 'object',
             properties: {
               message: { type: 'string', enum: ['Collection not found'] },
               code: { type: 'number', enum: [404] },
-              cause: { type: 'string', enum: ['COLLECTION_NOT_FOUND'] }
+              cause: { type: 'string', enum: ['COLLECTION_NOT_FOUND'] },
             },
             examples: [
               {
                 message: 'Collection not found',
                 code: 404,
-                cause: 'COLLECTION_NOT_FOUND'
-              }
-            ]
+                cause: 'COLLECTION_NOT_FOUND',
+              },
+            ],
           },
           500: {
             description: 'Internal server error - Database or server issues',
@@ -72,10 +74,10 @@ export default class {
             properties: {
               message: { type: 'string', enum: ['Internal server error'] },
               code: { type: 'number', enum: [500] },
-              cause: { type: 'string', enum: ['DELETE_COLLECTION_ERROR'] }
-            }
-          }
-        }
+              cause: { type: 'string', enum: ['DELETE_COLLECTION_ERROR'] },
+            },
+          },
+        },
       },
     },
   })

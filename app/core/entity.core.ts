@@ -118,14 +118,14 @@ export interface Collection extends Base {
   _schema: CollectionSchema;
   name: string;
   description: string | null;
-  logo: string | null;
+  logo: string | Storage | null;
   slug: string;
   fields: string[] | Field[];
   type: 'collection' | 'field-group';
   configuration: {
     style: 'gallery' | 'list';
-    visibility: 'public' | 'restrict';
-    collaboration: 'open' | 'restrict';
+    visibility: 'public' | 'restricted';
+    collaboration: 'open' | 'restricted';
     administrators: string[] | User[];
     owner: string | User;
     fields: {

@@ -34,7 +34,7 @@ export default async function Seed(): Promise<void> {
     },
   );
 
-  console.log(`🚀 Started work seed with ${NUM_WORKERS} workers`);
+  console.info(`🚀 Started work seed with ${NUM_WORKERS} workers`);
 
   const workers: Promise<void>[] = [];
   const totalBatches = Math.ceil(MAX / BATCH_SIZE);
@@ -73,7 +73,7 @@ export default async function Seed(): Promise<void> {
         const elapsed = Date.now() - startTime;
         const rate = ((progress / elapsed) * 1000).toFixed(0);
 
-        console.log(
+        console.info(
           `🌱 \x1b[32m ${progress}/${MAX} (${percent}%) - ${rate} docs/s => [${slug}]\x1b[0m`,
         );
       }
@@ -104,7 +104,7 @@ export default async function Seed(): Promise<void> {
   const totalTime = (Date.now() - startTime) / 1000;
   const avgRate = (MAX / totalTime).toFixed(0);
 
-  console.log(
+  console.info(
     `🌱 \x1b[32m professor 10M (populate) - ${totalTime}s - ${avgRate} docs/s \x1b[0m`,
   );
 }

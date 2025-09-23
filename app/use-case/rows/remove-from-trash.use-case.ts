@@ -32,7 +32,9 @@ export default class RemoveRowCollectionFromTrashUseCase {
         );
 
       const c = await buildCollection({
-        ...collection?.toJSON(),
+        ...collection?.toJSON({
+          flattenObjectIds: true,
+        }),
         _id: collection?._id.toString(),
       });
 
@@ -50,13 +52,21 @@ export default class RemoveRowCollectionFromTrashUseCase {
         );
 
       await row
-        .set({ ...row.toJSON(), trashed: false, trashedAt: null })
+        .set({
+          ...row.toJSON({
+            flattenObjectIds: true,
+          }),
+          trashed: false,
+          trashedAt: null,
+        })
         .save();
 
       const populated = await row.populate(populate);
 
       return right({
-        ...populated.toJSON(),
+        ...populated.toJSON({
+          flattenObjectIds: true,
+        }),
         _id: populated._id.toString(),
       });
     } catch (error) {

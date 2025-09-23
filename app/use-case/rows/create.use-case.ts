@@ -54,7 +54,9 @@ export default class CreateRowUseCase {
         if (!groupCollection) continue;
 
         const c = await buildCollection({
-          ...groupCollection?.toJSON(),
+          ...groupCollection?.toJSON({
+            flattenObjectIds: true,
+          }),
           _id: groupCollection?._id?.toString(),
         });
 
@@ -85,7 +87,9 @@ export default class CreateRowUseCase {
         if (row) {
           await row
             .set({
-              ...row.toJSON(),
+              ...row.toJSON({
+                flattenObjectIds: true,
+              }),
               ...item.payload,
             })
             .save();
@@ -95,7 +99,9 @@ export default class CreateRowUseCase {
       }
 
       const c = await buildCollection({
-        ...collection?.toJSON(),
+        ...collection?.toJSON({
+          flattenObjectIds: true,
+        }),
         _id: collection?._id?.toString(),
       });
 
@@ -108,7 +114,9 @@ export default class CreateRowUseCase {
       const row = await created.populate(populate);
 
       return right({
-        ...row?.toJSON(),
+        ...row?.toJSON({
+          flattenObjectIds: true,
+        }),
         _id: row?._id?.toString(),
       });
     } catch (error) {

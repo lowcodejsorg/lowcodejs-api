@@ -20,7 +20,8 @@ export default class {
       schema: {
         tags: ['Profile'],
         summary: 'Get current user profile',
-        description: 'Retrieves the authenticated user\'s profile information including personal data, group, and permissions.',
+        description:
+          "Retrieves the authenticated user's profile information including personal data, group, and permissions.",
         security: [{ cookieAuth: [] }],
         response: {
           200: {
@@ -29,8 +30,16 @@ export default class {
             properties: {
               _id: { type: 'string', description: 'User ID' },
               name: { type: 'string', description: 'User full name' },
-              email: { type: 'string', format: 'email', description: 'User email address' },
-              status: { type: 'string', enum: ['active', 'inactive'], description: 'User account status' },
+              email: {
+                type: 'string',
+                format: 'email',
+                description: 'User email address',
+              },
+              status: {
+                type: 'string',
+                enum: ['active', 'inactive'],
+                description: 'User account status',
+              },
               group: {
                 type: 'object',
                 description: 'User group with populated permissions',
@@ -38,7 +47,11 @@ export default class {
                   _id: { type: 'string', description: 'Group ID' },
                   name: { type: 'string', description: 'Group name' },
                   slug: { type: 'string', description: 'Group slug' },
-                  description: { type: 'string', nullable: true, description: 'Group description' },
+                  description: {
+                    type: 'string',
+                    nullable: true,
+                    description: 'Group description',
+                  },
                   permissions: {
                     type: 'array',
                     description: 'Array of permissions assigned to this group',
@@ -46,19 +59,37 @@ export default class {
                       type: 'object',
                       properties: {
                         _id: { type: 'string', description: 'Permission ID' },
-                        name: { type: 'string', description: 'Permission name' },
-                        slug: { type: 'string', description: 'Permission slug' },
-                        description: { type: 'string', nullable: true, description: 'Permission description' }
-                      }
-                    }
+                        name: {
+                          type: 'string',
+                          description: 'Permission name',
+                        },
+                        slug: {
+                          type: 'string',
+                          description: 'Permission slug',
+                        },
+                        description: {
+                          type: 'string',
+                          nullable: true,
+                          description: 'Permission description',
+                        },
+                      },
+                    },
                   },
                   createdAt: { type: 'string', format: 'date-time' },
-                  updatedAt: { type: 'string', format: 'date-time' }
-                }
+                  updatedAt: { type: 'string', format: 'date-time' },
+                },
               },
-              createdAt: { type: 'string', format: 'date-time', description: 'Account creation timestamp' },
-              updatedAt: { type: 'string', format: 'date-time', description: 'Last profile update timestamp' }
-            }
+              createdAt: {
+                type: 'string',
+                format: 'date-time',
+                description: 'Account creation timestamp',
+              },
+              updatedAt: {
+                type: 'string',
+                format: 'date-time',
+                description: 'Last profile update timestamp',
+              },
+            },
           },
           401: {
             description: 'Unauthorized - Authentication required',
@@ -66,8 +97,8 @@ export default class {
             properties: {
               message: { type: 'string', enum: ['Unauthorized'] },
               code: { type: 'number', enum: [401] },
-              cause: { type: 'string', enum: ['AUTHENTICATION_REQUIRED'] }
-            }
+              cause: { type: 'string', enum: ['AUTHENTICATION_REQUIRED'] },
+            },
           },
           404: {
             description: 'Not found - User profile not found',
@@ -75,15 +106,15 @@ export default class {
             properties: {
               message: { type: 'string', enum: ['User not found'] },
               code: { type: 'number', enum: [404] },
-              cause: { type: 'string', enum: ['USER_NOT_FOUND'] }
+              cause: { type: 'string', enum: ['USER_NOT_FOUND'] },
             },
             examples: [
               {
                 message: 'User not found',
                 code: 404,
-                cause: 'USER_NOT_FOUND'
-              }
-            ]
+                cause: 'USER_NOT_FOUND',
+              },
+            ],
           },
           500: {
             description: 'Internal server error - Database or server issues',
@@ -91,16 +122,17 @@ export default class {
             properties: {
               message: { type: 'string', enum: ['Internal server error'] },
               code: { type: 'number', enum: [500] },
-              cause: { type: 'string', enum: ['GET_USER_PROFILE_ERROR'] }
-            }
-          }
-        }
+              cause: { type: 'string', enum: ['GET_USER_PROFILE_ERROR'] },
+            },
+          },
+        },
       },
     },
   })
   async handle(request: FastifyRequest, response: FastifyReply): Promise<void> {
-    // @ts-ignore
-    const result = await this.useCase.execute();
+    const result = await this.useCase.execute({
+      _id: request.user.sub,
+    });
 
     if (result.isLeft()) {
       const error = result.value;

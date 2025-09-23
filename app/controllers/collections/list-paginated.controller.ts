@@ -90,24 +90,134 @@ export default class {
                 items: {
                   type: 'object',
                   properties: {
-                    _id: { type: 'string' },
-                    name: { type: 'string' },
-                    description: { type: 'string', nullable: true },
-                    slug: { type: 'string' },
-                    logo: { type: 'string', nullable: true },
+                    _id: { type: 'string', description: 'Collection ID' },
+                    name: { type: 'string', description: 'Collection name' },
+                    description: {
+                      type: 'string',
+                      nullable: true,
+                      description: 'Collection description'
+                    },
+                    slug: { type: 'string', description: 'Collection URL slug' },
+                    logo: {
+                      type: 'object',
+                      nullable: true,
+                      description: 'Collection logo storage details (populated)',
+                      properties: {
+                        _id: { type: 'string', description: 'Storage ID' },
+                        url: { type: 'string', description: 'File URL' },
+                        filename: { type: 'string', description: 'Original filename' },
+                        type: { type: 'string', description: 'MIME type' },
+                      },
+                    },
+                    fields: {
+                      type: 'array',
+                      description: 'Collection fields',
+                      items: {
+                        type: 'object',
+                        properties: {
+                          _id: { type: 'string', description: 'Field ID' },
+                          name: { type: 'string', description: 'Field name' },
+                          slug: { type: 'string', description: 'Field slug' },
+                          type: {
+                            type: 'string',
+                            enum: [
+                              'TEXT_SHORT',
+                              'TEXT_LONG',
+                              'DROPDOWN',
+                              'DATE',
+                              'RELATIONSHIP',
+                              'FILE',
+                              'FIELD_GROUP',
+                              'REACTION',
+                              'EVALUATION',
+                              'CATEGORY',
+                            ],
+                            description: 'Field type',
+                          },
+                          configuration: {
+                            type: 'object',
+                            description: 'Field configuration',
+                            additionalProperties: true,
+                          },
+                          createdAt: { type: 'string', format: 'date-time' },
+                          updatedAt: { type: 'string', format: 'date-time' },
+                        },
+                      },
+                    },
                     configuration: {
                       type: 'object',
+                      description: 'Collection configuration settings',
                       properties: {
-                        style: { type: 'string', enum: ['gallery', 'list'] },
+                        style: {
+                          type: 'string',
+                          enum: ['gallery', 'list'],
+                          description: 'Display style'
+                        },
                         visibility: {
                           type: 'string',
-                          enum: ['public', 'restrict'],
+                          enum: ['public', 'restricted'],
+                          description: 'Visibility setting'
                         },
                         collaboration: {
                           type: 'string',
-                          enum: ['open', 'restrict'],
+                          enum: ['open', 'restricted'],
+                          description: 'Collaboration setting'
+                        },
+                        administrators: {
+                          type: 'array',
+                          description: 'Administrator users (populated)',
+                          items: {
+                            type: 'object',
+                            properties: {
+                              _id: { type: 'string', description: 'User ID' },
+                              name: { type: 'string', description: 'User name' },
+                            },
+                          },
+                        },
+                        owner: {
+                          type: 'object',
+                          description: 'Collection owner (populated)',
+                          properties: {
+                            _id: { type: 'string', description: 'User ID' },
+                            name: { type: 'string', description: 'User name' },
+                          },
+                        },
+                        fields: {
+                          type: 'object',
+                          properties: {
+                            orderList: {
+                              type: 'array',
+                              items: { type: 'string' },
+                              description: 'Field order for list view',
+                            },
+                            orderForm: {
+                              type: 'array',
+                              items: { type: 'string' },
+                              description: 'Field order for form view',
+                            },
+                          },
                         },
                       },
+                    },
+                    type: {
+                      type: 'string',
+                      enum: ['collection', 'field-group'],
+                      description: 'Collection type',
+                    },
+                    _schema: {
+                      type: 'object',
+                      description: 'Generated MongoDB schema based on fields',
+                      additionalProperties: true,
+                    },
+                    trashed: {
+                      type: 'boolean',
+                      description: 'Is collection in trash',
+                    },
+                    trashedAt: {
+                      type: 'string',
+                      format: 'date-time',
+                      nullable: true,
+                      description: 'When collection was trashed',
                     },
                     createdAt: { type: 'string', format: 'date-time' },
                     updatedAt: { type: 'string', format: 'date-time' },

@@ -42,7 +42,9 @@ export default class ValidateCodeUseCase {
       if (diferenceTimeInMinutes > TIME_EXPIRATION_IN_MINUTES) {
         await token
           .set({
-            ...token?.toJSON(),
+            ...token?.toJSON({
+              flattenObjectIds: true,
+            }),
             status: TOKEN_STATUS.EXPIRED,
           })
           .save();
@@ -56,7 +58,9 @@ export default class ValidateCodeUseCase {
 
       await token
         .set({
-          ...token?.toJSON(),
+          ...token?.toJSON({
+            flattenObjectIds: true,
+          }),
           status: TOKEN_STATUS.VALIDATED,
         })
         .save();

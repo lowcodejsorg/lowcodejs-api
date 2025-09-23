@@ -37,6 +37,7 @@ export default class CreateUserUseCase {
       const created = await Model.create({
         ...payload,
         password: passwordHash,
+        status: 'active',
       });
 
       const populated = await created.populate([
@@ -46,7 +47,9 @@ export default class CreateUserUseCase {
       ]);
 
       return right({
-        ...populated?.toJSON(),
+        ...populated?.toJSON({
+          flattenObjectIds: true,
+        }),
         _id: populated?._id.toString(),
       });
     } catch (error) {

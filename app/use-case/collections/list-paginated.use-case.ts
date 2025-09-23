@@ -32,19 +32,36 @@ export default class ListCollectionPaginatedUseCase {
         query.$or = [
           { name: { $regex: normalize(payload.search), $options: 'i' } },
           { description: { $regex: normalize(payload.search), $options: 'i' } },
-          { slug: { $regex: normalize(payload.search), $options: 'i' } },
         ];
       }
 
       if (payload.name)
         query.name = { $regex: normalize(payload.name), $options: 'i' };
 
-      if (payload.type) query.type = payload.type;
-
       if (payload.trashed && payload.trashed === 'true') query.trashed = true;
       else query.trashed = false;
 
       const collections = await Model.find(query)
+        .populate([
+          {
+            path: 'configuration.administrators',
+            select: 'name _id',
+            model: 'User',
+          },
+          {
+            path: 'logo',
+            model: 'Storage',
+          },
+          {
+            path: 'configuration.owner',
+            select: 'name _id',
+            model: 'User',
+          },
+          {
+            path: 'fields',
+            model: 'Field',
+          },
+        ])
         .skip(skip)
         .limit(payload.perPage)
         .sort({ createdAt: 'asc' });
@@ -63,10 +80,12 @@ export default class ListCollectionPaginatedUseCase {
 
       return right({
         meta,
-        data: collections?.map((u) => ({
-          ...u?.toJSON(),
-          _id: u?._id.toString(),
-        })),
+        data: collections?.map((u) => {
+          return {
+            ...u?.toJSON(),
+            _id: u?._id.toString(),
+          };
+        }),
       });
     } catch (error) {
       return left(

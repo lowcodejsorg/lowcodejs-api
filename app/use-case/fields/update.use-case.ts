@@ -55,7 +55,9 @@ export default class UpdateFieldCollectionUseCase {
 
       await field
         .set({
-          ...field.toJSON(),
+          ...field.toJSON({
+            flattenObjectIds: true,
+          }),
           ...payload,
           slug,
         })
@@ -66,7 +68,9 @@ export default class UpdateFieldCollectionUseCase {
       ).map((f) => {
         if (f._id?.toString() === field._id?.toString()) {
           return {
-            ...field?.toJSON(),
+            ...field?.toJSON({
+              flattenObjectIds: true,
+            }),
             _id: field?._id?.toString(),
           };
         }
@@ -78,7 +82,9 @@ export default class UpdateFieldCollectionUseCase {
 
       await collection
         .set({
-          ...collection.toJSON(),
+          ...collection.toJSON({
+            flattenObjectIds: true,
+          }),
           _schema,
           fields: fields.flatMap((f) => f._id?.toString()),
         })
@@ -86,7 +92,9 @@ export default class UpdateFieldCollectionUseCase {
 
       if (oldSlug !== slug) {
         const c = await buildCollection({
-          ...collection.toJSON(),
+          ...collection.toJSON({
+            flattenObjectIds: true,
+          }),
           _id: collection._id.toString(),
         });
         await c.updateMany(
@@ -100,7 +108,9 @@ export default class UpdateFieldCollectionUseCase {
       }
 
       return right({
-        ...collection.toJSON(),
+        ...collection.toJSON({
+          flattenObjectIds: true,
+        }),
         _id: collection._id.toString(),
       });
     } catch (error) {

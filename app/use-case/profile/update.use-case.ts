@@ -41,20 +41,26 @@ export default class AtualizarPerfilUseCase {
       if (!payload.allowPasswordChange) {
         await user
           .set({
-            ...user?.toJSON(),
+            ...user?.toJSON({
+              flattenObjectIds: true,
+            }),
             ...payload,
             group: payload.group,
           })
           .save();
 
         return right({
-          ...user?.toJSON(),
+          ...user?.toJSON({
+            flattenObjectIds: true,
+          }),
           _id: user?._id.toString(),
         });
       }
 
       const isMatch = await isPasswordMatch({
-        hashed: user.toJSON().password,
+        hashed: user.toJSON({
+          flattenObjectIds: true,
+        }).password,
         plain: payload.newPassword as string,
       });
 
@@ -70,7 +76,9 @@ export default class AtualizarPerfilUseCase {
 
       await user
         .set({
-          ...user?.toJSON(),
+          ...user?.toJSON({
+            flattenObjectIds: true,
+          }),
           ...payload,
           group: payload.group,
           password,
@@ -78,7 +86,9 @@ export default class AtualizarPerfilUseCase {
         .save();
 
       return right({
-        ...user?.toJSON(),
+        ...user?.toJSON({
+          flattenObjectIds: true,
+        }),
         _id: user?._id.toString(),
       });
     } catch (error) {

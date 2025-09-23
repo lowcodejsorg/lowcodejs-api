@@ -126,6 +126,85 @@ export default class {
                       type: 'object',
                       description:
                         'Field configuration including required, multiple, format, etc.',
+                      properties: {
+                        required: {
+                          type: 'boolean',
+                          description: 'Is field required',
+                        },
+                        multiple: {
+                          type: 'boolean',
+                          description: 'Allows multiple values',
+                        },
+                        format: {
+                          type: 'string',
+                          nullable: true,
+                          enum: ['email', 'phone', 'url', 'color', 'password'],
+                          description: 'Field format validation',
+                        },
+                        listing: {
+                          type: 'boolean',
+                          description: 'Show in listings',
+                        },
+                        filtering: {
+                          type: 'boolean',
+                          description: 'Allow filtering',
+                        },
+                        default_value: {
+                          type: 'string',
+                          nullable: true,
+                          description: 'Default field value',
+                        },
+                        relationship: {
+                          type: 'object',
+                          nullable: true,
+                          description:
+                            'Relationship configuration for RELATIONSHIP fields',
+                          properties: {
+                            collection: {
+                              type: 'object',
+                              properties: {
+                                _id: { type: 'string' },
+                                slug: { type: 'string' },
+                              },
+                            },
+                            field: {
+                              type: 'object',
+                              properties: {
+                                _id: { type: 'string' },
+                                slug: { type: 'string' },
+                              },
+                            },
+                            order: { type: 'string', enum: ['asc', 'desc'] },
+                          },
+                        },
+                        dropdown: {
+                          type: 'array',
+                          items: { type: 'string' },
+                          description: 'Dropdown options for DROPDOWN fields',
+                        },
+                        category: {
+                          type: 'array',
+                          description: 'Category tree for CATEGORY fields',
+                          items: {
+                            type: 'object',
+                            properties: {
+                              id: { type: 'string' },
+                              label: { type: 'string' },
+                              children: { type: 'array', items: {} },
+                            },
+                          },
+                        },
+                        group: {
+                          type: 'object',
+                          nullable: true,
+                          description: 'Field group configuration',
+                          properties: {
+                            _id: { type: 'string', nullable: true },
+                            slug: { type: 'string', nullable: true },
+                          },
+                        },
+                      },
+                      additionalProperties: false,
                     },
                     createdAt: { type: 'string', format: 'date-time' },
                     updatedAt: { type: 'string', format: 'date-time' },
@@ -142,12 +221,12 @@ export default class {
                   },
                   visibility: {
                     type: 'string',
-                    enum: ['public', 'restrict'],
+                    enum: ['public', 'restricted'],
                     description: 'Visibility setting',
                   },
                   collaboration: {
                     type: 'string',
-                    enum: ['open', 'restrict'],
+                    enum: ['open', 'restricted'],
                     description: 'Collaboration setting',
                   },
                   administrators: {
@@ -195,6 +274,7 @@ export default class {
                 type: 'object',
                 description:
                   'Generated MongoDB schema based on fields with trashedAt and trashed properties',
+                additionalProperties: true,
               },
               trashed: {
                 type: 'boolean',

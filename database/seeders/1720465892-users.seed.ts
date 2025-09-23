@@ -59,5 +59,5 @@ export default async function Seed(): Promise<void> {
   ];
   await User.insertMany(payload);
 
-  console.log('🌱 \x1b[32m Users \x1b[0m');
+  console.info('🌱 \x1b[32m Users \x1b[0m');
 }

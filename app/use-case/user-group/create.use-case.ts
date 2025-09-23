@@ -45,7 +45,9 @@ export default class CreateUserGroupUseCase {
       ]);
 
       return right({
-        ...populated?.toJSON(),
+        ...populated?.toJSON({
+          flattenObjectIds: true,
+        }),
         _id: populated?._id.toString(),
       });
     } catch (error) {

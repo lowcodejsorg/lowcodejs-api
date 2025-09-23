@@ -1,8 +1,4 @@
 import z from 'zod';
-import {
-  CreateFieldCollectionSchema,
-  UpdateFieldCollectionSchema,
-} from './field-collection.validator';
 
 const Configuration = z.object({
   style: z.enum(['gallery', 'list']).default('list'),
@@ -22,7 +18,6 @@ export const GetCollectionBySlugSchema = z.object({
 export const GetCollectionQuerySchema = z.object({
   trashed: z.enum(['true', 'false']).default('false').optional(),
   public: z.enum(['true', 'false']).default('false').optional(),
-  type: z.enum(['collection', 'field-group']).optional(),
   name: z.string().optional(),
 });
 
@@ -34,10 +29,6 @@ export const ListCollectionPaginatedSchema = z.object({
 
 export const CreateCollectionSchema = z.object({
   name: z.string().trim(),
-  description: z.string().trim().nullable(),
-  logo: z.string().trim().nullable(),
-  fields: z.array(CreateFieldCollectionSchema).default([]),
-  configuration: Configuration,
   owner: z.string().optional(),
 });
 
@@ -45,7 +36,5 @@ export const UpdateCollectionSchema = z.object({
   name: z.string().trim(),
   description: z.string().trim().nullable(),
   logo: z.string().trim().nullable(),
-  fields: z.array(UpdateFieldCollectionSchema).default([]),
   configuration: Configuration,
-  owner: z.string().optional(),
 });

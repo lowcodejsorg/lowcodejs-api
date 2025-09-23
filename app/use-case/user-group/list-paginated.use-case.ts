@@ -50,7 +50,12 @@ export default class ListUserGroupPaginatedUseCase {
 
       return right({
         meta,
-        data: groups?.map((u) => ({ ...u?.toJSON(), _id: u?._id.toString() })),
+        data: groups?.map((u) => ({
+          ...u?.toJSON({
+            flattenObjectIds: true,
+          }),
+          _id: u?._id.toString(),
+        })),
       });
     } catch (error) {
       return left(
