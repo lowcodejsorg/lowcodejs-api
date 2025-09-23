@@ -16,6 +16,8 @@ services:
       - NODE_ENV=production
       - PORT=3000
       - DATABASE_URL=mongodb://demo:demo@demo-mongo:27017
+      - APP_SERVER_URL=https://api.demo.lowcodejs.org
+      - APP_CLIENT_URL=https://demo.lowcodejs.org
     networks:
       - traefik-network
     labels:
