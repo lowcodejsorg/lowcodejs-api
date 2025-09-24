@@ -65,7 +65,7 @@ export default class {
                   filtering: { type: 'boolean', description: 'Allow filtering by this field' },
                   format: { type: 'string', nullable: true, description: 'Field format' },
                   default_value: { type: 'string', nullable: true, description: 'Default field value' },
-                  dropdown: { type: 'array', items: { type: 'string' }, description: 'Dropdown options' },
+                  dropdown: { type: 'array', items: { type: 'string' }, nullable: true, description: 'Dropdown options' },
                   relationship: {
                     type: 'object',
                     nullable: true,
@@ -99,6 +99,7 @@ export default class {
                   },
                   category: {
                     type: 'array',
+                    nullable: true,
                     description: 'Category options',
                     items: {
                       type: 'object',

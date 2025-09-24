@@ -82,6 +82,8 @@ export default class ListRowCollectionPaginatedUseCase {
         collection?.fields as import('@core/entity.core').Field[],
       );
 
+      console.log(populate);
+
       const rows = await c
         .find(query)
         .populate(populate)
@@ -112,6 +114,7 @@ export default class ListRowCollectionPaginatedUseCase {
         })),
       });
     } catch (error) {
+      console.error(error);
       return left(
         ApplicationException.InternalServerError(
           'Internal server error',

@@ -27,8 +27,8 @@ const Configuration = z.object({
   filtering: z.boolean().default(false),
   defaultValue: z.string().nullable().default(null),
   relationship: Relacionamento.nullable().default(null),
-  dropdown: z.array(z.string()).default([]),
-  category: z.array(Category).default([]),
+  dropdown: z.array(z.string()).nullable().default(null),
+  category: z.array(Category).nullable().default(null),
   group: z
     .object({
       _id: z.string().trim(),

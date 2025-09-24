@@ -92,7 +92,8 @@ export default class {
                 dropdown: {
                   type: 'array',
                   items: { type: 'string' },
-                  default: [],
+                  nullable: true,
+                  default: null,
                   description: 'Options for DROPDOWN type fields'
                 },
                 relationship: {
@@ -137,7 +138,8 @@ export default class {
                 },
                 category: {
                   type: 'array',
-                  default: [],
+                  nullable: true,
+                  default: null,
                   description: 'Categories for CATEGORY type',
                   items: {
                     type: 'object',
@@ -164,6 +166,59 @@ export default class {
               type: { type: 'string', enum: ['TEXT_SHORT', 'TEXT_LONG', 'DROPDOWN', 'DATE', 'RELATIONSHIP', 'FILE', 'FIELD_GROUP', 'REACTION', 'EVALUATION', 'CATEGORY'], description: 'Field type' },
               configuration: {
                 type: 'object',
+                properties: {
+                  required: { type: 'boolean', description: 'Field is required' },
+                  multiple: { type: 'boolean', description: 'Field accepts multiple values' },
+                  listing: { type: 'boolean', description: 'Show field in list view' },
+                  filtering: { type: 'boolean', description: 'Allow filtering by this field' },
+                  format: { type: 'string', nullable: true, description: 'Field format' },
+                  defaultValue: { type: 'string', nullable: true, description: 'Default field value' },
+                  dropdown: { type: 'array', items: { type: 'string' }, nullable: true, description: 'Dropdown options' },
+                  relationship: {
+                    type: 'object',
+                    nullable: true,
+                    description: 'Relationship configuration',
+                    properties: {
+                      collection: {
+                        type: 'object',
+                        properties: {
+                          _id: { type: 'string' },
+                          slug: { type: 'string' }
+                        }
+                      },
+                      field: {
+                        type: 'object',
+                        properties: {
+                          _id: { type: 'string' },
+                          slug: { type: 'string' }
+                        }
+                      },
+                      order: { type: 'string', enum: ['asc', 'desc'] }
+                    }
+                  },
+                  category: {
+                    type: 'array',
+                    nullable: true,
+                    description: 'Category options',
+                    items: {
+                      type: 'object',
+                      properties: {
+                        id: { type: 'string' },
+                        label: { type: 'string' },
+                        children: { type: 'array' }
+                      }
+                    }
+                  },
+                  group: {
+                    type: 'object',
+                    nullable: true,
+                    description: 'Field group configuration',
+                    properties: {
+                      _id: { type: 'string' },
+                      slug: { type: 'string' }
+                    }
+                  }
+                },
                 description: 'Field configuration with populated group if FIELD_GROUP type'
               },
               trashed: { type: 'boolean', enum: [false], description: 'Field is not trashed' },

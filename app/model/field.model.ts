@@ -36,7 +36,10 @@ const Group = new mongoose.Schema(
   },
 );
 
-function validateCategory(Category: any[]): boolean {
+function validateCategory(Category: any[] | null): boolean {
+  // null é válido
+  if (Category === null) return true;
+
   // Array vazio é válido
   if (Category.length === 0) return true;
 
@@ -98,7 +101,7 @@ const Configuration = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-    default_value: {
+    defaultValue: {
       type: String,
       default: null,
     },
@@ -106,15 +109,17 @@ const Configuration = new mongoose.Schema(
       type: Relationship,
       default: null,
     },
-    dropdown: [
-      {
-        type: String,
-        default: null,
+    dropdown: {
+      type: [String],
+      default: function () {
+        return null;
       },
-    ],
+    },
     category: {
       type: [Category],
-      default: [],
+      default: function () {
+        return null;
+      },
       validate: {
         validator: validateCategory,
         message:
@@ -148,6 +153,19 @@ export const Schema = new mongoose.Schema(
   },
   {
     timestamps: true,
+    toJSON: {
+      transform: function (_doc, ret: any) {
+        if (ret.configuration) {
+          if (ret.configuration.dropdown === undefined) {
+            ret.configuration.dropdown = null;
+          }
+          if (ret.configuration.category === undefined) {
+            ret.configuration.category = null;
+          }
+        }
+        return ret;
+      },
+    },
   },
 );
 

@@ -65,10 +65,10 @@ export default class {
                   filtering: { type: 'boolean', enum: [false], description: 'Field filtering disabled when trashed' },
                   format: { type: 'string', nullable: true, description: 'Field format' },
                   default_value: { type: 'string', nullable: true, description: 'Default field value' },
-                  dropdown: { type: 'array', items: { type: 'string' }, description: 'Dropdown options' },
+                  dropdown: { type: 'array', items: { type: 'string' }, nullable: true, description: 'Dropdown options' },
                   relationship: { type: 'object', nullable: true, description: 'Relationship configuration' },
                   group: { type: 'object', nullable: true, description: 'Field group configuration' },
-                  category: { type: 'array', description: 'Category options' }
+                  category: { type: 'array', nullable: true, description: 'Category options' }
                 },
                 description: 'Field configuration with listing, filtering, and required set to false'
               },

@@ -1,4 +1,5 @@
 import { Either, left, right } from '@core/either.core';
+import { FIELD_TYPE } from '@core/entity.core';
 import { buildCollection, buildSchema } from '@core/util.core';
 import ApplicationException from '@exceptions/application.exception';
 import { Collection } from '@model/collection.model';
@@ -12,10 +13,7 @@ import { Service } from 'fastify-decorators';
 import slugify from 'slugify';
 import z from 'zod';
 
-type Response = Either<
-  ApplicationException,
-  import('@core/entity.core').Collection
->;
+type Response = Either<ApplicationException, import('@core/entity.core').Field>;
 
 @Service()
 export default class UpdateFieldCollectionUseCase {
@@ -63,6 +61,67 @@ export default class UpdateFieldCollectionUseCase {
         })
         .save();
 
+      if (field.type === FIELD_TYPE.FIELD_GROUP) {
+        let group;
+
+        // Se já tem grupo, busca existente
+        if (field.configuration?.group?._id) {
+          group = await Collection.findOne({
+            _id: field.configuration.group._id,
+          });
+        }
+
+        // Se não tem grupo, cria novo
+        if (!group) {
+          const _schema = buildSchema([]);
+          group = await Collection.create({
+            _schema,
+            fields: [],
+            slug,
+            configuration: {
+              administrators: [],
+              fields: {
+                orderForm: [],
+                orderList: [],
+              },
+              collaboration: 'restricted',
+              style: 'list',
+              visibility: 'restricted',
+              owner: collection?.configuration?.owner?.toString(),
+            },
+            description: null,
+            name: field.name,
+            type: 'field-group',
+          });
+
+          // Atualiza field com referência ao grupo
+          await field
+            .set({
+              ...field.toJSON({
+                flattenObjectIds: true,
+              }),
+              configuration: {
+                ...field.toJSON({
+                  flattenObjectIds: true,
+                }).configuration,
+                group: {
+                  _id: group._id,
+                  slug: group.slug,
+                },
+              },
+            })
+            .save();
+        }
+
+        // Sempre registra o modelo do grupo
+        await buildCollection({
+          ...group.toJSON({
+            flattenObjectIds: true,
+          }),
+          _id: group._id.toString(),
+        });
+      }
+
       const fields = (
         collection.fields as import('@core/entity.core').Field[]
       ).map((f) => {
@@ -108,10 +167,10 @@ export default class UpdateFieldCollectionUseCase {
       }
 
       return right({
-        ...collection.toJSON({
+        ...field.toJSON({
           flattenObjectIds: true,
         }),
-        _id: collection._id.toString(),
+        _id: field._id.toString(),
       });
     } catch (error) {
       return left(

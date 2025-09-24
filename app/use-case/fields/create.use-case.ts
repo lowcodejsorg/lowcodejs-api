@@ -58,6 +58,7 @@ export default class CreateFieldCollectionUseCase {
 
       if (field.type === FIELD_TYPE.FIELD_GROUP) {
         const _schema = buildSchema([]);
+
         const group = await Collection.create({
           _schema,
           fields: [],
@@ -94,6 +95,13 @@ export default class CreateFieldCollectionUseCase {
             },
           })
           .save();
+
+        await buildCollection({
+          ...group.toJSON({
+            flattenObjectIds: true,
+          }),
+          _id: group._id.toString(),
+        });
       }
 
       const fields = [
@@ -136,6 +144,7 @@ export default class CreateFieldCollectionUseCase {
         _id: field._id.toString(),
       });
     } catch (error) {
+      console.error(error);
       return left(
         ApplicationException.InternalServerError(
           'Internal server error',

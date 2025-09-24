@@ -68,7 +68,7 @@ export default class {
                 filtering: { type: 'boolean', description: 'Allow filtering by this field' },
                 format: { type: 'string', nullable: true, description: 'Field format' },
                 default_value: { type: 'string', nullable: true, description: 'Default field value' },
-                dropdown: { type: 'array', items: { type: 'string' }, description: 'Options for DROPDOWN type' },
+                dropdown: { type: 'array', items: { type: 'string' }, nullable: true, description: 'Options for DROPDOWN type' },
                 relationship: {
                   type: 'object',
                   nullable: true,
@@ -102,6 +102,7 @@ export default class {
                 },
                 category: {
                   type: 'array',
+                  nullable: true,
                   description: 'Categories for CATEGORY type',
                   items: {
                     type: 'object',
@@ -118,27 +119,78 @@ export default class {
         },
         response: {
           200: {
-            description: 'Field updated successfully and collection schema rebuilt',
+            description: 'Field updated successfully with updated configuration',
             type: 'object',
             properties: {
-              _id: { type: 'string', description: 'Collection ID' },
-              name: { type: 'string', description: 'Collection name' },
-              slug: { type: 'string', description: 'Collection slug' },
-              description: { type: 'string', nullable: true, description: 'Collection description' },
-              logo: { type: 'string', nullable: true, description: 'Collection logo' },
-              fields: {
-                type: 'array',
-                description: 'Updated collection fields array with modified field',
-                items: { type: 'string' }
+              _id: { type: 'string', description: 'Field ID' },
+              name: { type: 'string', description: 'Field name' },
+              slug: { type: 'string', description: 'Field slug' },
+              type: {
+                type: 'string',
+                enum: ['TEXT_SHORT', 'TEXT_LONG', 'DROPDOWN', 'DATE', 'RELATIONSHIP', 'FILE', 'FIELD_GROUP', 'REACTION', 'EVALUATION', 'CATEGORY'],
+                description: 'Field type'
               },
-              _schema: {
+              configuration: {
                 type: 'object',
-                description: 'Rebuilt MongoDB schema reflecting field changes'
+                properties: {
+                  required: { type: 'boolean', description: 'Field is required' },
+                  multiple: { type: 'boolean', description: 'Field accepts multiple values' },
+                  listing: { type: 'boolean', description: 'Show field in list view' },
+                  filtering: { type: 'boolean', description: 'Allow filtering by this field' },
+                  format: { type: 'string', nullable: true, description: 'Field format' },
+                  defaultValue: { type: 'string', nullable: true, description: 'Default field value' },
+                  dropdown: { type: 'array', items: { type: 'string' }, nullable: true, description: 'Dropdown options' },
+                  relationship: {
+                    type: 'object',
+                    nullable: true,
+                    description: 'Relationship configuration',
+                    properties: {
+                      collection: {
+                        type: 'object',
+                        properties: {
+                          _id: { type: 'string' },
+                          slug: { type: 'string' }
+                        }
+                      },
+                      field: {
+                        type: 'object',
+                        properties: {
+                          _id: { type: 'string' },
+                          slug: { type: 'string' }
+                        }
+                      },
+                      order: { type: 'string', enum: ['asc', 'desc'] }
+                    }
+                  },
+                  category: {
+                    type: 'array',
+                    nullable: true,
+                    description: 'Category options',
+                    items: {
+                      type: 'object',
+                      properties: {
+                        id: { type: 'string' },
+                        label: { type: 'string' },
+                        children: { type: 'array' }
+                      }
+                    }
+                  },
+                  group: {
+                    type: 'object',
+                    nullable: true,
+                    description: 'Field group configuration',
+                    properties: {
+                      _id: { type: 'string' },
+                      slug: { type: 'string' }
+                    }
+                  }
+                },
+                description: 'Updated field configuration'
               },
-              type: { type: 'string', enum: ['collection', 'field-group'], description: 'Collection type' },
-              configuration: { type: 'object', description: 'Collection configuration' },
-              createdAt: { type: 'string', format: 'date-time' },
-              updatedAt: { type: 'string', format: 'date-time' }
+              trashed: { type: 'boolean', description: 'Is field in trash' },
+              trashedAt: { type: 'string', format: 'date-time', nullable: true, description: 'When field was trashed' },
+              createdAt: { type: 'string', format: 'date-time', description: 'Creation timestamp' },
+              updatedAt: { type: 'string', format: 'date-time', description: 'Last update timestamp' }
             }
           },
           400: {

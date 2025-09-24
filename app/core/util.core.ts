@@ -206,6 +206,7 @@ export async function buildPopulate(
   fields?: Field[],
 ): Promise<{ path: string }[]> {
   const relacionamentos = getRelationship(fields);
+  console.log('relacionamentos', JSON.stringify(relacionamentos, null, 2));
   const populate = [];
 
   for await (const field of relacionamentos) {
@@ -214,6 +215,7 @@ export async function buildPopulate(
         FIELD_TYPE.FIELD_GROUP,
         FIELD_TYPE.REACTION,
         FIELD_TYPE.EVALUATION,
+        FIELD_TYPE.RELATIONSHIP,
       ].includes(field.type)
     ) {
       populate.push({
@@ -248,6 +250,13 @@ export async function buildPopulate(
       });
 
       if (group) {
+        await buildCollection({
+          ...group.toJSON({
+            flattenObjectIds: true,
+          }),
+          _id: group._id.toString(),
+        });
+
         const groupRelationship = getRelationship(group?.fields as Field[]);
 
         const groupFields = await buildPopulate(groupRelationship);
