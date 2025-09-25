@@ -43,6 +43,7 @@ export default class UploadStorageUseCase {
         })),
       );
     } catch (error) {
+      console.error(error);
       return left(
         ApplicationException.InternalServerError(
           'Internal server error',

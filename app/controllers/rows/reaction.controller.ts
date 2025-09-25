@@ -25,7 +25,8 @@ export default class {
       schema: {
         tags: ['Rows'],
         summary: 'Add reaction to row',
-        description: 'Adds a reaction (like/unlike) to a specific field in a row. Creates or updates reaction record linked to user and field.',
+        description:
+          'Adds a reaction (like/unlike) to a specific field in a row. Creates or updates reaction record linked to user and field.',
         security: [{ cookieAuth: [] }],
         params: {
           type: 'object',
@@ -34,57 +35,60 @@ export default class {
             slug: {
               type: 'string',
               description: 'Collection slug containing the row',
-              examples: ['users', 'products', 'blog-posts']
+              examples: ['users', 'products', 'blog-posts'],
             },
             _id: {
               type: 'string',
               description: 'Row ID to add reaction to',
-              examples: ['507f1f77bcf86cd799439011']
-            }
+              examples: ['507f1f77bcf86cd799439011'],
+            },
           },
-          additionalProperties: false
+          additionalProperties: false,
         },
         body: {
           type: 'object',
-          required: ['type', 'field', 'user'],
+          required: ['type', 'field'],
           properties: {
             type: {
               type: 'string',
               enum: ['like', 'unlike'],
-              description: 'Type of reaction'
+              description: 'Type of reaction',
             },
             field: {
               type: 'string',
-              description: 'Field slug that accepts reactions (must be REACTION type field)',
-              examples: ['rating', 'feedback', 'approval']
+              description:
+                'Field slug that accepts reactions (must be REACTION type field)',
+              examples: ['rating', 'feedback', 'approval'],
             },
-            user: {
-              type: 'string',
-              description: 'User ID adding the reaction',
-              examples: ['507f1f77bcf86cd799439012']
-            }
           },
-          additionalProperties: false
+          additionalProperties: false,
         },
         response: {
           200: {
-            description: 'Reaction added successfully',
+            description:
+              'Reaction added successfully - Returns the complete updated row',
             type: 'object',
             properties: {
-              _id: { type: 'string', description: 'Reaction ID' },
-              type: { type: 'string', enum: ['like', 'unlike'], description: 'Reaction type' },
-              user: {
-                type: 'object',
-                description: 'User who made the reaction (populated)',
-                properties: {
-                  _id: { type: 'string' },
-                  name: { type: 'string' },
-                  email: { type: 'string' }
-                }
+              _id: { type: 'string', description: 'Row ID' },
+              trashed: { type: 'boolean', description: 'Is row in trash' },
+              trashedAt: {
+                type: 'string',
+                format: 'date-time',
+                nullable: true,
+                description: 'When row was trashed',
               },
-              createdAt: { type: 'string', format: 'date-time', description: 'Creation timestamp' },
-              updatedAt: { type: 'string', format: 'date-time', description: 'Last update timestamp' }
-            }
+              createdAt: {
+                type: 'string',
+                format: 'date-time',
+                description: 'Creation timestamp',
+              },
+              updatedAt: {
+                type: 'string',
+                format: 'date-time',
+                description: 'Last update timestamp',
+              },
+            },
+            additionalProperties: true,
           },
           400: {
             description: 'Bad request - Invalid field type or validation error',
@@ -92,11 +96,18 @@ export default class {
             properties: {
               message: {
                 type: 'string',
-                enum: ['Field is not a reaction field', 'Invalid reaction type', 'User not found']
+                enum: [
+                  'Field is not a reaction field',
+                  'Invalid reaction type',
+                  'User not found',
+                ],
               },
               code: { type: 'number', enum: [400] },
-              cause: { type: 'string', enum: ['INVALID_FIELD_TYPE', 'INVALID_PARAMETERS'] }
-            }
+              cause: {
+                type: 'string',
+                enum: ['INVALID_FIELD_TYPE', 'INVALID_PARAMETERS'],
+              },
+            },
           },
           401: {
             description: 'Unauthorized - Authentication required',
@@ -104,8 +115,8 @@ export default class {
             properties: {
               message: { type: 'string', enum: ['Unauthorized'] },
               code: { type: 'number', enum: [401] },
-              cause: { type: 'string', enum: ['AUTHENTICATION_REQUIRED'] }
-            }
+              cause: { type: 'string', enum: ['AUTHENTICATION_REQUIRED'] },
+            },
           },
           404: {
             description: 'Not found - Collection, row, or field does not exist',
@@ -113,14 +124,22 @@ export default class {
             properties: {
               message: {
                 type: 'string',
-                enum: ['Collection not found', 'Row not found', 'Field not found']
+                enum: [
+                  'Collection not found',
+                  'Row not found',
+                  'Field not found',
+                ],
               },
               code: { type: 'number', enum: [404] },
               cause: {
                 type: 'string',
-                enum: ['COLLECTION_NOT_FOUND', 'ROW_NOT_FOUND', 'FIELD_NOT_FOUND']
-              }
-            }
+                enum: [
+                  'COLLECTION_NOT_FOUND',
+                  'ROW_NOT_FOUND',
+                  'FIELD_NOT_FOUND',
+                ],
+              },
+            },
           },
           500: {
             description: 'Internal server error - Database or server issues',
@@ -128,10 +147,10 @@ export default class {
             properties: {
               message: { type: 'string', enum: ['Internal server error'] },
               code: { type: 'number', enum: [500] },
-              cause: { type: 'string', enum: ['REACTION_ROW_ERROR'] }
-            }
-          }
-        }
+              cause: { type: 'string', enum: ['REACTION_ROW_ERROR'] },
+            },
+          },
+        },
       },
     },
   })
@@ -144,6 +163,7 @@ export default class {
     const result = await this.useCase.execute({
       ...payload,
       ...params,
+      user: request.user.sub,
     });
 
     if (result.isLeft()) {

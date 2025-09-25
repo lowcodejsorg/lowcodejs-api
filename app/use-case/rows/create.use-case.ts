@@ -71,7 +71,13 @@ export default class CreateRowUseCase {
         }
       }
 
+      const processedGroupIds: { [key: string]: string[] } = {};
+
       for await (const item of groupPayload) {
+        if (!processedGroupIds[item.group]) {
+          processedGroupIds[item.group] = [];
+        }
+
         const row = await item.collection.findOne({
           _id: item.payload._id,
         });
@@ -81,7 +87,7 @@ export default class CreateRowUseCase {
             ...item.payload,
           });
 
-          (payload[item.group] as string[])?.push(created?._id?.toString());
+          processedGroupIds[item.group].push(created?._id?.toString());
         }
 
         if (row) {
@@ -94,8 +100,12 @@ export default class CreateRowUseCase {
             })
             .save();
 
-          (payload[item.group] as string[])?.push(row?._id?.toString());
+          processedGroupIds[item.group].push(row?._id?.toString());
         }
+      }
+
+      for (const groupSlug in processedGroupIds) {
+        payload[groupSlug] = processedGroupIds[groupSlug];
       }
 
       const c = await buildCollection({
@@ -120,6 +130,7 @@ export default class CreateRowUseCase {
         _id: row?._id?.toString(),
       });
     } catch (error) {
+      console.error(error);
       return left(
         ApplicationException.InternalServerError(
           'Internal server error',

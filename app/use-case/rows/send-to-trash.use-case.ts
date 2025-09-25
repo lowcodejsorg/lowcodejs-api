@@ -70,6 +70,7 @@ export default class SendRowCollectionToTrashUseCase {
         _id: populated._id.toString(),
       });
     } catch (error) {
+      console.error(error);
       return left(
         ApplicationException.InternalServerError(
           'Internal server error',

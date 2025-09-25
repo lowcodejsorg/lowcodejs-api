@@ -44,11 +44,11 @@ export const ListRowCollectionPaginatedSchema = z.object({
 export const ReactionRowCollectionSchema = z.object({
   type: z.enum(['like', 'unlike']),
   field: z.string(),
-  user: z.string(),
+  user: z.string().optional(),
 });
 
 export const EvaluationRowCollectionSchema = z.object({
   value: z.number(),
   field: z.string(),
-  user: z.string(),
+  user: z.string().optional(),
 });

@@ -243,6 +243,35 @@ export async function buildPopulate(
       });
     }
 
+    if (field.type === FIELD_TYPE.RELATIONSHIP) {
+      const relationshipCollectionId =
+        field?.configuration?.relationship?.collection?._id?.toString();
+      const relationshipCollection = await Collection.findOne({
+        _id: relationshipCollectionId,
+      });
+
+      if (relationshipCollection) {
+        await buildCollection({
+          ...relationshipCollection.toJSON({
+            flattenObjectIds: true,
+          }),
+          _id: relationshipCollection._id.toString(),
+        });
+
+        const relationshipFields = getRelationship(
+          relationshipCollection?.fields as Field[],
+        );
+        const relationshipPopulate = await buildPopulate(relationshipFields);
+
+        populate.push({
+          path: field.slug,
+          ...(relationshipPopulate.length > 0 && {
+            populate: relationshipPopulate,
+          }),
+        });
+      }
+    }
+
     if (field.type === FIELD_TYPE.FIELD_GROUP) {
       const groupId = field?.configuration?.group?._id?.toString();
       const group = await Collection.findOne({

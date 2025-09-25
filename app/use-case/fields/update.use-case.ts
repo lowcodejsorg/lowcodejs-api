@@ -58,6 +58,10 @@ export default class UpdateFieldCollectionUseCase {
           }),
           ...payload,
           slug,
+          ...(payload.trashed && { trashed: payload.trashed }),
+          ...(payload.trashedAt && {
+            trashedAt: payload.trashedAt,
+          }),
         })
         .save();
 
@@ -173,6 +177,7 @@ export default class UpdateFieldCollectionUseCase {
         _id: field._id.toString(),
       });
     } catch (error) {
+      console.error(error);
       return left(
         ApplicationException.InternalServerError(
           'Internal server error',

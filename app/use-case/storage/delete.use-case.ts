@@ -31,6 +31,7 @@ export default class DeleteStorageUseCase {
 
       return right(null);
     } catch (error) {
+      console.error(error);
       return left(
         ApplicationException.InternalServerError(
           'Internal server error',

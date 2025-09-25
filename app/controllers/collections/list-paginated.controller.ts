@@ -139,6 +139,16 @@ export default class {
                             description: 'Field configuration',
                             additionalProperties: true,
                           },
+                          trashed: {
+                            type: 'boolean',
+                            description: 'Is field in trash',
+                          },
+                          trashedAt: {
+                            type: 'string',
+                            format: 'date-time',
+                            nullable: true,
+                            description: 'When field was trashed',
+                          },
                           createdAt: { type: 'string', format: 'date-time' },
                           updatedAt: { type: 'string', format: 'date-time' },
                         },

@@ -9,6 +9,7 @@ import {
   ReactionRowCollectionSchema,
 } from '@validators/row-collection.validator';
 import { Service } from 'fastify-decorators';
+import { ObjectId } from 'mongoose';
 import z from 'zod';
 
 type Response = Either<ApplicationException, import('@core/entity.core').Row>;
@@ -23,7 +24,12 @@ export default class ReactionRowCollectionUseCase {
     try {
       const collection = await Collection.findOne({
         slug: payload.slug,
-      });
+      }).populate([
+        {
+          path: 'fields',
+          model: 'Field',
+        },
+      ]);
 
       if (!collection)
         return left(
@@ -44,11 +50,9 @@ export default class ReactionRowCollectionUseCase {
         collection.fields as import('@core/entity.core').Field[],
       );
 
-      const row = await c
-        .findOne({
-          _id: payload._id,
-        })
-        .populate(populate);
+      const row = await c.findOne({
+        _id: payload._id,
+      });
 
       if (!row)
         return left(
@@ -77,7 +81,8 @@ export default class ReactionRowCollectionUseCase {
           .save();
       }
 
-      const reactions = row[payload.field] ?? [];
+      const reactions =
+        row[payload.field]?.flatMap((r: ObjectId) => r?.toString()) ?? [];
       const reactionId = reaction?._id?.toString();
 
       // se não existir a reação adiciona o id na propriedade do registro
@@ -100,6 +105,7 @@ export default class ReactionRowCollectionUseCase {
         _id: populated?._id.toString(),
       });
     } catch (error) {
+      console.error(error);
       return left(
         ApplicationException.InternalServerError(
           'Internal server error',

@@ -82,6 +82,7 @@ export default class CreateCollectionUseCase {
         _id: created._id.toString(),
       });
     } catch (error) {
+      console.error(error);
       return left(
         ApplicationException.InternalServerError(
           'Internal server error',

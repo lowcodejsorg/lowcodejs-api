@@ -28,7 +28,7 @@ export default class DeleteCollectionUseCase {
 
       return right(null);
     } catch (error) {
-      console.log(error);
+      console.error(error);
       return left(
         ApplicationException.InternalServerError(
           'Internal server error',

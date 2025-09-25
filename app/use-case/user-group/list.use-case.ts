@@ -20,6 +20,7 @@ export default class ListUserGroupUseCase {
         })),
       );
     } catch (error) {
+      console.error(error);
       return left(
         ApplicationException.InternalServerError(
           'Internal server error',

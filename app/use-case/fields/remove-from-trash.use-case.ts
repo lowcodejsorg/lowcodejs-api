@@ -93,6 +93,7 @@ export default class RemoveFieldFromTrashUseCase {
         _id: field._id?.toString(),
       });
     } catch (error) {
+      console.error(error);
       return left(
         ApplicationException.InternalServerError(
           'Internal server error',

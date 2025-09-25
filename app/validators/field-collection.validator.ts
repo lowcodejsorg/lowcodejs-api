@@ -56,4 +56,6 @@ export const UpdateFieldCollectionSchema = z.object({
   name: z.string().trim(),
   type: z.enum(FIELD_TYPE),
   configuration: Configuration,
+  trashed: z.boolean().default(false),
+  trashedAt: z.string().nullable().default(null),
 });

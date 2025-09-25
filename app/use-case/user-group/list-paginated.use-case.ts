@@ -58,6 +58,7 @@ export default class ListUserGroupPaginatedUseCase {
         })),
       });
     } catch (error) {
+      console.error(error);
       return left(
         ApplicationException.InternalServerError(
           'Internal server error',

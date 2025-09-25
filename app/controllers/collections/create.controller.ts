@@ -77,6 +77,18 @@ export default class {
                       type: 'object',
                       description: 'Field configuration',
                     },
+                    trashed: {
+                      type: 'boolean',
+                      description: 'Is field in trash',
+                    },
+                    trashedAt: {
+                      type: 'string',
+                      format: 'date-time',
+                      nullable: true,
+                      description: 'When field was trashed',
+                    },
+                    createdAt: { type: 'string', format: 'date-time' },
+                    updatedAt: { type: 'string', format: 'date-time' },
                   },
                 },
                 description: 'Collection fields (processed with slugs)',

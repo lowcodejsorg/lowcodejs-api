@@ -114,6 +114,18 @@ export default class {
                   }
                 }
               }
+            },
+            trashed: {
+              type: 'boolean',
+              description: 'Set field as trashed',
+              examples: [true, false]
+            },
+            trashedAt: {
+              type: 'string',
+              format: 'date-time',
+              nullable: true,
+              description: 'Timestamp when field was trashed',
+              examples: ['2023-01-01T00:00:00.000Z', null]
             }
           }
         },

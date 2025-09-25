@@ -35,6 +35,7 @@ export default class GetUserGroupById {
         _id: group?._id.toString(),
       });
     } catch (error) {
+      console.error(error);
       return left(
         ApplicationException.InternalServerError(
           'Internal server error',

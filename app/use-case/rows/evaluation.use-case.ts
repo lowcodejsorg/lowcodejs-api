@@ -9,6 +9,7 @@ import {
   GetRowCollectionSlugSchema,
 } from '@validators/row-collection.validator';
 import { Service } from 'fastify-decorators';
+import { ObjectId } from 'mongoose';
 import z from 'zod';
 
 type Response = Either<ApplicationException, import('@core/entity.core').Row>;
@@ -23,7 +24,12 @@ export default class EvaluationRowCollectionUseCase {
     try {
       const collection = await Collection.findOne({
         slug: payload.slug,
-      });
+      }).populate([
+        {
+          path: 'fields',
+          model: 'Field',
+        },
+      ]);
 
       if (!collection)
         return left(
@@ -44,11 +50,10 @@ export default class EvaluationRowCollectionUseCase {
         collection.fields as import('@core/entity.core').Field[],
       );
 
-      const row = await c
-        .findOne({
-          _id: payload._id,
-        })
-        .populate(populate);
+      const row = await c.findOne({
+        _id: payload._id,
+      });
+      // .populate(populate);
 
       if (!row)
         return left(
@@ -69,15 +74,14 @@ export default class EvaluationRowCollectionUseCase {
       if (evaluation) {
         await evaluation
           .set({
-            ...evaluation.toJSON({
-              flattenObjectIds: true,
-            }),
+            ...evaluation.toJSON(),
             value: payload.value,
           })
           .save();
       }
 
-      const evaluations = row[payload.field] ?? [];
+      const evaluations =
+        row[payload.field]?.flatMap((r: ObjectId) => r?.toString()) ?? [];
       const evaluationId = evaluation?._id?.toString();
 
       if (!evaluations.includes(evaluationId))
@@ -99,6 +103,7 @@ export default class EvaluationRowCollectionUseCase {
         _id: populated?._id?.toString(),
       });
     } catch (error) {
+      console.error(error);
       return left(
         ApplicationException.InternalServerError(
           'Internal server error',

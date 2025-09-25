@@ -69,6 +69,7 @@ export default class ValidateCodeUseCase {
         user: token.user,
       });
     } catch (error) {
+      console.error(error);
       return left(
         ApplicationException.InternalServerError(
           'Internal server error',

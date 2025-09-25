@@ -21,9 +21,15 @@ export default class UpdateRowCollectionUseCase {
       z.infer<typeof GetRowCollectionSlugSchema>,
   ): Promise<Response> {
     try {
+      console.log(payload);
       const collection = await Collection.findOne({
         slug: payload.slug,
-      });
+      }).populate([
+        {
+          path: 'fields',
+          model: 'Field',
+        },
+      ]);
 
       if (!collection)
         return left(
@@ -74,43 +80,100 @@ export default class UpdateRowCollectionUseCase {
           _id: groupCollection?._id?.toString(),
         });
 
-        for (const item of payload[
-          group.slug
-        ] as import('@core/entity.core').Row[]) {
-          groupPayload.push({
-            collection: cGroup,
-            payload: item,
-            group: group.slug,
-          });
+        const groupItems = payload[group.slug] as any[];
+        console.log(
+          'Processing group:',
+          group.slug,
+          'Items:',
+          JSON.stringify(groupItems, null, 2),
+        );
+
+        for (const item of groupItems) {
+          if (typeof item === 'string') {
+            groupPayload.push({
+              collection: cGroup,
+              payload: null,
+              group: group.slug,
+              existingId: item,
+            });
+          } else if (item._id && (item.createdAt || item.updatedAt)) {
+            groupPayload.push({
+              collection: cGroup,
+              payload: null,
+              group: group.slug,
+              existingId: item._id,
+            });
+          } else if (item._id) {
+            groupPayload.push({
+              collection: cGroup,
+              payload: item,
+              group: group.slug,
+              existingId: item._id,
+            });
+          } else {
+            groupPayload.push({
+              collection: cGroup,
+              payload: item,
+              group: group.slug,
+              existingId: null,
+            });
+          }
         }
       }
+
+      console.log('groupPayload', groupPayload);
+
+      const processedGroupIds: { [key: string]: string[] } = {};
 
       for await (const item of groupPayload) {
-        const row = await item.collection.findOne({
-          _id: item.payload._id,
-        });
+        if (!processedGroupIds[item.group]) {
+          processedGroupIds[item.group] = [];
+        }
 
-        if (!row) {
-          const created = await item.collection.create({
-            ...item.payload,
+        if (item.existingId && !item.payload) {
+          processedGroupIds[item.group].push(item.existingId);
+          continue;
+        }
+
+        if (item.existingId && item.payload) {
+          const row = await item.collection.findOne({
+            _id: item.existingId,
           });
 
-          (payload[item.group] as string[])?.push(created?._id?.toString());
+          if (row) {
+            await row
+              .set({
+                ...row.toJSON({
+                  flattenObjectIds: true,
+                }),
+                ...item.payload,
+              })
+              .save();
+          }
+
+          processedGroupIds[item.group].push(item.existingId);
+          continue;
         }
 
-        if (row) {
-          await row
-            .set({
-              ...row.toJSON({
-                flattenObjectIds: true,
-              }),
-              ...item.payload,
-            })
-            .save();
+        const created = await item.collection.create({
+          ...item.payload,
+        });
 
-          (payload[item.group] as string[])?.push(row?._id?.toString());
-        }
+        processedGroupIds[item.group].push(created?._id?.toString());
       }
+
+      for (const groupSlug in processedGroupIds) {
+        console.log(
+          'Setting payload[' + groupSlug + '] =',
+          processedGroupIds[groupSlug],
+        );
+        payload[groupSlug] = processedGroupIds[groupSlug];
+      }
+
+      console.log(
+        'Final payload before save:',
+        JSON.stringify(payload, null, 2),
+      );
 
       const populate = await buildPopulate(
         collection?.fields as import('@core/entity.core').Field[],
@@ -134,6 +197,7 @@ export default class UpdateRowCollectionUseCase {
         _id: updated?._id?.toString(),
       });
     } catch (error) {
+      console.error(error);
       return left(
         ApplicationException.InternalServerError(
           'Internal server error',

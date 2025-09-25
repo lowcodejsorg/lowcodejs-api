@@ -51,6 +51,7 @@ export default class UpdateUserGroupUseCase {
         _id: group?._id.toString(),
       });
     } catch (error) {
+      console.error(error);
       return left(
         ApplicationException.InternalServerError(
           'Internal server error',

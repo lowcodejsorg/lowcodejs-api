@@ -88,6 +88,7 @@ export default class SendFieldToTrashUseCase {
         _id: field._id.toString(),
       });
     } catch (error) {
+      console.error(error);
       return left(
         ApplicationException.InternalServerError(
           'Internal server error',

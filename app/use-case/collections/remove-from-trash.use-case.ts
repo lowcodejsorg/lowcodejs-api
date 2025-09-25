@@ -62,6 +62,7 @@ export default class RemoveCollectionFromTrashUseCase {
         _id: populated._id.toString(),
       });
     } catch (error) {
+      console.error(error);
       return left(
         ApplicationException.InternalServerError(
           'Internal server error',

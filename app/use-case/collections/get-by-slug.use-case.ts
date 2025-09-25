@@ -65,6 +65,7 @@ export default class GetCollectionBySlugUseCase {
         _id: collection._id.toString(),
       });
     } catch (error) {
+      console.error(error);
       return left(
         ApplicationException.InternalServerError(
           'Internal server error',
