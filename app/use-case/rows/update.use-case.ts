@@ -21,7 +21,6 @@ export default class UpdateRowCollectionUseCase {
       z.infer<typeof GetRowCollectionSlugSchema>,
   ): Promise<Response> {
     try {
-      console.log(payload);
       const collection = await Collection.findOne({
         slug: payload.slug,
       }).populate([
@@ -81,12 +80,6 @@ export default class UpdateRowCollectionUseCase {
         });
 
         const groupItems = payload[group.slug] as any[];
-        console.log(
-          'Processing group:',
-          group.slug,
-          'Items:',
-          JSON.stringify(groupItems, null, 2),
-        );
 
         for (const item of groupItems) {
           if (typeof item === 'string') {
@@ -120,8 +113,6 @@ export default class UpdateRowCollectionUseCase {
           }
         }
       }
-
-      console.log('groupPayload', groupPayload);
 
       const processedGroupIds: { [key: string]: string[] } = {};
 
@@ -163,17 +154,8 @@ export default class UpdateRowCollectionUseCase {
       }
 
       for (const groupSlug in processedGroupIds) {
-        console.log(
-          'Setting payload[' + groupSlug + '] =',
-          processedGroupIds[groupSlug],
-        );
         payload[groupSlug] = processedGroupIds[groupSlug];
       }
-
-      console.log(
-        'Final payload before save:',
-        JSON.stringify(payload, null, 2),
-      );
 
       const populate = await buildPopulate(
         collection?.fields as import('@core/entity.core').Field[],

@@ -30,16 +30,20 @@ export const GetRowCollectionSlugSchema = z.object({
   slug: z.string(),
 });
 
-export const GetRowCollectionQuerySchema = z.object({
-  trashed: z.enum(['true', 'false']).default('false').optional(),
-  public: z.enum(['true', 'false']).default('false'),
-});
+export const GetRowCollectionQuerySchema = z
+  .object({
+    trashed: z.enum(['true', 'false']).default('false').optional(),
+    public: z.enum(['true', 'false']).default('false'),
+  })
+  .loose();
 
-export const ListRowCollectionPaginatedSchema = z.object({
-  page: z.coerce.number().default(1),
-  perPage: z.coerce.number().default(50),
-  search: z.string().optional(),
-});
+export const ListRowCollectionPaginatedSchema = z
+  .object({
+    page: z.coerce.number().default(1),
+    perPage: z.coerce.number().default(50),
+    search: z.string().optional(),
+  })
+  .loose();
 
 export const ReactionRowCollectionSchema = z.object({
   type: z.enum(['like', 'unlike']),

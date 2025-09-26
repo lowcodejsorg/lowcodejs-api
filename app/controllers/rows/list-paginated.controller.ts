@@ -26,7 +26,7 @@ export default class {
         tags: ['Rows'],
         summary: 'List rows paginated',
         description:
-          'Get a paginated list of rows in a collection with optional search and filtering',
+          'Get a paginated list of rows in a collection with optional search and dynamic filtering',
         security: [{ cookieAuth: [] }],
         params: {
           type: 'object',
@@ -79,7 +79,7 @@ export default class {
               examples: ['true', 'false'],
             },
           },
-          additionalProperties: false,
+          additionalProperties: true,
         },
         response: {
           200: {
@@ -165,6 +165,8 @@ export default class {
     },
   })
   async handle(request: FastifyRequest, response: FastifyReply): Promise<void> {
+    console.log('ListRowCollectionPaginatedController', request.query);
+
     const query = ListRowCollectionPaginatedSchema.parse(request.query);
     const params = {
       ...GetRowCollectionSlugSchema.parse(request.params),

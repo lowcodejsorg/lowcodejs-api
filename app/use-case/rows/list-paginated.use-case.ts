@@ -29,6 +29,7 @@ export default class ListRowCollectionPaginatedUseCase {
       z.infer<typeof GetRowCollectionQuerySchema>,
   ): Promise<Response> {
     try {
+      console.log('ListRowCollectionPaginatedUseCase', payload);
       const skip = (payload.page - 1) * payload.perPage;
 
       const collection = await Collection.findOne({
@@ -81,8 +82,6 @@ export default class ListRowCollectionPaginatedUseCase {
       const populate = await buildPopulate(
         collection?.fields as import('@core/entity.core').Field[],
       );
-
-      console.log(populate);
 
       const rows = await c
         .find(query)

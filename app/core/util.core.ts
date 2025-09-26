@@ -206,7 +206,6 @@ export async function buildPopulate(
   fields?: Field[],
 ): Promise<{ path: string }[]> {
   const relacionamentos = getRelationship(fields);
-  console.log('relacionamentos', JSON.stringify(relacionamentos, null, 2));
   const populate = [];
 
   for await (const field of relacionamentos) {
@@ -310,7 +309,18 @@ export function buildQuery(
   fields: Field[] = [],
 ) {
   let query = fields?.reduce((acc, col) => {
-    if (!col?.type || !col.slug || rest[col.slug] === undefined) return acc;
+    if (!col?.type || !col.slug) return acc;
+
+    // For date fields, check if either -initial or -final exists
+    if (col.type === FIELD_TYPE.DATE) {
+      const slug = String(col.slug?.toString());
+      const initialKey = `${slug}-initial`;
+      const finalKey = `${slug}-final`;
+      if (!rest[initialKey] && !rest[finalKey]) return acc;
+    } else {
+      // For other fields, check if the field value exists
+      if (rest[col.slug] === undefined) return acc;
+    }
 
     const slug = String(col.slug?.toString());
 
@@ -334,25 +344,22 @@ export function buildQuery(
     }
 
     if (col.type === FIELD_TYPE.DATE) {
-      if (!String(rest[slug])?.includes(',')) {
-        const date = new Date(String(rest[slug]));
-        const initial = new Date(date.setUTCHours(0, 0, 0, 0));
-        const final = new Date(date.setUTCHours(23, 59, 59, 0));
-        acc[slug] = {
-          $gte: initial,
-          $lte: final,
-        };
+      const initialKey = `${slug}-initial`;
+      const finalKey = `${slug}-final`;
+      const dateQuery: any = {};
+
+      if (rest[initialKey]) {
+        const initial = new Date(String(rest[initialKey]));
+        dateQuery.$gte = new Date(initial.setUTCHours(0, 0, 0, 0));
       }
 
-      if (String(rest[slug])?.includes(',')) {
-        const [part_initial, part_final] = String(rest[slug]).split(',');
-        const initial = new Date(part_initial).setUTCHours(0, 0, 0, 0);
-        const final = new Date(part_final).setUTCHours(23, 59, 59, 0);
+      if (rest[finalKey]) {
+        const final = new Date(String(rest[finalKey]));
+        dateQuery.$lte = new Date(final.setUTCHours(23, 59, 59, 999));
+      }
 
-        acc[slug] = {
-          $gte: new Date(initial),
-          $lte: new Date(final),
-        };
+      if (Object.keys(dateQuery).length > 0) {
+        acc[slug] = dateQuery;
       }
     }
 
@@ -392,7 +399,7 @@ export function buildQuery(
 
 export type QueryOrder = Record<
   string,
-  number | string | boolean | null | RootFilterQuery<Row> | QueryOrder[]
+  number | string | boolean | null | unknown | RootFilterQuery<Row> | QueryOrder[]
 >;
 
 export function buildOrder(
