@@ -4,7 +4,10 @@ import { Either, left, right } from '@core/either.core';
 import { UserGroup as Entity } from '@core/entity.core';
 import ApplicationException from '@exceptions/application.exception';
 import { UserGroup as Model } from '@model/user-group.model';
-import { UpdateUserGroupSchema } from '@validators/user-group.validator';
+import {
+  GetUserGroupByIdSchema,
+  UpdateUserGroupSchema,
+} from '@validators/user-group.validator';
 import z from 'zod';
 
 type Response = Either<ApplicationException, Entity>;
@@ -12,7 +15,8 @@ type Response = Either<ApplicationException, Entity>;
 @Service()
 export default class UpdateUserGroupUseCase {
   async execute(
-    payload: z.infer<typeof UpdateUserGroupSchema>,
+    payload: z.infer<typeof UpdateUserGroupSchema> &
+      z.infer<typeof GetUserGroupByIdSchema>,
   ): Promise<Response> {
     try {
       const group = await Model.findOne({

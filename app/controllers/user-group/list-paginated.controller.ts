@@ -58,8 +58,37 @@ export default class {
                   properties: {
                     _id: { type: 'string' },
                     name: { type: 'string' },
+                    slug: { type: 'string' },
                     description: { type: 'string' },
-                    permissions: { type: 'array', items: { type: 'string' } },
+                    // permissions: { type: 'array', items: { type: 'string' } },
+                    permissions: {
+                      type: 'array',
+                      description: 'Permissions assigned to the user group',
+                      items: {
+                        type: 'object',
+                        properties: {
+                          _id: { type: 'string', description: 'Field ID' },
+                          name: { type: 'string', description: 'Field name' },
+                          slug: { type: 'string', description: 'Field slug' },
+                          description: {
+                            type: 'string',
+                            description: 'Field description',
+                          },
+                          trashed: {
+                            type: 'boolean',
+                            description: 'Is field in trash',
+                          },
+                          trashedAt: {
+                            type: 'string',
+                            format: 'date-time',
+                            nullable: true,
+                            description: 'When field was trashed',
+                          },
+                          createdAt: { type: 'string', format: 'date-time' },
+                          updatedAt: { type: 'string', format: 'date-time' },
+                        },
+                      },
+                    },
                     createdAt: { type: 'string', format: 'date-time' },
                     updatedAt: { type: 'string', format: 'date-time' },
                   },

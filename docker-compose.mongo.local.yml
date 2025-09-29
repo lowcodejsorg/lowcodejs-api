@@ -1,11 +1,14 @@
 services:
   local-mongo:
-    image: bitnami/mongodb:latest
+    image: mongo:latest # imagem oficial
+    # image: bitnami/mongodb:latest
     container_name: local-mongo
     restart: unless-stopped
     environment:
-      MONGODB_ROOT_USER: local
-      MONGODB_ROOT_PASSWORD: local
+      MONGO_INITDB_ROOT_USERNAME: local
+      MONGO_INITDB_ROOT_PASSWORD: local
+      # MONGODB_ROOT_USER: local # for bitnami
+      # MONGODB_ROOT_PASSWORD: local # for bitnami
     volumes:
       - ./database-data:/data/db
     ports:

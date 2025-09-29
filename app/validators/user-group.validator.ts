@@ -13,7 +13,6 @@ export const CreateUserGroupSchema = z.object({
 export const UpdateUserGroupSchema = z.object({
   description: z.string().trim().nullable(),
   permissions: z.array(z.string()).default([]),
-  _id: z.string(),
 });
 
 export const ListUserGroupPaginatedSchema = z.object({
