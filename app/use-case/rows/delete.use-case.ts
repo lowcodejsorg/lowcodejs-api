@@ -31,12 +31,23 @@ export default class DeleteRowCollectionUseCase {
           ),
         );
 
-      const c = await buildCollection({
-        ...collection?.toJSON({
-          flattenObjectIds: true,
-        }),
-        _id: collection?._id.toString(),
-      });
+      let c;
+      try {
+        c = await buildCollection({
+          ...collection?.toJSON({
+            flattenObjectIds: true,
+          }),
+          _id: collection?._id.toString(),
+        });
+      } catch (error) {
+        console.error('Model build error:', error);
+        return left(
+          ApplicationException.InternalServerError(
+            'Failed to build collection model',
+            'MODEL_BUILD_FAILED',
+          ),
+        );
+      }
 
       const row = await c.findOneAndDelete({
         _id: payload._id,

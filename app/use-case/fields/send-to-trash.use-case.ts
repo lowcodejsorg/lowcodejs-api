@@ -36,6 +36,14 @@ export default class SendFieldToTrashUseCase {
           ApplicationException.NotFound('Field not found', 'FIELD_NOT_FOUND'),
         );
 
+      if (field.trashed)
+        return left(
+          ApplicationException.Conflict(
+            'Field already in trash',
+            'ALREADY_TRASHED',
+          ),
+        );
+
       await field
         .set({
           ...field.toJSON({

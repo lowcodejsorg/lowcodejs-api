@@ -14,7 +14,7 @@ export default class {
 
       if (!user) {
         return left(
-          ApplicationException.Unauthorized('User not found', 'USER_NOT_FOUND'),
+          ApplicationException.NotFound('User not found', 'USER_NOT_FOUND'),
         );
       }
 

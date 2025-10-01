@@ -2,9 +2,23 @@
 
 > Contexto técnico do projeto para assistência de IA
 
+## 📖 Documentação Adicional
+
+Para informações detalhadas sobre arquitetura, fluxos de dados e mapeamento
+completo do projeto, consulte:
+
+- **[PROJECT-MAPPING.md](PROJECT-MAPPING.md)** - Mapeamento completo do projeto,
+  fluxos detalhados e best practices
+- **[API-ENDPOINTS.md](API-ENDPOINTS.md)** - Referência resumida de todos os
+  endpoints da API
+- **[API-ROUTES-DETAILED.md](API-ROUTES-DETAILED.md)** - ⭐ **Mapeamento detalhado**
+  com payloads, responses e HTTP codes
+- **[README.md](README.md)** - Documentação do projeto, instalação e uso
+
 ## Arquitetura & Stack
 
 ### Core Technologies
+
 - **Framework**: Fastify v5.6.0 + TypeScript
 - **Database**: MongoDB + Mongoose ODM
 - **Authentication**: JWT (RS256) + httpOnly cookies
@@ -14,6 +28,7 @@
 - **Architecture**: Clean Architecture + Decorators
 
 ### Key Dependencies
+
 ```json
 {
   "fastify": "^5.6.0",
@@ -85,6 +100,7 @@
 ### Core Entities
 
 #### User
+
 ```typescript
 interface User {
   _id: ObjectId;
@@ -101,6 +117,7 @@ interface User {
 ```
 
 #### Collection (Dynamic Collections)
+
 ```typescript
 interface Collection {
   _id: ObjectId;
@@ -128,6 +145,7 @@ interface Collection {
 ```
 
 #### Field (Configurable Fields)
+
 ```typescript
 interface Field {
   _id: ObjectId;
@@ -152,6 +170,7 @@ interface Field {
 ```
 
 ### Field Types Supported
+
 - `TEXT_SHORT`: Short text (alphanumeric, integer, decimal, URL, email)
 - `TEXT_LONG`: Long text/textarea
 - `DROPDOWN`: Select options
@@ -166,6 +185,7 @@ interface Field {
 ## API Patterns
 
 ### Controller Structure
+
 ```typescript
 @Controller()
 export default class {
@@ -177,12 +197,14 @@ export default class {
 ```
 
 ### Common HTTP Methods Used
+
 - `@GET` - Retrieve data
 - `@POST` - Create resources
 - `@PUT` - Update resources
 - `@DELETE` - Delete resources
 
 ### Authentication Flow
+
 1. JWT tokens signed with RS256 algorithm
 2. Stored in httpOnly cookies (`accessToken`)
 3. Public/private key pair for signing/verification
@@ -191,28 +213,33 @@ export default class {
 ## Key Features
 
 ### 1. Dynamic Collections System
+
 - Create collections with configurable fields
 - Multiple field types and formats
 - Relationships between collections
 - Dynamic validation based on field configuration
 
 ### 2. Soft Delete (Trash System)
+
 - All entities support `trashed` boolean flag
 - `trashedAt` timestamp for deletion tracking
 - Restore functionality available
 
 ### 3. Permission System
+
 - User groups with granular permissions
 - Collection-level administrators
 - Owner-based access control
 
 ### 4. File Management
+
 - Upload via multipart forms
 - Files stored in `_storage/` directory
 - Access control integration
 - Metadata tracking
 
 ### 5. Internationalization
+
 - Multi-language support (pt-BR, en-US)
 - Locale files in `_system/locales/`
 - Dynamic language switching
@@ -220,6 +247,7 @@ export default class {
 ## Environment Configuration
 
 ### Required Environment Variables
+
 ```env
 # Server
 NODE_ENV=production|development
@@ -261,6 +289,7 @@ npm run format          # Prettier
 ## Docker Configuration
 
 ### Local MongoDB
+
 ```yaml
 # docker-compose.mongo.local.yml
 services:
@@ -275,6 +304,7 @@ services:
 ```
 
 ### Demo Environment
+
 - Uses Traefik for reverse proxy
 - SSL/TLS termination
 - Health checks configured
@@ -298,6 +328,7 @@ services:
 ## Business Logic Organization
 
 ### Use Cases (app/use-case/)
+
 - Authentication flows
 - Collection management
 - User management
@@ -305,6 +336,7 @@ services:
 - Permission handling
 
 ### Services (app/services/)
+
 - Email service
 - File service
 - Authentication service
@@ -315,6 +347,7 @@ services:
 **Total: 49 endpoints across 12 domains**
 
 ### Authentication Domain (8 endpoints)
+
 ```
 POST   /authentication/sign-in                    # User login
 POST   /authentication/sign-up                    # User registration
@@ -327,6 +360,7 @@ PUT    /authentication/recovery/update-password  # Update password
 ```
 
 ### Collections Management (7 endpoints)
+
 ```
 POST   /collections                    # Create collection (auth required)
 GET    /collections/paginated         # List paginated collections (auth required)
@@ -338,6 +372,7 @@ PATCH  /collections/:slug/restore     # Restore from trash (auth required)
 ```
 
 ### Fields Management (5 endpoints)
+
 ```
 POST   /collections/:slug/fields                # Create field (auth required)
 GET    /collections/:slug/fields/:_id          # Get field by ID (auth required)
@@ -347,6 +382,7 @@ PATCH  /collections/:slug/fields/:_id/restore  # Restore field (auth required)
 ```
 
 ### Rows Management (9 endpoints) - **CORE DATA LAYER**
+
 ```
 POST   /collections/:slug/rows                      # Create row with dynamic validation
 GET    /collections/:slug/rows/paginated           # List rows with complex filtering/search
@@ -360,14 +396,18 @@ PATCH  /collections/:slug/rows/:_id/evaluation     # Social: Add numeric rating
 ```
 
 **Advanced Row Features:**
+
 - **Dynamic Schema Validation**: Adapts to collection field configurations
 - **Complex Relationships**: Handles nested data and cross-collection references
-- **Social Features**: Reactions (like/unlike) and evaluations (ratings) with user context
+- **Social Features**: Reactions (like/unlike) and evaluations (ratings) with
+  user context
 - **Advanced Search**: Full-text search, field-specific filtering, date ranges
 - **Soft Delete System**: Trash/restore with timestamp tracking
-- **Population Strategies**: Intelligent loading of related data and social features
+- **Population Strategies**: Intelligent loading of related data and social
+  features
 
 ### Users Management (4 endpoints)
+
 ```
 POST  /users              # Create user (auth required)
 GET   /users/paginated   # List paginated users (auth required)
@@ -376,6 +416,7 @@ PATCH /users/:_id        # Update user (auth required)
 ```
 
 ### User Groups Management (5 endpoints)
+
 ```
 POST  /user-group              # Create user group (auth required)
 GET   /user-group             # List user groups (auth required)
@@ -385,6 +426,7 @@ PATCH /user-group/:_id        # Update user group (auth required)
 ```
 
 ### Storage Management (2 endpoints)
+
 ```
 POST   /storage         # Upload file (auth required)
 DELETE /storage/:_id    # Delete file (auth required)
@@ -392,18 +434,21 @@ DELETE /storage/:_id    # Delete file (auth required)
 ```
 
 ### Profile Management (2 endpoints)
+
 ```
 GET /profile    # Get current user profile (auth required)
 PUT /profile    # Update current user profile (auth required)
 ```
 
 ### Settings Management (2 endpoints)
+
 ```
 GET /setting    # Get application settings (auth required)
 PUT /setting    # Update application settings (auth required)
 ```
 
 ### Other Endpoints (9 endpoints)
+
 ```
 GET /permissions                # List permissions (auth required)
 GET /locales/                  # List locales (auth required)
@@ -417,6 +462,7 @@ GET /documentation            # Scalar API documentation (public)
 ## Validation Schemas (Zod)
 
 ### Authentication Validators
+
 - `AuthenticationSignInSchema`: email, password
 - `AuthenticationSignUpSchema`: name, email, password
 - `AuthenticationMagicLinkSchema`: code
@@ -425,49 +471,58 @@ GET /documentation            # Scalar API documentation (public)
 - `AuthenticationRecoveryValidateCodeSchema`: code
 
 ### Collections Validators
+
 - `CreateCollectionSchema`: name, owner (optional)
 - `UpdateCollectionSchema`: name, description, logo, configuration
 - `GetCollectionBySlugSchema`: slug
 - `ListCollectionPaginatedSchema`: page, perPage, search
 
 ### Field Validators
+
 - `CreateFieldCollectionSchema`: name, type (FIELD_TYPE enum), configuration
 - `UpdateFieldCollectionSchema`: name, type, configuration, trashed, trashedAt
-- `GetFieldCollectionByIdSchema`: _id
+- `GetFieldCollectionByIdSchema`: \_id
 
 ### Row Validators (Dynamic System)
-- `CreateRowCollectionSchema`: Dynamic record schema (z.record) adapts to collection fields
+
+- `CreateRowCollectionSchema`: Dynamic record schema (z.record) adapts to
+  collection fields
 - `UpdateRowCollectionSchema`: Same as create, handles partial updates
 - `GetRowCollectionByIdSchema`: Row ID validation
 - `GetRowCollectionSlugSchema`: Collection slug validation
 - `ListRowCollectionPaginatedSchema`: Pagination + complex query parameters
-- `ReactionRowCollectionSchema`: Social reactions (type: 'like'/'unlike', field, user)
+- `ReactionRowCollectionSchema`: Social reactions (type: 'like'/'unlike', field,
+  user)
 - `EvaluationRowCollectionSchema`: Numeric ratings (value: number, field, user)
 
 **Dynamic Validation Features:**
+
 ```typescript
 // Supports all field types dynamically
 z.union([
-  z.string(),                    // TEXT_SHORT, TEXT_LONG, DROPDOWN, CATEGORY
-  z.number(),                    // INTEGER, DECIMAL formats
-  z.boolean(),                   // Boolean fields
-  z.null(),                      // Optional fields
-  z.array(z.string()),          // Multiple selections (DROPDOWN)
-  z.array(z.number()),          // Multiple numeric values
-  z.array(z.object({_id: z.string().optional()}).loose()), // FIELD_GROUP arrays
-  z.object({}).loose()          // Complex nested objects
+  z.string(), // TEXT_SHORT, TEXT_LONG, DROPDOWN, CATEGORY
+  z.number(), // INTEGER, DECIMAL formats
+  z.boolean(), // Boolean fields
+  z.null(), // Optional fields
+  z.array(z.string()), // Multiple selections (DROPDOWN)
+  z.array(z.number()), // Multiple numeric values
+  z.array(z.object({ _id: z.string().optional() }).loose()), // FIELD_GROUP arrays
+  z.object({}).loose(), // Complex nested objects
 ]);
 ```
 
 ### User Validators
+
 - `CreateUserSchema`: name, email, password, group
 - `UpdateUserSchema`: name, email, group, password (optional), status
-- `UpdateUserProfileSchema`: name, email, group, currentPassword, newPassword, allowPasswordChange
+- `UpdateUserProfileSchema`: name, email, group, currentPassword, newPassword,
+  allowPasswordChange
 - `ListUserPaginatedSchema`: page, perPage, search, sub
 
 ### User Group Validators
+
 - `CreateUserGroupSchema`: name, description, permissions array
-- `UpdateUserGroupSchema`: description, permissions, _id
+- `UpdateUserGroupSchema`: description, permissions, \_id
 - `ListUserGroupPaginatedSchema`: page, perPage, search
 
 ## Database Models (Mongoose)
@@ -475,6 +530,7 @@ z.union([
 ### Core Models (9 total)
 
 #### User Model
+
 ```typescript
 {
   name: String (required)
@@ -489,6 +545,7 @@ z.union([
 ```
 
 #### Collection Model
+
 ```typescript
 {
   _schema: Mixed (dynamic schema)
@@ -512,6 +569,7 @@ z.union([
 ```
 
 #### Field Model
+
 ```typescript
 {
   name: String (required)
@@ -535,6 +593,7 @@ z.union([
 ```
 
 #### Other Models
+
 - **UserGroup**: name, slug, description, permissions array
 - **Storage**: url, filename, type (for file uploads)
 - **ValidationToken**: user, code, status (for auth flows)
@@ -547,16 +606,19 @@ z.union([
 **Total: 43 use case files across 9 domains**
 
 ### Pattern: Functional Error Handling
+
 - All use cases return `Either<ApplicationException, T>`
 - Consistent left-right error handling
 - Service decorator pattern with `@Service()`
 - Repository pattern with Mongoose models
 
 ### Business Logic Organization
+
 1. **Authentication** (7 files): Magic link, sign-in/up, recovery flows
 2. **Collections** (8 files): CRUD + trash management + dynamic schema building
 3. **Fields** (5 files): Field management with dynamic validation
-4. **Rows** (9 files): **CORE DATA LAYER** - Dynamic data operations + social features
+4. **Rows** (9 files): **CORE DATA LAYER** - Dynamic data operations + social
+   features
    - `create.use-case.ts`: Dynamic row creation with field validation
    - `list-paginated.use-case.ts`: Complex querying with population strategies
    - `get-by-id.use-case.ts`: Single row retrieval with relationships
@@ -575,12 +637,14 @@ z.union([
 ## Middleware System
 
 ### Authentication Middleware
+
 - JWT verification using `request.jwtVerify()`
 - Extracts user data from JWT payload
 - Sets `request.user` with decoded info
 - Returns 401 on authentication failure
 
 ### Resource Middleware (Permission-based)
+
 - Factory function: `ResourceMiddleware(resource: string)`
 - Checks for resource-specific permissions
 - Supports public access via `?public=true` query param
@@ -591,6 +655,7 @@ z.union([
 ### Core Entities & Type System (`app/core/entity.core.ts`)
 
 #### **Foundation Types**
+
 ```typescript
 // Makes specified properties optional while keeping others required
 type Optional<T, K extends keyof T> = Pick<Partial<T>, K> & Omit<T, K>;
@@ -606,24 +671,25 @@ interface Base {
 ```
 
 #### **Core Enums**
+
 ```typescript
 enum TOKEN_STATUS {
   REQUESTED = 'REQUESTED',
   EXPIRED = 'EXPIRED',
-  VALIDATED = 'VALIDATED'
+  VALIDATED = 'VALIDATED',
 }
 
 enum FIELD_TYPE {
-  TEXT_SHORT = 'TEXT_SHORT',     // Simple text input
-  TEXT_LONG = 'TEXT_LONG',       // Textarea input
-  DROPDOWN = 'DROPDOWN',         // Select from options
-  DATE = 'DATE',                 // Date/datetime values
+  TEXT_SHORT = 'TEXT_SHORT', // Simple text input
+  TEXT_LONG = 'TEXT_LONG', // Textarea input
+  DROPDOWN = 'DROPDOWN', // Select from options
+  DATE = 'DATE', // Date/datetime values
   RELATIONSHIP = 'RELATIONSHIP', // Reference to other collections
-  FILE = 'FILE',                 // File attachments
-  FIELD_GROUP = 'FIELD_GROUP',   // Nested field groups
-  REACTION = 'REACTION',         // Like/unlike system
-  EVALUATION = 'EVALUATION',     // Numeric rating system
-  CATEGORY = 'CATEGORY'          // Hierarchical categories
+  FILE = 'FILE', // File attachments
+  FIELD_GROUP = 'FIELD_GROUP', // Nested field groups
+  REACTION = 'REACTION', // Like/unlike system
+  EVALUATION = 'EVALUATION', // Numeric rating system
+  CATEGORY = 'CATEGORY', // Hierarchical categories
 }
 
 enum FIELD_FORMAT {
@@ -648,6 +714,7 @@ enum FIELD_FORMAT {
 ```
 
 #### **Authentication Entities**
+
 ```typescript
 interface JWTPayload {
   sub: string;
@@ -680,6 +747,7 @@ interface ValidationToken extends Base {
 ```
 
 #### **Dynamic Schema System Entities**
+
 ```typescript
 interface Collection extends Base {
   _schema: CollectionSchema; // Dynamic MongoDB schema
@@ -727,6 +795,7 @@ interface Row extends Base, Record<string, any> {
 ```
 
 #### **Social & Content Entities**
+
 ```typescript
 interface Reaction extends Base {
   user: string | User;
@@ -752,6 +821,7 @@ interface Category {
 ```
 
 #### **Query & Pagination System**
+
 ```typescript
 interface Search extends Record<string, unknown> {
   page: number;
@@ -781,15 +851,23 @@ interface Paginated<Entity> {
 // ERROR case
 export class Left<L, R> {
   readonly value: L;
-  isRight(): this is Right<L, R> { return false; }
-  isLeft(): this is Left<L, R> { return true; }
+  isRight(): this is Right<L, R> {
+    return false;
+  }
+  isLeft(): this is Left<L, R> {
+    return true;
+  }
 }
 
 // SUCCESS case
 export class Right<L, R> {
   readonly value: R;
-  isRight(): this is Right<L, R> { return true; }
-  isLeft(): this is Left<L, R> { return false; }
+  isRight(): this is Right<L, R> {
+    return true;
+  }
+  isLeft(): this is Left<L, R> {
+    return false;
+  }
 }
 
 export type Either<L, R> = Left<L, R> | Right<L, R>;
@@ -800,6 +878,7 @@ export const right = <L, R>(value: R): Either<L, R> => new Right(value);
 ```
 
 **Usage in Use Cases:**
+
 ```typescript
 type Response = Either<ApplicationException, EntityType>;
 
@@ -816,30 +895,46 @@ async execute(payload: any): Promise<Response> {
 ### Exception System (`app/exceptions/application.exception.ts`)
 
 #### **ApplicationException Architecture**
+
 ```typescript
 class ApplicationException extends Error {
   private constructor(
     public readonly message: string,
     public readonly code: number,
-    public readonly cause: string
-  ) { super(message); }
+    public readonly cause: string,
+  ) {
+    super(message);
+  }
 
   // Client Errors (4xx)
-  static BadRequest(message = 'Bad Request', cause = 'INVALID_PARAMETERS')
-  static Unauthorized(message = 'Unauthorized', cause = 'AUTHENTICATION_REQUIRED')
-  static Forbidden(message = 'Forbidden', cause = 'ACCESS_DENIED')
-  static NotFound(message = 'Not Found', cause = 'RESOURCE_NOT_FOUND')
-  static Conflict(message = 'Conflict', cause = 'CONFLICT_IN_REQUEST')
-  static UnprocessableEntity(message = 'Unprocessable Entity', cause = 'VALIDATION_ERROR')
+  static BadRequest(message = 'Bad Request', cause = 'INVALID_PARAMETERS');
+  static Unauthorized(
+    message = 'Unauthorized',
+    cause = 'AUTHENTICATION_REQUIRED',
+  );
+  static Forbidden(message = 'Forbidden', cause = 'ACCESS_DENIED');
+  static NotFound(message = 'Not Found', cause = 'RESOURCE_NOT_FOUND');
+  static Conflict(message = 'Conflict', cause = 'CONFLICT_IN_REQUEST');
+  static UnprocessableEntity(
+    message = 'Unprocessable Entity',
+    cause = 'VALIDATION_ERROR',
+  );
 
   // Server Errors (5xx)
-  static InternalServerError(message = 'Internal Server Error', cause = 'SERVER_ERROR')
-  static NotImplemented(message = 'Not Implemented', cause = 'NOT_IMPLEMENTED')
-  static ServiceUnavailable(message = 'Service Unavailable', cause = 'SERVICE_UNAVAILABLE')
+  static InternalServerError(
+    message = 'Internal Server Error',
+    cause = 'SERVER_ERROR',
+  );
+  static NotImplemented(message = 'Not Implemented', cause = 'NOT_IMPLEMENTED');
+  static ServiceUnavailable(
+    message = 'Service Unavailable',
+    cause = 'SERVICE_UNAVAILABLE',
+  );
 }
 ```
 
 **Error Response Structure:**
+
 ```typescript
 {
   message: string, // Human-readable error message
@@ -851,6 +946,7 @@ class ApplicationException extends Error {
 ### Core Utilities (`app/core/util.core.ts`)
 
 #### **Dynamic Schema Building**
+
 ```typescript
 // Creates MongoDB schemas dynamically based on field definitions
 buildSchema(fields: Field[]): CollectionSchema
@@ -863,6 +959,7 @@ buildPopulate(fields): Promise<{path: string}[]>
 ```
 
 #### **Query Building System**
+
 ```typescript
 // Constructs MongoDB queries from search parameters
 buildQuery(searchParams, fields): Query
@@ -873,6 +970,7 @@ normalize(search: string): string
 ```
 
 **Advanced Query Features:**
+
 ```typescript
 // Field-specific filtering patterns:
 {
@@ -887,6 +985,7 @@ normalize(search: string): string
 ```
 
 #### **Text Normalization (Internationalization)**
+
 ```typescript
 function normalize(search: string): string {
   return escapedSearch
@@ -903,12 +1002,14 @@ function normalize(search: string): string {
 ### Architecture Integration Patterns
 
 #### **Layered Architecture Flow**
+
 1. **Controller → Use Case → Model → Core**
 2. **Either Pattern**: All use cases return `Either<ApplicationException, T>`
 3. **Dynamic Schema**: Runtime model generation based on field configurations
 4. **Type Safety**: Comprehensive TypeScript contracts throughout
 
 #### **Key Strengths**
+
 - **Functional Error Handling**: No unhandled exceptions
 - **Dynamic Schema System**: Runtime flexibility without code changes
 - **Type Safety**: Complete TypeScript coverage
@@ -921,13 +1022,16 @@ function normalize(search: string): string {
 **The heart of the low-code platform - manages dynamic data records**
 
 ### Dynamic Schema System
+
 The system builds Mongoose schemas dynamically based on field configurations:
+
 - **Field Type Mapping**: Maps FIELD_TYPE to Mongoose schema types
 - **Dynamic Collections**: Collections generate schemas at runtime
 - **Relationship Handling**: Complex relationship population strategies
 - **Validation Integration**: Zod + Mongoose validation layers
 
 ### Row Data Structure
+
 ```typescript
 // Rows are completely dynamic based on collection fields
 {
@@ -941,30 +1045,33 @@ The system builds Mongoose schemas dynamically based on field configurations:
 ```
 
 ### Field Type Implementation in Rows
+
 ```typescript
 const FieldTypeMapper: Record<FIELD_TYPE, Schema['type']> = {
-  TEXT_SHORT: 'String',     // Simple text input
-  TEXT_LONG: 'String',      // Textarea input
-  DROPDOWN: 'String',       // Select from predefined options
-  FILE: 'ObjectId',         // Reference to Storage model
-  DATE: 'Date',            // Date/datetime values
+  TEXT_SHORT: 'String', // Simple text input
+  TEXT_LONG: 'String', // Textarea input
+  DROPDOWN: 'String', // Select from predefined options
+  FILE: 'ObjectId', // Reference to Storage model
+  DATE: 'Date', // Date/datetime values
   RELATIONSHIP: 'ObjectId', // Reference to other collection rows
-  FIELD_GROUP: 'ObjectId',  // Nested collection data
-  EVALUATION: 'ObjectId',   // Numeric rating system
-  REACTION: 'ObjectId',     // Like/unlike system
-  CATEGORY: 'String',       // Hierarchical categories
+  FIELD_GROUP: 'ObjectId', // Nested collection data
+  EVALUATION: 'ObjectId', // Numeric rating system
+  REACTION: 'ObjectId', // Like/unlike system
+  CATEGORY: 'String', // Hierarchical categories
 };
 ```
 
 ### Row Operations & Features
 
 #### CRUD Operations
+
 - **Create**: Dynamic validation based on collection fields
 - **Read**: Complex population of relationships and social data
 - **Update**: Field-specific updates with type validation
 - **Delete**: Both soft delete (trash) and permanent delete
 
 #### Advanced Query System
+
 ```typescript
 // Query building supports:
 {
@@ -980,7 +1087,9 @@ const FieldTypeMapper: Record<FIELD_TYPE, Schema['type']> = {
 ```
 
 #### Social Features Integration
+
 **Reactions System:**
+
 ```typescript
 {
   type: 'like' | 'unlike',
@@ -990,6 +1099,7 @@ const FieldTypeMapper: Record<FIELD_TYPE, Schema['type']> = {
 ```
 
 **Evaluation System:**
+
 ```typescript
 {
   value: number,           // Rating value (e.g., 1-5 stars)
@@ -999,30 +1109,33 @@ const FieldTypeMapper: Record<FIELD_TYPE, Schema['type']> = {
 ```
 
 #### Relationship Management
+
 - **Simple References**: Direct ObjectId references to other collections
 - **Field Groups**: Nested collections within collections
 - **Population Strategy**: Intelligent recursive population of related data
 - **Circular Reference Protection**: Prevents infinite population loops
 
 #### Dynamic Validation
+
 ```typescript
 // Row validation adapts to collection schema
 CreateRowCollectionSchema = z.record(
   z.string(),
   z.union([
-    z.string(),           // Text fields
-    z.number(),           // Numeric fields
-    z.boolean(),          // Boolean fields
-    z.null(),            // Null values
+    z.string(), // Text fields
+    z.number(), // Numeric fields
+    z.boolean(), // Boolean fields
+    z.null(), // Null values
     z.array(z.string()), // Multiple selections
     z.array(z.number()),
-    z.array(z.object({_id: z.string().optional()}).loose()), // Field groups
-    z.object({}).loose() // Complex objects
-  ])
+    z.array(z.object({ _id: z.string().optional() }).loose()), // Field groups
+    z.object({}).loose(), // Complex objects
+  ]),
 );
 ```
 
 ### Row Use Cases (Business Logic)
+
 1. **create.use-case.ts**: Dynamic row creation with field validation
 2. **list-paginated.use-case.ts**: Complex querying with population
 3. **get-by-id.use-case.ts**: Single row retrieval with relationships
@@ -1034,12 +1147,376 @@ CreateRowCollectionSchema = z.record(
 9. **evaluation.use-case.ts**: Rating system management
 
 ### Key Architectural Patterns in Rows
+
 - **Dynamic Model Generation**: `buildCollection()` creates models at runtime
 - **Population Strategy**: `buildPopulate()` handles complex relationships
 - **Query Builder**: `buildQuery()` creates MongoDB queries dynamically
 - **Schema Normalization**: `normalize()` handles accented characters in search
 - **Either Pattern**: Consistent error handling across all operations
 
-This comprehensive rows system enables the low-code platform to handle completely dynamic data structures while maintaining type safety, performance, and data integrity.
+This comprehensive rows system enables the low-code platform to handle
+completely dynamic data structures while maintaining type safety, performance,
+and data integrity.
 
-This context provides comprehensive understanding of the entire LowCodeJS API codebase structure, patterns, and functionality.
+---
+
+## 🔧 Debugging & Troubleshooting
+
+### Common Development Patterns
+
+#### **Starting the Development Environment**
+
+```bash
+# 1. Start local MongoDB (Docker)
+docker-compose -f docker-compose.mongo.local.yml up -d
+
+# 2. Install dependencies
+npm install
+
+# 3. Configure environment
+cp .env.example .env
+# Edit .env with your configuration
+
+# 4. Run seeders (optional - populate database)
+npm run seed
+
+# 5. Start development server
+npm run dev
+```
+
+#### **Debugging Dynamic Collections**
+
+```typescript
+// Check if collection exists and is properly built
+const collection = await Collection.findOne({ slug: 'your-slug' });
+console.log('Collection schema:', collection._schema);
+
+// Build and test dynamic model
+const Model = await buildCollection(collection);
+console.log('Model name:', Model.modelName);
+console.log('Model schema:', Model.schema.obj);
+
+// Test population strategy
+const populate = await buildPopulate(collection.fields);
+console.log('Population strategy:', JSON.stringify(populate, null, 2));
+```
+
+#### **Testing Query Building**
+
+```typescript
+// Test query building with different parameters
+const query = buildQuery(
+  {
+    search: 'joão',
+    status: 'active',
+    'created-initial': '2024-01-01',
+    'created-final': '2024-12-31',
+    trashed: 'false',
+  },
+  fields,
+);
+
+console.log('Generated query:', JSON.stringify(query, null, 2));
+// Output includes normalized search with accents
+```
+
+#### **JWT Token Debugging**
+
+```typescript
+// Decode JWT from cookie
+import jwt from 'jsonwebtoken';
+
+const token = request.cookies.accessToken;
+const decoded = jwt.verify(token, Buffer.from(Env.JWT_PUBLIC_KEY, 'base64'), {
+  algorithms: ['RS256'],
+});
+console.log('Decoded JWT:', decoded);
+```
+
+#### **Mongoose Model Issues**
+
+```typescript
+// Clear cached models (useful in development)
+if (mongoose.models['collection-slug']) {
+  delete mongoose.models['collection-slug'];
+}
+
+// Verify model registration
+console.log('Registered models:', Object.keys(mongoose.models));
+
+// Check collection existence in MongoDB
+const collections = await mongoose.connection.db.listCollections().toArray();
+console.log(
+  'MongoDB collections:',
+  collections.map((c) => c.name),
+);
+```
+
+### Common Issues & Solutions
+
+#### **Issue 1: "Collection slug not found" Error**
+
+**Causa**: Collection não existe ou slug está incorreto **Solução**:
+
+```typescript
+// Verify collection exists
+const collection = await Collection.findOne({ slug: 'your-slug' });
+if (!collection) {
+  console.error('Collection not found');
+  // Create collection or fix slug
+}
+```
+
+#### **Issue 2: Dynamic Schema Not Building Correctly**
+
+**Causa**: Fields não estão configurados corretamente **Solução**:
+
+```typescript
+// Check field configurations
+const fields = await Field.find({ _id: { $in: collection.fields } });
+console.log(
+  'Fields:',
+  fields.map((f) => ({
+    slug: f.slug,
+    type: f.type,
+    config: f.configuration,
+  })),
+);
+
+// Rebuild schema manually
+const schema = buildSchema(fields);
+console.log('Built schema:', schema);
+```
+
+#### **Issue 3: Population Not Working**
+
+**Causa**: Relacionamentos não configurados ou modelos não registrados
+**Solução**:
+
+```typescript
+// Verify relationship configuration
+const relationshipFields = fields.filter(
+  (f) => f.type === FIELD_TYPE.RELATIONSHIP,
+);
+relationshipFields.forEach((f) => {
+  console.log('Relationship:', {
+    field: f.slug,
+    collection: f.configuration?.relationship?.collection?.slug,
+    field: f.configuration?.relationship?.field?.slug,
+  });
+});
+
+// Ensure related models are built
+const relatedCollection = await Collection.findOne({
+  slug: f.configuration.relationship.collection.slug,
+});
+await buildCollection(relatedCollection);
+```
+
+#### **Issue 4: Authentication Errors**
+
+**Causa**: JWT inválido, expirado ou mal configurado **Solução**:
+
+```typescript
+// Verify JWT configuration
+console.log('JWT Public Key:', Env.JWT_PUBLIC_KEY?.substring(0, 50) + '...');
+console.log('JWT Private Key:', Env.JWT_PRIVATE_KEY?.substring(0, 50) + '...');
+
+// Test JWT signing
+const testToken = await app.jwt.sign({
+  sub: 'test-user-id',
+  email: 'test@example.com',
+});
+console.log('Test token:', testToken);
+
+// Verify token
+try {
+  const decoded = await app.jwt.verify(testToken);
+  console.log('Token valid:', decoded);
+} catch (error) {
+  console.error('Token invalid:', error);
+}
+```
+
+#### **Issue 5: CORS Errors**
+
+**Causa**: Origin não está na whitelist **Solução**:
+
+```typescript
+// In start/kernel.ts, add your origin
+const allowedOrigins = [
+  'https://demo.lowcodejs.org',
+  'http://localhost:5173',
+  'http://localhost:3000',
+  'YOUR_ORIGIN_HERE', // Add your origin
+];
+```
+
+#### **Issue 6: File Upload Not Working**
+
+**Causa**: Multipart não configurado ou diretório de storage não existe
+**Solução**:
+
+```bash
+# Ensure storage directory exists
+mkdir -p _storage
+
+# Check permissions
+chmod 755 _storage
+
+# Verify multipart registration in kernel.ts
+```
+
+### Performance Debugging
+
+#### **Slow Queries**
+
+```typescript
+// Enable MongoDB query logging
+mongoose.set('debug', true);
+
+// Measure query performance
+console.time('query');
+const results = await Model.find(query).populate(populate);
+console.timeEnd('query');
+
+// Check indexes
+const indexes = await Model.collection.getIndexes();
+console.log('Indexes:', indexes);
+```
+
+#### **Memory Issues with Large Datasets**
+
+```typescript
+// Use lean() for read-only operations
+const results = await Model.find(query).lean();
+
+// Use cursor for large datasets
+const cursor = Model.find(query).cursor();
+for (let doc = await cursor.next(); doc != null; doc = await cursor.next()) {
+  // Process document
+}
+
+// Limit population depth
+const populate = await buildPopulate(fields);
+// Consider limiting depth manually
+```
+
+### Testing Strategies
+
+#### **Unit Testing Use Cases**
+
+```typescript
+// Example test for a use case
+describe('CreateRowUseCase', () => {
+  it('should create row with valid data', async () => {
+    const result = await createRowUseCase.execute({
+      collectionSlug: 'users',
+      data: { name: 'John', email: 'john@example.com' },
+    });
+
+    expect(result.isRight()).toBe(true);
+    expect(result.value).toHaveProperty('_id');
+  });
+
+  it('should return error for invalid data', async () => {
+    const result = await createRowUseCase.execute({
+      collectionSlug: 'users',
+      data: { invalid: 'data' },
+    });
+
+    expect(result.isLeft()).toBe(true);
+    expect(result.value.code).toBe(422);
+  });
+});
+```
+
+#### **Integration Testing Endpoints**
+
+```typescript
+// Using Fastify inject (no HTTP server needed)
+const response = await app.inject({
+  method: 'POST',
+  url: '/collections/users/rows',
+  headers: {
+    cookie: `accessToken=${validToken}`,
+  },
+  payload: {
+    name: 'John Doe',
+    email: 'john@example.com',
+  },
+});
+
+expect(response.statusCode).toBe(201);
+expect(response.json()).toHaveProperty('_id');
+```
+
+### Useful Commands
+
+```bash
+# Check MongoDB connection
+npm run dev
+# Look for "Mongoose connected" in logs
+
+# Run specific seeder
+npx tsx database/seeders/YOUR_SEEDER.ts
+
+# Build and check output
+npm run build
+ls -la build/
+
+# Check TypeScript types
+npx tsc --noEmit
+
+# Lint code
+npm run lint
+
+# Format code
+npm run format
+
+# View logs in Docker
+docker-compose -f docker-compose.demo.yml logs -f api
+
+# Access MongoDB shell (Docker)
+docker exec -it local-mongo mongosh -u local -p local
+
+# Check environment variables
+node -e "require('dotenv').config(); console.log(process.env)"
+```
+
+---
+
+## 📋 Quick Reference
+
+### File Locations
+
+- **Controllers**: `app/controllers/{domain}/*.controller.ts`
+- **Use Cases**: `app/use-case/{domain}/*.use-case.ts`
+- **Models**: `app/model/*.model.ts`
+- **Validators**: `app/validators/*.validator.ts`
+- **Core Types**: `app/core/entity.core.ts`
+- **Utilities**: `app/core/util.core.ts`
+- **Exceptions**: `app/exceptions/application.exception.ts`
+
+### Key Functions
+
+- **buildSchema(fields)**: Create Mongoose schema from fields
+- **buildCollection(collection)**: Create dynamic Mongoose model
+- **buildPopulate(fields)**: Generate population strategy
+- **buildQuery(params, fields)**: Build MongoDB query
+- **normalize(text)**: Normalize text for search
+
+### Environment Variables
+
+```env
+PORT=3000
+DATABASE_URL=mongodb://localhost:27017/lowcodejs
+JWT_PRIVATE_KEY=base64_encoded_private_key
+JWT_PUBLIC_KEY=base64_encoded_public_key
+COOKIE_SECRET=your_secret
+```
+
+---
+
+This context provides comprehensive understanding of the entire LowCodeJS API
+codebase structure, patterns, and functionality.

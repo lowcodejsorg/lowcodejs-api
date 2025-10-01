@@ -28,6 +28,14 @@ export default class RemoveCollectionFromTrashUseCase {
           ),
         );
 
+      if (!collection.trashed)
+        return left(
+          ApplicationException.Conflict(
+            'Collection is not in trash',
+            'NOT_TRASHED',
+          ),
+        );
+
       await collection
         .set({
           ...collection.toJSON(),

@@ -19,9 +19,9 @@ export default class RequestCodeUseCase {
 
       if (!user)
         return left(
-          ApplicationException.Conflict(
-            'Invalid credentials',
-            'INVALID_CREDENTIALS',
+          ApplicationException.NotFound(
+            'Email not found',
+            'EMAIL_NOT_FOUND',
           ),
         );
 

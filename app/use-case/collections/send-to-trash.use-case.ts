@@ -29,6 +29,14 @@ export default class SendCollectionToTrashUseCase {
           ),
         );
 
+      if (collection.trashed)
+        return left(
+          ApplicationException.Conflict(
+            'Collection already in trash',
+            'ALREADY_TRASHED',
+          ),
+        );
+
       await collection
         .set({
           ...collection.toJSON(),

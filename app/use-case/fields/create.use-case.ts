@@ -41,7 +41,7 @@ export default class CreateFieldCollectionUseCase {
 
       if (existFieldOnCollection)
         return left(
-          ApplicationException.BadRequest(
+          ApplicationException.Conflict(
             'Field already exist',
             'FIELD_ALREADY_EXIST',
           ),

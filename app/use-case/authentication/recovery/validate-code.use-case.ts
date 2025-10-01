@@ -29,7 +29,7 @@ export default class ValidateCodeUseCase {
 
       if (token.status === TOKEN_STATUS.EXPIRED)
         return left(
-          ApplicationException.BadRequest('Code expired', 'CODE_EXPIRED'),
+          ApplicationException.Gone('Code expired', 'CODE_EXPIRED'),
         );
 
       const TIME_EXPIRATION_IN_MINUTES = 10;
@@ -49,7 +49,7 @@ export default class ValidateCodeUseCase {
           })
           .save();
         return left(
-          ApplicationException.BadRequest(
+          ApplicationException.Gone(
             'Validation token code expired',
             'VALIDATION_TOKEN_EXPIRED',
           ),
@@ -73,7 +73,7 @@ export default class ValidateCodeUseCase {
       return left(
         ApplicationException.InternalServerError(
           'Internal server error',
-          'GET_USER_BY_ID_ERROR',
+          'VALIDATE_CODE_ERROR',
         ),
       );
     }

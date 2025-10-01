@@ -108,16 +108,38 @@ export default class CreateRowUseCase {
         payload[groupSlug] = processedGroupIds[groupSlug];
       }
 
-      const c = await buildCollection({
-        ...collection?.toJSON({
-          flattenObjectIds: true,
-        }),
-        _id: collection?._id?.toString(),
-      });
+      let c;
+      try {
+        c = await buildCollection({
+          ...collection?.toJSON({
+            flattenObjectIds: true,
+          }),
+          _id: collection?._id?.toString(),
+        });
+      } catch (error) {
+        console.error('Model build error:', error);
+        return left(
+          ApplicationException.InternalServerError(
+            'Failed to build collection model',
+            'MODEL_BUILD_FAILED',
+          ),
+        );
+      }
 
-      const populate = await buildPopulate(
-        collection?.fields as import('@core/entity.core').Field[],
-      );
+      let populate;
+      try {
+        populate = await buildPopulate(
+          collection?.fields as import('@core/entity.core').Field[],
+        );
+      } catch (error) {
+        console.error('Populate build error:', error);
+        return left(
+          ApplicationException.InternalServerError(
+            'Failed to build populate strategy',
+            'POPULATE_BUILD_FAILED',
+          ),
+        );
+      }
 
       const created = await c.create(payload);
 

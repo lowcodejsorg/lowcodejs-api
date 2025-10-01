@@ -51,16 +51,38 @@ export default class GetRowCollectionByIdUseCase {
         );
       }
 
-      const c = await buildCollection({
-        ...collection?.toJSON({
-          flattenObjectIds: true,
-        }),
-        _id: collection?._id.toString(),
-      });
+      let c;
+      try {
+        c = await buildCollection({
+          ...collection?.toJSON({
+            flattenObjectIds: true,
+          }),
+          _id: collection?._id.toString(),
+        });
+      } catch (error) {
+        console.error('Model build error:', error);
+        return left(
+          ApplicationException.InternalServerError(
+            'Failed to build collection model',
+            'MODEL_BUILD_FAILED',
+          ),
+        );
+      }
 
-      const populate = await buildPopulate(
-        collection.fields as import('@core/entity.core').Field[],
-      );
+      let populate;
+      try {
+        populate = await buildPopulate(
+          collection.fields as import('@core/entity.core').Field[],
+        );
+      } catch (error) {
+        console.error('Populate build error:', error);
+        return left(
+          ApplicationException.InternalServerError(
+            'Failed to build populate strategy',
+            'POPULATE_BUILD_FAILED',
+          ),
+        );
+      }
 
       const row = await c.findOne({
         _id: payload._id,

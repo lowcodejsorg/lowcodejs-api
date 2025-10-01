@@ -30,7 +30,7 @@ export default class MagicLinkUseCase {
 
       if (token.status === TOKEN_STATUS.VALIDATED)
         return left(
-          ApplicationException.BadRequest(
+          ApplicationException.Conflict(
             'Validation token code already used',
             'VALIDATION_TOKEN_ALREADY_USED',
           ),
@@ -38,7 +38,7 @@ export default class MagicLinkUseCase {
 
       if (token.status === TOKEN_STATUS.EXPIRED)
         return left(
-          ApplicationException.BadRequest(
+          ApplicationException.Gone(
             'Validation token code expired',
             'VALIDATION_TOKEN_EXPIRED',
           ),
@@ -62,7 +62,7 @@ export default class MagicLinkUseCase {
           .save();
 
         return left(
-          ApplicationException.BadRequest(
+          ApplicationException.Gone(
             'Validation token code expired',
             'VALIDATION_TOKEN_EXPIRED',
           ),

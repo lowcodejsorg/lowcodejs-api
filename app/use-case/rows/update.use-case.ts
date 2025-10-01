@@ -38,12 +38,23 @@ export default class UpdateRowCollectionUseCase {
           ),
         );
 
-      const c = await buildCollection({
-        ...collection?.toJSON({
-          flattenObjectIds: true,
-        }),
-        _id: collection?._id.toString(),
-      });
+      let c;
+      try {
+        c = await buildCollection({
+          ...collection?.toJSON({
+            flattenObjectIds: true,
+          }),
+          _id: collection?._id.toString(),
+        });
+      } catch (error) {
+        console.error('Model build error:', error);
+        return left(
+          ApplicationException.InternalServerError(
+            'Failed to build collection model',
+            'MODEL_BUILD_FAILED',
+          ),
+        );
+      }
 
       const row = await c.findOne({
         _id: payload._id,
@@ -72,12 +83,23 @@ export default class UpdateRowCollectionUseCase {
 
         if (!groupCollection) continue;
 
-        const cGroup = await buildCollection({
-          ...groupCollection?.toJSON({
-            flattenObjectIds: true,
-          }),
-          _id: groupCollection?._id?.toString(),
-        });
+        let cGroup;
+        try {
+          cGroup = await buildCollection({
+            ...groupCollection?.toJSON({
+              flattenObjectIds: true,
+            }),
+            _id: groupCollection?._id?.toString(),
+          });
+        } catch (error) {
+          console.error('Group model build error:', error);
+          return left(
+            ApplicationException.InternalServerError(
+              'Failed to build group collection model',
+              'GROUP_MODEL_BUILD_FAILED',
+            ),
+          );
+        }
 
         const groupItems = payload[group.slug] as any[];
 
@@ -157,9 +179,20 @@ export default class UpdateRowCollectionUseCase {
         payload[groupSlug] = processedGroupIds[groupSlug];
       }
 
-      const populate = await buildPopulate(
-        collection?.fields as import('@core/entity.core').Field[],
-      );
+      let populate;
+      try {
+        populate = await buildPopulate(
+          collection?.fields as import('@core/entity.core').Field[],
+        );
+      } catch (error) {
+        console.error('Populate build error:', error);
+        return left(
+          ApplicationException.InternalServerError(
+            'Failed to build populate strategy',
+            'POPULATE_BUILD_FAILED',
+          ),
+        );
+      }
 
       await row
         .set({

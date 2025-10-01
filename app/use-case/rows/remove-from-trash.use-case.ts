@@ -31,16 +31,38 @@ export default class RemoveRowCollectionFromTrashUseCase {
           ),
         );
 
-      const c = await buildCollection({
-        ...collection?.toJSON({
-          flattenObjectIds: true,
-        }),
-        _id: collection?._id.toString(),
-      });
+      let c;
+      try {
+        c = await buildCollection({
+          ...collection?.toJSON({
+            flattenObjectIds: true,
+          }),
+          _id: collection?._id.toString(),
+        });
+      } catch (error) {
+        console.error('Model build error:', error);
+        return left(
+          ApplicationException.InternalServerError(
+            'Failed to build collection model',
+            'MODEL_BUILD_FAILED',
+          ),
+        );
+      }
 
-      const populate = await buildPopulate(
-        collection?.fields as import('@core/entity.core').Field[],
-      );
+      let populate;
+      try {
+        populate = await buildPopulate(
+          collection?.fields as import('@core/entity.core').Field[],
+        );
+      } catch (error) {
+        console.error('Populate build error:', error);
+        return left(
+          ApplicationException.InternalServerError(
+            'Failed to build populate strategy',
+            'POPULATE_BUILD_FAILED',
+          ),
+        );
+      }
 
       const row = await c.findOne({
         _id: payload._id,
@@ -49,6 +71,14 @@ export default class RemoveRowCollectionFromTrashUseCase {
       if (!row)
         return left(
           ApplicationException.NotFound('Row not found', 'ROW_NOT_FOUND'),
+        );
+
+      if (!row.trashed)
+        return left(
+          ApplicationException.Conflict(
+            'Row is not in trash',
+            'NOT_TRASHED',
+          ),
         );
 
       await row
@@ -74,7 +104,7 @@ export default class RemoveRowCollectionFromTrashUseCase {
       return left(
         ApplicationException.InternalServerError(
           'Internal server error',
-          'REMOVE_COLLECTION_FROM_TRASH_ERROR',
+          'REMOVE_ROW_FROM_TRASH_ERROR',
         ),
       );
     }

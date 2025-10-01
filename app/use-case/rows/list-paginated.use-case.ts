@@ -62,12 +62,23 @@ export default class ListRowCollectionPaginatedUseCase {
         );
       }
 
-      const c = await buildCollection({
-        ...collection?.toJSON({
-          flattenObjectIds: true,
-        }),
-        _id: collection?._id.toString(),
-      });
+      let c;
+      try {
+        c = await buildCollection({
+          ...collection?.toJSON({
+            flattenObjectIds: true,
+          }),
+          _id: collection?._id.toString(),
+        });
+      } catch (error) {
+        console.error('Model build error:', error);
+        return left(
+          ApplicationException.InternalServerError(
+            'Failed to build collection model',
+            'MODEL_BUILD_FAILED',
+          ),
+        );
+      }
 
       const query = buildQuery(
         payload,
@@ -79,9 +90,20 @@ export default class ListRowCollectionPaginatedUseCase {
         collection?.fields as import('@core/entity.core').Field[],
       );
 
-      const populate = await buildPopulate(
-        collection?.fields as import('@core/entity.core').Field[],
-      );
+      let populate;
+      try {
+        populate = await buildPopulate(
+          collection?.fields as import('@core/entity.core').Field[],
+        );
+      } catch (error) {
+        console.error('Populate build error:', error);
+        return left(
+          ApplicationException.InternalServerError(
+            'Failed to build populate strategy',
+            'POPULATE_BUILD_FAILED',
+          ),
+        );
+      }
 
       const rows = await c
         .find(query)

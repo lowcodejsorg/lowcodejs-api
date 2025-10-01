@@ -41,6 +41,14 @@ export default class RemoveFieldFromTrashUseCase {
           ApplicationException.NotFound('Field not found', 'FIELD_NOT_FOUND'),
         );
 
+      if (!field.trashed)
+        return left(
+          ApplicationException.Conflict(
+            'Field is not in trash',
+            'NOT_TRASHED',
+          ),
+        );
+
       await field
         .set({
           ...field.toJSON({
