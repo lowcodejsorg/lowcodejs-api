@@ -369,24 +369,20 @@ export function buildQuery(
   if (search) {
     query = {
       ...query,
-      $or: [
-        ...fields.map((col) => {
-          if (
-            [FIELD_TYPE.TEXT_SHORT, FIELD_TYPE.TEXT_LONG].includes(col?.type)
-          ) {
-            const slug = String(col.slug?.toString());
-            return {
-              [slug]: {
-                $regex: normalize(search),
-                $options: 'i',
-              },
-            };
-          }
-
-          return null;
-        }),
-      ],
+      $or: [],
     };
+
+    for (const field of fields) {
+      if ([FIELD_TYPE.TEXT_SHORT, FIELD_TYPE.TEXT_LONG].includes(field?.type)) {
+        const slug = String(field.slug?.toString());
+        query.$or.push({
+          [slug]: {
+            $regex: normalize(search),
+            $options: 'i',
+          },
+        });
+      }
+    }
   }
 
   if (trashed && trashed === 'true') query.trashed = true;
@@ -399,7 +395,13 @@ export function buildQuery(
 
 export type QueryOrder = Record<
   string,
-  number | string | boolean | null | unknown | RootFilterQuery<Row> | QueryOrder[]
+  | number
+  | string
+  | boolean
+  | null
+  | unknown
+  | RootFilterQuery<Row>
+  | QueryOrder[]
 >;
 
 export function buildOrder(

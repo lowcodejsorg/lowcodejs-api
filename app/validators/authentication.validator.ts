@@ -20,9 +20,9 @@ export const AuthenticationRecoveryUpdatePasswordSchema = z.object({
 });
 
 export const AuthenticationRecoveryRequestCodeSchema = z.object({
-  email: z.email(),
+  email: z.email().trim(),
 });
 
 export const AuthenticationRecoveryValidateCodeSchema = z.object({
-  code: z.coerce.string(),
+  code: z.coerce.string().trim(),
 });

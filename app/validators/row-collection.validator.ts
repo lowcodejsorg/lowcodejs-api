@@ -3,16 +3,16 @@ import z from 'zod';
 export const CreateRowCollectionSchema = z.record(
   z.string(),
   z.union([
-    z.string(),
+    z.string().trim(),
     z.number(),
     z.boolean(),
     z.null(),
-    z.array(z.string()),
+    z.array(z.string().trim()),
     z.array(z.number()),
     z.array(
       z
         .object({
-          _id: z.string().optional(),
+          _id: z.string().trim().optional(),
         })
         .loose(),
     ),
@@ -23,11 +23,11 @@ export const CreateRowCollectionSchema = z.record(
 export const UpdateRowCollectionSchema = CreateRowCollectionSchema.clone();
 
 export const GetRowCollectionByIdSchema = z.object({
-  _id: z.string(),
+  _id: z.string().trim(),
 });
 
 export const GetRowCollectionSlugSchema = z.object({
-  slug: z.string(),
+  slug: z.string().trim(),
 });
 
 export const GetRowCollectionQuerySchema = z
@@ -41,18 +41,18 @@ export const ListRowCollectionPaginatedSchema = z
   .object({
     page: z.coerce.number().default(1),
     perPage: z.coerce.number().default(50),
-    search: z.string().optional(),
+    search: z.string().trim().optional(),
   })
   .loose();
 
 export const ReactionRowCollectionSchema = z.object({
   type: z.enum(['like', 'unlike']),
-  field: z.string(),
-  user: z.string().optional(),
+  field: z.string().trim(),
+  user: z.string().trim().optional(),
 });
 
 export const EvaluationRowCollectionSchema = z.object({
   value: z.number(),
-  field: z.string(),
-  user: z.string().optional(),
+  field: z.string().trim(),
+  user: z.string().trim().optional(),
 });

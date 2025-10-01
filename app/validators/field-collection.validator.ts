@@ -2,8 +2,8 @@ import { FIELD_FORMAT, FIELD_TYPE } from '@core/entity.core';
 import z from 'zod';
 
 const Category = z.object({
-  id: z.string(),
-  label: z.string(),
+  id: z.string().trim(),
+  label: z.string().trim(),
   children: z.array(z.unknown()).default([]), // aceita qualquer coisa
 });
 
@@ -27,7 +27,7 @@ const Configuration = z.object({
   filtering: z.boolean().default(false),
   defaultValue: z.string().nullable().default(null),
   relationship: Relacionamento.nullable().default(null),
-  dropdown: z.array(z.string()).nullable().default(null),
+  dropdown: z.array(z.string().trim()).nullable().default(null),
   category: z.array(Category).nullable().default(null),
   group: z
     .object({
@@ -39,11 +39,11 @@ const Configuration = z.object({
 });
 
 export const GetFieldCollectionParamsSchema = z.object({
-  slug: z.string(),
+  slug: z.string().trim(),
 });
 
 export const GetFieldCollectionByIdSchema = z.object({
-  _id: z.string(),
+  _id: z.string().trim(),
 });
 
 export const CreateFieldCollectionSchema = z.object({
