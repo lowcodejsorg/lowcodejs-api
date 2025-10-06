@@ -1,11 +1,14 @@
+/* eslint-disable no-unused-vars */
+
+import type { FastifyReply, FastifyRequest } from 'fastify';
+import { Controller, getInstanceByToken, PATCH } from 'fastify-decorators';
+
 import { AuthenticationMiddleware } from '@middlewares/authentication.middleware';
 import SendRowToTrashUseCase from '@use-case/rows/send-to-trash.use-case';
 import {
   GetRowCollectionByIdSchema,
   GetRowCollectionSlugSchema,
 } from '@validators/row-collection.validator';
-import type { FastifyReply, FastifyRequest } from 'fastify';
-import { Controller, getInstanceByToken, PATCH } from 'fastify-decorators';
 
 @Controller({
   route: 'collections',

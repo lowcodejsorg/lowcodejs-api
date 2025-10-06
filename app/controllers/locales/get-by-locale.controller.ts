@@ -139,6 +139,7 @@ export default class {
 
       return response.status(200).send(translations);
     } catch (error) {
+      console.error(error);
       return response.status(500).send({
         message: 'Internal server error',
         code: 500,

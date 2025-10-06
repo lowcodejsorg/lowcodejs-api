@@ -1,7 +1,10 @@
-import { AuthenticationMiddleware } from '@middlewares/authentication.middleware';
-import ListPermissionsUseCase from '@use-case/permissions/list.use-case';
+/* eslint-disable no-unused-vars */
+
 import type { FastifyReply, FastifyRequest } from 'fastify';
 import { Controller, GET, getInstanceByToken } from 'fastify-decorators';
+
+import { AuthenticationMiddleware } from '@middlewares/authentication.middleware';
+import ListPermissionsUseCase from '@use-case/permissions/list.use-case';
 
 @Controller({
   route: 'permissions',
@@ -34,9 +37,9 @@ export default class {
                 slug: { type: 'string' },
                 description: { type: 'string', nullable: true },
                 createdAt: { type: 'string', format: 'date-time' },
-                updatedAt: { type: 'string', format: 'date-time' }
-              }
-            }
+                updatedAt: { type: 'string', format: 'date-time' },
+              },
+            },
           },
           401: {
             description: 'Unauthorized - Authentication required',
@@ -44,15 +47,15 @@ export default class {
             properties: {
               message: { type: 'string', enum: ['Unauthorized'] },
               code: { type: 'number', enum: [401] },
-              cause: { type: 'string', enum: ['AUTHENTICATION_REQUIRED'] }
+              cause: { type: 'string', enum: ['AUTHENTICATION_REQUIRED'] },
             },
             examples: [
               {
                 message: 'Unauthorized',
                 code: 401,
-                cause: 'AUTHENTICATION_REQUIRED'
-              }
-            ]
+                cause: 'AUTHENTICATION_REQUIRED',
+              },
+            ],
           },
           500: {
             description: 'Internal server error',
@@ -60,17 +63,17 @@ export default class {
             properties: {
               message: { type: 'string', enum: ['Internal server error'] },
               code: { type: 'number', enum: [500] },
-              cause: { type: 'string', enum: ['LIST_PERMISSIONS_ERROR'] }
+              cause: { type: 'string', enum: ['LIST_PERMISSIONS_ERROR'] },
             },
             examples: [
               {
                 message: 'Internal server error',
                 code: 500,
-                cause: 'LIST_PERMISSIONS_ERROR'
-              }
-            ]
-          }
-        }
+                cause: 'LIST_PERMISSIONS_ERROR',
+              },
+            ],
+          },
+        },
       },
     },
   })

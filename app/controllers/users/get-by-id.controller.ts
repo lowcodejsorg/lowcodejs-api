@@ -1,8 +1,11 @@
+/* eslint-disable no-unused-vars */
+
+import type { FastifyReply, FastifyRequest } from 'fastify';
+import { Controller, GET, getInstanceByToken } from 'fastify-decorators';
+
 import { AuthenticationMiddleware } from '@middlewares/authentication.middleware';
 import GetUserByIdUseCase from '@use-case/users/get-by-id.use-case';
 import { GetUserByIdSchema } from '@validators/users';
-import type { FastifyReply, FastifyRequest } from 'fastify';
-import { Controller, GET, getInstanceByToken } from 'fastify-decorators';
 
 @Controller({
   route: '/users',
@@ -21,7 +24,8 @@ export default class {
       schema: {
         tags: ['Users'],
         summary: 'Get user by ID',
-        description: 'Retrieves a specific user by their ID (password excluded from response)',
+        description:
+          'Retrieves a specific user by their ID (password excluded from response)',
         security: [{ cookieAuth: [] }],
         params: {
           type: 'object',
@@ -29,9 +33,9 @@ export default class {
           properties: {
             _id: {
               type: 'string',
-              description: 'User ID'
-            }
-          }
+              description: 'User ID',
+            },
+          },
         },
         response: {
           200: {
@@ -46,13 +50,13 @@ export default class {
                 properties: {
                   _id: { type: 'string' },
                   name: { type: 'string' },
-                  description: { type: 'string' }
-                }
+                  description: { type: 'string' },
+                },
               },
               status: { type: 'string' },
               createdAt: { type: 'string', format: 'date-time' },
-              updatedAt: { type: 'string', format: 'date-time' }
-            }
+              updatedAt: { type: 'string', format: 'date-time' },
+            },
           },
           401: {
             description: 'Unauthorized - Authentication required',
@@ -60,15 +64,15 @@ export default class {
             properties: {
               message: { type: 'string', enum: ['Unauthorized'] },
               code: { type: 'number', enum: [401] },
-              cause: { type: 'string', enum: ['AUTHENTICATION_REQUIRED'] }
+              cause: { type: 'string', enum: ['AUTHENTICATION_REQUIRED'] },
             },
             examples: [
               {
                 message: 'Unauthorized',
                 code: 401,
-                cause: 'AUTHENTICATION_REQUIRED'
-              }
-            ]
+                cause: 'AUTHENTICATION_REQUIRED',
+              },
+            ],
           },
           404: {
             description: 'User not found',
@@ -76,15 +80,15 @@ export default class {
             properties: {
               message: { type: 'string', enum: ['User not found'] },
               code: { type: 'number', enum: [404] },
-              cause: { type: 'string', enum: ['USER_NOT_FOUND'] }
+              cause: { type: 'string', enum: ['USER_NOT_FOUND'] },
             },
             examples: [
               {
                 message: 'User not found',
                 code: 404,
-                cause: 'USER_NOT_FOUND'
-              }
-            ]
+                cause: 'USER_NOT_FOUND',
+              },
+            ],
           },
           500: {
             description: 'Internal server error',
@@ -92,17 +96,17 @@ export default class {
             properties: {
               message: { type: 'string', enum: ['Internal server error'] },
               code: { type: 'number', enum: [500] },
-              cause: { type: 'string', enum: ['GET_USER_BY_ID_ERROR'] }
+              cause: { type: 'string', enum: ['GET_USER_BY_ID_ERROR'] },
             },
             examples: [
               {
                 message: 'Internal server error',
                 code: 500,
-                cause: 'GET_USER_BY_ID_ERROR'
-              }
-            ]
-          }
-        }
+                cause: 'GET_USER_BY_ID_ERROR',
+              },
+            ],
+          },
+        },
       },
     },
   })

@@ -1,3 +1,7 @@
+/* eslint-disable no-unused-vars */
+import type { FastifyReply, FastifyRequest } from 'fastify';
+import { Controller, GET, getInstanceByToken } from 'fastify-decorators';
+
 import { AuthenticationMiddleware } from '@middlewares/authentication.middleware';
 import ListRowPaginatedUseCase from '@use-case/rows/list-paginated.use-case';
 import {
@@ -5,8 +9,6 @@ import {
   GetRowCollectionSlugSchema,
   ListRowCollectionPaginatedSchema,
 } from '@validators/row-collection.validator';
-import type { FastifyReply, FastifyRequest } from 'fastify';
-import { Controller, GET, getInstanceByToken } from 'fastify-decorators';
 
 @Controller({
   route: 'collections',
@@ -165,8 +167,6 @@ export default class {
     },
   })
   async handle(request: FastifyRequest, response: FastifyReply): Promise<void> {
-    console.log('ListRowCollectionPaginatedController', request.query);
-
     const query = ListRowCollectionPaginatedSchema.parse(request.query);
     const params = {
       ...GetRowCollectionSlugSchema.parse(request.params),

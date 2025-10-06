@@ -1,13 +1,17 @@
+/* eslint-disable @typescript-eslint/consistent-type-imports */
+import type { RootFilterQuery, SortOrder } from 'mongoose';
+import mongoose from 'mongoose';
+
 import { Collection } from '@model/collection.model';
-import mongoose, { RootFilterQuery, SortOrder } from 'mongoose';
-import {
+
+import type {
   CollectionSchema,
   Field,
-  FIELD_TYPE,
   Optional,
   Row,
   Schema,
 } from './entity.core';
+import { FIELD_TYPE } from './entity.core';
 
 const FieldTypeMapper: Record<FIELD_TYPE, Schema['type']> = {
   [FIELD_TYPE.TEXT_SHORT]: 'String',
@@ -304,29 +308,21 @@ export async function buildPopulate(
 
 type Query = Record<string, any>;
 
-export function buildQuery(
-  { search, trashed, ...rest }: Partial<Query>,
+export async function buildQuery(
+  { search, trashed, ...payload }: Partial<Query>,
   fields: Field[] = [],
-) {
-  let query = fields?.reduce((acc, col) => {
-    if (!col?.type || !col.slug) return acc;
+): Promise<Query> {
+  let query: Query = {};
 
-    // For date fields, check if either -initial or -final exists
-    if (col.type === FIELD_TYPE.DATE) {
-      const slug = String(col.slug?.toString());
-      const initialKey = `${slug}-initial`;
-      const finalKey = `${slug}-final`;
-      if (!rest[initialKey] && !rest[finalKey]) return acc;
-    } else {
-      // For other fields, check if the field value exists
-      if (rest[col.slug] === undefined) return acc;
-    }
+  for (const field of fields.filter((f) => f.type !== FIELD_TYPE.FIELD_GROUP)) {
+    const slug = String(field.slug?.toString());
 
-    const slug = String(col.slug?.toString());
-
-    if ([FIELD_TYPE.TEXT_SHORT, FIELD_TYPE.TEXT_LONG].includes(col.type)) {
-      acc[slug] = {
-        $regex: normalize(rest[slug]?.toString()),
+    if (
+      [FIELD_TYPE.TEXT_SHORT, FIELD_TYPE.TEXT_LONG].includes(field.type) &&
+      payload[slug]
+    ) {
+      query[slug] = {
+        $regex: normalize(payload[slug]?.toString()),
         $options: 'i',
       };
     }
@@ -336,46 +332,87 @@ export function buildQuery(
         FIELD_TYPE.RELATIONSHIP,
         FIELD_TYPE.DROPDOWN,
         FIELD_TYPE.CATEGORY,
-      ].includes(col.type)
+      ].includes(field.type) &&
+      payload[slug]
     ) {
-      acc[slug] = {
-        $in: rest[slug]?.toString().split(','),
+      query[slug] = {
+        $in: payload[slug]?.toString().split(','),
       };
     }
 
-    if (col.type === FIELD_TYPE.DATE) {
+    if (field.type === FIELD_TYPE.DATE) {
       const initialKey = `${slug}-initial`;
       const finalKey = `${slug}-final`;
-      const dateQuery: any = {};
 
-      if (rest[initialKey]) {
-        const initial = new Date(String(rest[initialKey]));
-        dateQuery.$gte = new Date(initial.setUTCHours(0, 0, 0, 0));
+      if (payload[initialKey]) {
+        const initial = new Date(String(payload[initialKey]));
+        query[field.slug].$gte = new Date(initial.setUTCHours(0, 0, 0, 0));
       }
 
-      if (rest[finalKey]) {
-        const final = new Date(String(rest[finalKey]));
-        dateQuery.$lte = new Date(final.setUTCHours(23, 59, 59, 999));
-      }
-
-      if (Object.keys(dateQuery).length > 0) {
-        acc[slug] = dateQuery;
+      if (payload[finalKey]) {
+        const final = new Date(String(payload[finalKey]));
+        query[field.slug].$lte = new Date(final.setUTCHours(23, 59, 59, 999));
       }
     }
+  }
 
-    return acc;
-  }, {} as Query);
+  for (const field of fields.filter((f) => f.type === FIELD_TYPE.FIELD_GROUP)) {
+    const slug = String(field.slug?.toString());
+
+    const group = await Collection.findOne({
+      slug: field?.configuration?.group?.slug,
+    }).populate([
+      {
+        path: 'fields',
+        model: 'Field',
+      },
+    ]);
+
+    if (!group) continue;
+
+    let groupPayload: Query = {};
+
+    for (const fieldGroup of group?.fields as import('@core/entity.core').Field[]) {
+      const fieldGroupSlug = slug.concat('-').concat(String(fieldGroup.slug));
+      groupPayload[fieldGroup.slug] = payload[fieldGroupSlug];
+    }
+
+    const queryGroup = await buildQuery(
+      { ...groupPayload, trashed },
+      group?.fields as import('@core/entity.core').Field[],
+    );
+
+    if (Object.keys(queryGroup).length > 0 && group) {
+      const c = await buildCollection({
+        ...group?.toJSON({
+          flattenObjectIds: true,
+        }),
+        _id: group?._id.toString(),
+      });
+
+      const ids: string[] = await c?.find(queryGroup).distinct('_id');
+
+      if (ids.length === 0)
+        query[slug] = {
+          $in: [],
+        };
+
+      if (ids.length > 0)
+        query[slug] = {
+          $in: ids,
+        };
+    }
+  }
 
   if (search) {
-    query = {
-      ...query,
-      $or: [],
-    };
+    const searchQuery: Query[] = [];
 
-    for (const field of fields) {
+    for (const field of fields.filter(
+      (f) => f.type !== FIELD_TYPE.FIELD_GROUP,
+    )) {
       if ([FIELD_TYPE.TEXT_SHORT, FIELD_TYPE.TEXT_LONG].includes(field?.type)) {
         const slug = String(field.slug?.toString());
-        query.$or.push({
+        searchQuery.push({
           [slug]: {
             $regex: normalize(search),
             $options: 'i',
@@ -383,12 +420,16 @@ export function buildQuery(
         });
       }
     }
+
+    if (searchQuery.length > 0) {
+      query = {
+        $and: [{ ...query }, { $or: searchQuery }],
+      };
+    }
   }
 
   if (trashed && trashed === 'true') query.trashed = true;
   else query.trashed = false;
-
-  console.info(JSON.stringify(query, null, 2));
 
   return query;
 }

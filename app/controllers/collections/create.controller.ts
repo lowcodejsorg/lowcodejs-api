@@ -1,8 +1,10 @@
+/* eslint-disable no-unused-vars */
+import type { FastifyReply, FastifyRequest } from 'fastify';
+import { Controller, getInstanceByToken, POST } from 'fastify-decorators';
+
 import { AuthenticationMiddleware } from '@middlewares/authentication.middleware';
 import CreateCollectionUseCase from '@use-case/collections/create.use-case';
 import { CreateCollectionSchema } from '@validators/collections.validator';
-import type { FastifyReply, FastifyRequest } from 'fastify';
-import { Controller, getInstanceByToken, POST } from 'fastify-decorators';
 
 @Controller({
   route: 'collections',
@@ -54,7 +56,10 @@ export default class {
                 properties: {
                   _id: { type: 'string', description: 'Storage ID' },
                   url: { type: 'string', description: 'File URL' },
-                  filename: { type: 'string', description: 'Original filename' },
+                  filename: {
+                    type: 'string',
+                    description: 'Original filename',
+                  },
                   type: { type: 'string', description: 'MIME type' },
                 },
               },

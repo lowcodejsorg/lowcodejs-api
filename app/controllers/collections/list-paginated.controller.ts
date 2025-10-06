@@ -1,11 +1,14 @@
+/* eslint-disable no-unused-vars */
+
+import type { FastifyReply, FastifyRequest } from 'fastify';
+import { Controller, GET, getInstanceByToken } from 'fastify-decorators';
+
 import { AuthenticationMiddleware } from '@middlewares/authentication.middleware';
 import ListCollectionPaginatedUseCase from '@use-case/collections/list-paginated.use-case';
 import {
   GetCollectionQuerySchema,
   ListCollectionPaginatedSchema,
 } from '@validators/collections.validator';
-import type { FastifyReply, FastifyRequest } from 'fastify';
-import { Controller, GET, getInstanceByToken } from 'fastify-decorators';
 
 @Controller({
   route: 'collections',
@@ -95,17 +98,24 @@ export default class {
                     description: {
                       type: 'string',
                       nullable: true,
-                      description: 'Collection description'
+                      description: 'Collection description',
                     },
-                    slug: { type: 'string', description: 'Collection URL slug' },
+                    slug: {
+                      type: 'string',
+                      description: 'Collection URL slug',
+                    },
                     logo: {
                       type: 'object',
                       nullable: true,
-                      description: 'Collection logo storage details (populated)',
+                      description:
+                        'Collection logo storage details (populated)',
                       properties: {
                         _id: { type: 'string', description: 'Storage ID' },
                         url: { type: 'string', description: 'File URL' },
-                        filename: { type: 'string', description: 'Original filename' },
+                        filename: {
+                          type: 'string',
+                          description: 'Original filename',
+                        },
                         type: { type: 'string', description: 'MIME type' },
                       },
                     },
@@ -161,17 +171,17 @@ export default class {
                         style: {
                           type: 'string',
                           enum: ['gallery', 'list'],
-                          description: 'Display style'
+                          description: 'Display style',
                         },
                         visibility: {
                           type: 'string',
                           enum: ['public', 'restricted'],
-                          description: 'Visibility setting'
+                          description: 'Visibility setting',
                         },
                         collaboration: {
                           type: 'string',
                           enum: ['open', 'restricted'],
-                          description: 'Collaboration setting'
+                          description: 'Collaboration setting',
                         },
                         administrators: {
                           type: 'array',
@@ -180,7 +190,10 @@ export default class {
                             type: 'object',
                             properties: {
                               _id: { type: 'string', description: 'User ID' },
-                              name: { type: 'string', description: 'User name' },
+                              name: {
+                                type: 'string',
+                                description: 'User name',
+                              },
                             },
                           },
                         },
@@ -237,11 +250,20 @@ export default class {
               meta: {
                 type: 'object',
                 properties: {
-                  total: { type: 'number', description: 'Total number of collections' },
-                  perPage: { type: 'number', description: 'Number of items per page' },
+                  total: {
+                    type: 'number',
+                    description: 'Total number of collections',
+                  },
+                  perPage: {
+                    type: 'number',
+                    description: 'Number of items per page',
+                  },
                   page: { type: 'number', description: 'Current page number' },
                   lastPage: { type: 'number', description: 'Last page number' },
-                  firstPage: { type: 'number', description: 'First page number' }
+                  firstPage: {
+                    type: 'number',
+                    description: 'First page number',
+                  },
                 },
               },
             },
@@ -268,8 +290,11 @@ export default class {
             properties: {
               message: { type: 'string', enum: ['Internal server error'] },
               code: { type: 'number', enum: [500] },
-              cause: { type: 'string', enum: ['COLLECTION_LIST_PAGINATED_ERROR'] },
-            }
+              cause: {
+                type: 'string',
+                enum: ['COLLECTION_LIST_PAGINATED_ERROR'],
+              },
+            },
           },
         },
       },

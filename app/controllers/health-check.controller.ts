@@ -18,20 +18,20 @@ export default class {
               status: {
                 type: 'string',
                 enum: ['ok'],
-                description: 'Health status indicator'
+                description: 'Health status indicator',
               },
               timestamp: {
                 type: 'string',
                 format: 'date-time',
-                description: 'Current server timestamp'
+                description: 'Current server timestamp',
               },
             },
             examples: [
               {
                 status: 'ok',
-                timestamp: '2023-12-01T10:30:00.000Z'
-              }
-            ]
+                timestamp: '2023-12-01T10:30:00.000Z',
+              },
+            ],
           },
         },
       },

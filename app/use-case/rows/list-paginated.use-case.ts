@@ -1,5 +1,10 @@
-import { Either, left, right } from '@core/either.core';
-import { Meta, Paginated } from '@core/entity.core';
+/* eslint-disable @typescript-eslint/consistent-type-imports */
+import { Service } from 'fastify-decorators';
+import type z from 'zod';
+
+import type { Either } from '@core/either.core';
+import { left, right } from '@core/either.core';
+import type { Meta, Paginated } from '@core/entity.core';
 import {
   buildCollection,
   buildOrder,
@@ -8,13 +13,11 @@ import {
 } from '@core/util.core';
 import ApplicationException from '@exceptions/application.exception';
 import { Collection } from '@model/collection.model';
-import {
+import type {
   GetRowCollectionQuerySchema,
   GetRowCollectionSlugSchema,
   ListRowCollectionPaginatedSchema,
 } from '@validators/row-collection.validator';
-import { Service } from 'fastify-decorators';
-import z from 'zod';
 
 type Response = Either<
   ApplicationException,
@@ -29,7 +32,6 @@ export default class ListRowCollectionPaginatedUseCase {
       z.infer<typeof GetRowCollectionQuerySchema>,
   ): Promise<Response> {
     try {
-      console.log('ListRowCollectionPaginatedUseCase', payload);
       const skip = (payload.page - 1) * payload.perPage;
 
       const collection = await Collection.findOne({
@@ -62,27 +64,21 @@ export default class ListRowCollectionPaginatedUseCase {
         );
       }
 
-      let c;
-      try {
-        c = await buildCollection({
-          ...collection?.toJSON({
-            flattenObjectIds: true,
-          }),
-          _id: collection?._id.toString(),
-        });
-      } catch (error) {
-        console.error('Model build error:', error);
-        return left(
-          ApplicationException.InternalServerError(
-            'Failed to build collection model',
-            'MODEL_BUILD_FAILED',
-          ),
-        );
-      }
+      const c = await buildCollection({
+        ...collection?.toJSON({
+          flattenObjectIds: true,
+        }),
+        _id: collection?._id.toString(),
+      });
 
-      const query = buildQuery(
+      const query = await buildQuery(
         payload,
         collection?.fields as import('@core/entity.core').Field[],
+      );
+
+      console.info(
+        'query on list-paginated.use-case.ts',
+        JSON.stringify(query, null, 2),
       );
 
       const order = buildOrder(
@@ -90,20 +86,9 @@ export default class ListRowCollectionPaginatedUseCase {
         collection?.fields as import('@core/entity.core').Field[],
       );
 
-      let populate;
-      try {
-        populate = await buildPopulate(
-          collection?.fields as import('@core/entity.core').Field[],
-        );
-      } catch (error) {
-        console.error('Populate build error:', error);
-        return left(
-          ApplicationException.InternalServerError(
-            'Failed to build populate strategy',
-            'POPULATE_BUILD_FAILED',
-          ),
-        );
-      }
+      const populate = await buildPopulate(
+        collection?.fields as import('@core/entity.core').Field[],
+      );
 
       const rows = await c
         .find(query)

@@ -22,7 +22,7 @@ export default [
     },
     rules: {
       ...js.configs.recommended.rules,
-      ...tseslint.configs.recommended,
+      ...tseslint.configs.recommended.rules,
       'prettier/prettier': 'error',
       '@typescript-eslint/consistent-type-imports': [
         'error',
@@ -65,6 +65,7 @@ export default [
             ['@use-case', './app/use-case'],
             ['@services', './app/services'],
             ['@validators', './app/validators'],
+            ['@generated', './generated'],
           ],
           extensions: ['.ts', '.js', '.json'],
         },

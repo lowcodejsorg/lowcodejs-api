@@ -1,7 +1,10 @@
-import { AuthenticationMiddleware } from '@middlewares/authentication.middleware';
-import GetProfileUseCase from '@use-case/profile/get.use-case';
+/* eslint-disable no-unused-vars */
+
 import type { FastifyReply, FastifyRequest } from 'fastify';
 import { Controller, GET, getInstanceByToken } from 'fastify-decorators';
+
+import { AuthenticationMiddleware } from '@middlewares/authentication.middleware';
+import GetProfileUseCase from '@use-case/profile/get.use-case';
 
 @Controller({
   route: 'profile',

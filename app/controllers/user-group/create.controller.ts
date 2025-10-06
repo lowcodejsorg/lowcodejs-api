@@ -1,8 +1,11 @@
+/* eslint-disable no-unused-vars */
+
+import type { FastifyReply, FastifyRequest } from 'fastify';
+import { Controller, getInstanceByToken, POST } from 'fastify-decorators';
+
 import { AuthenticationMiddleware } from '@middlewares/authentication.middleware';
 import CreateUserGroupUseCase from '@use-case/user-group/create.use-case';
 import { CreateUserGroupSchema } from '@validators/user-group.validator';
-import type { FastifyReply, FastifyRequest } from 'fastify';
-import { Controller, getInstanceByToken, POST } from 'fastify-decorators';
 
 @Controller()
 export default class {

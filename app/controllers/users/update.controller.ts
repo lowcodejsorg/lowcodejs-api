@@ -1,8 +1,11 @@
+/* eslint-disable no-unused-vars */
+
+import type { FastifyReply, FastifyRequest } from 'fastify';
+import { Controller, getInstanceByToken, PATCH } from 'fastify-decorators';
+
 import { AuthenticationMiddleware } from '@middlewares/authentication.middleware';
 import UpdateUserUseCase from '@use-case/users/update.use-case';
 import { GetUserByIdSchema, UpdateUserSchema } from '@validators/users';
-import type { FastifyReply, FastifyRequest } from 'fastify';
-import { Controller, getInstanceByToken, PATCH } from 'fastify-decorators';
 
 @Controller({
   route: '/users',
@@ -21,7 +24,8 @@ export default class {
       schema: {
         tags: ['Users'],
         summary: 'Update user',
-        description: 'Updates an existing user with new information including optional password change',
+        description:
+          'Updates an existing user with new information including optional password change',
         security: [{ cookieAuth: [] }],
         params: {
           type: 'object',
@@ -29,9 +33,9 @@ export default class {
           properties: {
             _id: {
               type: 'string',
-              description: 'User ID'
-            }
-          }
+              description: 'User ID',
+            },
+          },
         },
         body: {
           type: 'object',
@@ -39,27 +43,27 @@ export default class {
           properties: {
             name: {
               type: 'string',
-              description: 'Updated user full name'
+              description: 'Updated user full name',
             },
             email: {
               type: 'string',
               format: 'email',
-              description: 'Updated user email address'
+              description: 'Updated user email address',
             },
             group: {
               type: 'string',
-              description: 'Updated user group ID'
+              description: 'Updated user group ID',
             },
             password: {
               type: 'string',
-              description: 'New password (optional)'
+              description: 'New password (optional)',
             },
             status: {
               type: 'string',
               enum: ['active', 'inactive'],
-              description: 'User status'
-            }
-          }
+              description: 'User status',
+            },
+          },
         },
         response: {
           200: {
@@ -73,29 +77,32 @@ export default class {
                 type: 'object',
                 properties: {
                   _id: { type: 'string' },
-                  name: { type: 'string' }
-                }
+                  name: { type: 'string' },
+                },
               },
               status: { type: 'string' },
               createdAt: { type: 'string', format: 'date-time' },
-              updatedAt: { type: 'string', format: 'date-time' }
-            }
+              updatedAt: { type: 'string', format: 'date-time' },
+            },
           },
           400: {
             description: 'Bad request - Validation error',
             type: 'object',
             properties: {
-              message: { type: 'string', description: 'Validation error message' },
+              message: {
+                type: 'string',
+                description: 'Validation error message',
+              },
               code: { type: 'number', enum: [400] },
-              cause: { type: 'string', enum: ['INVALID_PARAMETERS'] }
+              cause: { type: 'string', enum: ['INVALID_PARAMETERS'] },
             },
             examples: [
               {
                 message: 'Validation failed',
                 code: 400,
-                cause: 'INVALID_PARAMETERS'
-              }
-            ]
+                cause: 'INVALID_PARAMETERS',
+              },
+            ],
           },
           401: {
             description: 'Unauthorized - Authentication required',
@@ -103,15 +110,15 @@ export default class {
             properties: {
               message: { type: 'string', enum: ['Unauthorized'] },
               code: { type: 'number', enum: [401] },
-              cause: { type: 'string', enum: ['AUTHENTICATION_REQUIRED'] }
+              cause: { type: 'string', enum: ['AUTHENTICATION_REQUIRED'] },
             },
             examples: [
               {
                 message: 'Unauthorized',
                 code: 401,
-                cause: 'AUTHENTICATION_REQUIRED'
-              }
-            ]
+                cause: 'AUTHENTICATION_REQUIRED',
+              },
+            ],
           },
           404: {
             description: 'User not found',
@@ -119,15 +126,15 @@ export default class {
             properties: {
               message: { type: 'string', enum: ['User not found'] },
               code: { type: 'number', enum: [404] },
-              cause: { type: 'string', enum: ['USER_NOT_FOUND'] }
+              cause: { type: 'string', enum: ['USER_NOT_FOUND'] },
             },
             examples: [
               {
                 message: 'User not found',
                 code: 404,
-                cause: 'USER_NOT_FOUND'
-              }
-            ]
+                cause: 'USER_NOT_FOUND',
+              },
+            ],
           },
           500: {
             description: 'Internal server error',
@@ -135,17 +142,17 @@ export default class {
             properties: {
               message: { type: 'string', enum: ['Internal server error'] },
               code: { type: 'number', enum: [500] },
-              cause: { type: 'string', enum: ['UPDATE_USER_ERROR'] }
+              cause: { type: 'string', enum: ['UPDATE_USER_ERROR'] },
             },
             examples: [
               {
                 message: 'Internal server error',
                 code: 500,
-                cause: 'UPDATE_USER_ERROR'
-              }
-            ]
-          }
-        }
+                cause: 'UPDATE_USER_ERROR',
+              },
+            ],
+          },
+        },
       },
     },
   })

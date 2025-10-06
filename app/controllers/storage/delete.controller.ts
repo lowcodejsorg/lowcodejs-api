@@ -1,8 +1,11 @@
-import { AuthenticationMiddleware } from '@middlewares/authentication.middleware';
-import DeleteStorageUseCase from '@use-case/storage/delete.use-case';
+/* eslint-disable no-unused-vars */
+
 import type { FastifyReply, FastifyRequest } from 'fastify';
 import { Controller, DELETE, getInstanceByToken } from 'fastify-decorators';
 import z from 'zod';
+
+import { AuthenticationMiddleware } from '@middlewares/authentication.middleware';
+import DeleteStorageUseCase from '@use-case/storage/delete.use-case';
 
 const Schema = z.object({
   _id: z.string(),
@@ -26,7 +29,8 @@ export default class {
       schema: {
         tags: ['Storage'],
         summary: 'Delete file from storage',
-        description: 'Permanently deletes a file from both the database and file system. This action cannot be undone.',
+        description:
+          'Permanently deletes a file from both the database and file system. This action cannot be undone.',
         security: [{ cookieAuth: [] }],
         params: {
           type: 'object',
@@ -35,10 +39,10 @@ export default class {
             _id: {
               type: 'string',
               description: 'Storage record ID to delete',
-              examples: ['507f1f77bcf86cd799439011']
-            }
+              examples: ['507f1f77bcf86cd799439011'],
+            },
           },
-          additionalProperties: false
+          additionalProperties: false,
         },
         response: {
           200: {
@@ -46,8 +50,12 @@ export default class {
             type: 'object',
             properties: {
               message: { type: 'string', enum: ['File deleted successfully'] },
-              deletedAt: { type: 'string', format: 'date-time', description: 'Deletion timestamp' }
-            }
+              deletedAt: {
+                type: 'string',
+                format: 'date-time',
+                description: 'Deletion timestamp',
+              },
+            },
           },
           401: {
             description: 'Unauthorized - Authentication required',
@@ -55,8 +63,8 @@ export default class {
             properties: {
               message: { type: 'string', enum: ['Unauthorized'] },
               code: { type: 'number', enum: [401] },
-              cause: { type: 'string', enum: ['AUTHENTICATION_REQUIRED'] }
-            }
+              cause: { type: 'string', enum: ['AUTHENTICATION_REQUIRED'] },
+            },
           },
           404: {
             description: 'Not found - Storage record does not exist',
@@ -64,26 +72,27 @@ export default class {
             properties: {
               message: { type: 'string', enum: ['Storage not found'] },
               code: { type: 'number', enum: [404] },
-              cause: { type: 'string', enum: ['STORAGE_NOT_FOUND'] }
+              cause: { type: 'string', enum: ['STORAGE_NOT_FOUND'] },
             },
             examples: [
               {
                 message: 'Storage not found',
                 code: 404,
-                cause: 'STORAGE_NOT_FOUND'
-              }
-            ]
+                cause: 'STORAGE_NOT_FOUND',
+              },
+            ],
           },
           500: {
-            description: 'Internal server error - Database or file system issues',
+            description:
+              'Internal server error - Database or file system issues',
             type: 'object',
             properties: {
               message: { type: 'string', enum: ['Internal server error'] },
               code: { type: 'number', enum: [500] },
-              cause: { type: 'string', enum: ['STORAGE_DELETE_ERROR'] }
-            }
-          }
-        }
+              cause: { type: 'string', enum: ['STORAGE_DELETE_ERROR'] },
+            },
+          },
+        },
       },
     },
   })

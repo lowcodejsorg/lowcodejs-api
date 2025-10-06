@@ -1,7 +1,8 @@
-import { AuthenticationMiddleware } from '@middlewares/authentication.middleware';
-import { Env } from '@start/env';
 import type { FastifyReply, FastifyRequest } from 'fastify';
 import { Controller, POST } from 'fastify-decorators';
+
+import { AuthenticationMiddleware } from '@middlewares/authentication.middleware';
+import { Env } from '@start/env';
 
 @Controller({
   route: 'authentication',

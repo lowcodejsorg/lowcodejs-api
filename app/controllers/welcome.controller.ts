@@ -17,7 +17,7 @@ export default class {
               location: {
                 type: 'string',
                 description: 'Redirect destination URL',
-                examples: ['/documentation']
+                examples: ['/documentation'],
               },
             },
             type: 'object',
@@ -25,14 +25,14 @@ export default class {
               message: {
                 type: 'string',
                 enum: ['LowCodeJs API'],
-                description: 'Welcome message'
+                description: 'Welcome message',
               },
             },
             examples: [
               {
-                message: 'LowCodeJs API'
-              }
-            ]
+                message: 'LowCodeJs API',
+              },
+            ],
           },
         },
       },

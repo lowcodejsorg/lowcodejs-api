@@ -1,8 +1,11 @@
+/* eslint-disable no-unused-vars */
+
+import type { FastifyReply, FastifyRequest } from 'fastify';
+import { Controller, GET, getInstanceByToken } from 'fastify-decorators';
+
 import { AuthenticationMiddleware } from '@middlewares/authentication.middleware';
 import ListUserGroupPaginatedUseCase from '@use-case/user-group/list-paginated.use-case';
 import { ListCollectionPaginatedSchema } from '@validators/collections.validator';
-import type { FastifyReply, FastifyRequest } from 'fastify';
-import { Controller, GET, getInstanceByToken } from 'fastify-decorators';
 
 @Controller({
   route: 'user-group',

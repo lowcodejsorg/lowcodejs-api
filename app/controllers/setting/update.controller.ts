@@ -1,9 +1,10 @@
-import { AuthenticationMiddleware } from '@middlewares/authentication.middleware';
 import type { FastifyReply, FastifyRequest } from 'fastify';
 import { Controller, PUT } from 'fastify-decorators';
 import { readFile, writeFile } from 'fs/promises';
 import { join } from 'path';
 import z from 'zod';
+
+import { AuthenticationMiddleware } from '@middlewares/authentication.middleware';
 
 @Controller({
   route: '/setting',

@@ -1,8 +1,11 @@
+/* eslint-disable no-unused-vars */
+
+import type { FastifyReply, FastifyRequest } from 'fastify';
+import { Controller, getInstanceByToken, PATCH } from 'fastify-decorators';
+
 import { AuthenticationMiddleware } from '@middlewares/authentication.middleware';
 import RemoveCollectionFromTrashUseCase from '@use-case/collections/remove-from-trash.use-case';
 import { GetCollectionBySlugSchema } from '@validators/collections.validator';
-import type { FastifyReply, FastifyRequest } from 'fastify';
-import { Controller, getInstanceByToken, PATCH } from 'fastify-decorators';
 
 @Controller({
   route: 'collections',
@@ -21,7 +24,8 @@ export default class {
       schema: {
         tags: ['Collections'],
         summary: 'Remove collection from trash',
-        description: 'Restores a collection from trash, making it active again with all its original functionality.',
+        description:
+          'Restores a collection from trash, making it active again with all its original functionality.',
         security: [{ cookieAuth: [] }],
         params: {
           type: 'object',
@@ -30,14 +34,15 @@ export default class {
             slug: {
               type: 'string',
               description: 'Collection slug identifier',
-              examples: ['users', 'products', 'blog-posts']
-            }
+              examples: ['users', 'products', 'blog-posts'],
+            },
           },
-          additionalProperties: false
+          additionalProperties: false,
         },
         response: {
           200: {
-            description: 'Collection restored from trash successfully with populated data',
+            description:
+              'Collection restored from trash successfully with populated data',
             type: 'object',
             properties: {
               _id: { type: 'string', description: 'Collection ID' },
@@ -270,7 +275,7 @@ export default class {
                 format: 'date-time',
                 description: 'Last update timestamp',
               },
-            }
+            },
           },
           401: {
             description: 'Unauthorized - Authentication required',
@@ -278,24 +283,25 @@ export default class {
             properties: {
               message: { type: 'string', enum: ['Unauthorized'] },
               code: { type: 'number', enum: [401] },
-              cause: { type: 'string', enum: ['AUTHENTICATION_REQUIRED'] }
-            }
+              cause: { type: 'string', enum: ['AUTHENTICATION_REQUIRED'] },
+            },
           },
           404: {
-            description: 'Not found - Collection with specified slug does not exist or is not in trash',
+            description:
+              'Not found - Collection with specified slug does not exist or is not in trash',
             type: 'object',
             properties: {
               message: { type: 'string', enum: ['Collection not found'] },
               code: { type: 'number', enum: [404] },
-              cause: { type: 'string', enum: ['COLLECTION_NOT_FOUND'] }
+              cause: { type: 'string', enum: ['COLLECTION_NOT_FOUND'] },
             },
             examples: [
               {
                 message: 'Collection not found',
                 code: 404,
-                cause: 'COLLECTION_NOT_FOUND'
-              }
-            ]
+                cause: 'COLLECTION_NOT_FOUND',
+              },
+            ],
           },
           500: {
             description: 'Internal server error - Database or server issues',
@@ -303,10 +309,13 @@ export default class {
             properties: {
               message: { type: 'string', enum: ['Internal server error'] },
               code: { type: 'number', enum: [500] },
-              cause: { type: 'string', enum: ['REMOVE_COLLECTION_FROM_TRASH_ERROR'] }
-            }
-          }
-        }
+              cause: {
+                type: 'string',
+                enum: ['REMOVE_COLLECTION_FROM_TRASH_ERROR'],
+              },
+            },
+          },
+        },
       },
     },
   })

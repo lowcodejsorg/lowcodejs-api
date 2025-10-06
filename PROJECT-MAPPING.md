@@ -9,6 +9,7 @@
 ## 📊 Estatísticas do Projeto
 
 ### Resumo Geral
+
 - **Total de Controllers**: 49 arquivos
 - **Total de Use Cases**: 43 arquivos
 - **Total de Models**: 9 modelos Mongoose
@@ -18,6 +19,7 @@
 - **Domínios de Negócio**: 12 domínios principais
 
 ### Distribuição de Código
+
 ```
 app/
 ├── controllers/     49 arquivos (.controller.ts)
@@ -37,6 +39,7 @@ app/
 ### Padrões Arquiteturais Implementados
 
 #### 1. **Clean Architecture**
+
 ```
 ┌─────────────────────────────────────────┐
 │         Controllers Layer               │
@@ -60,6 +63,7 @@ app/
 ```
 
 #### 2. **Functional Error Handling - Either Pattern**
+
 ```typescript
 // Todas as operações retornam Either<Error, Success>
 type Response = Either<ApplicationException, Entity>;
@@ -74,6 +78,7 @@ return result.value; // Entity
 ```
 
 #### 3. **Decorator-Based Routing**
+
 ```typescript
 @Controller()
 export default class {
@@ -93,9 +98,11 @@ export default class {
 ## 🗂️ Mapeamento de Domínios
 
 ### 1. Authentication Domain (8 endpoints)
+
 **Responsabilidade**: Gerenciamento de autenticação e recuperação de senha
 
 #### Controllers (8 arquivos)
+
 - `sign-in.controller.ts` - Login com JWT
 - `sign-up.controller.ts` - Registro de usuários
 - `sign-out.controller.ts` - Logout/invalidação de token
@@ -106,6 +113,7 @@ export default class {
 - `recovery/update-password.controller.ts` - Atualizar senha
 
 #### Use Cases (7 arquivos)
+
 - `sign-in.use-case.ts` - Validação e geração de JWT
 - `sign-up.use-case.ts` - Criação de usuário e envio de email
 - `magic-link.use-case.ts` - Validação de código mágico
@@ -115,6 +123,7 @@ export default class {
 - `recovery/update-password.use-case.ts` - Atualização de senha com hash
 
 #### Fluxos de Autenticação
+
 ```
 ┌─────────────┐
 │  Sign In    │
@@ -147,9 +156,11 @@ export default class {
 ---
 
 ### 2. Collections Domain (7 endpoints)
+
 **Responsabilidade**: Gerenciamento de coleções dinâmicas
 
 #### Controllers (7 arquivos)
+
 - `create.controller.ts` - Criar coleção
 - `list-paginated.controller.ts` - Listar com paginação
 - `get-by-slug.controller.ts` - Buscar por slug
@@ -159,6 +170,7 @@ export default class {
 - `remove-from-trash.controller.ts` - Restaurar da lixeira
 
 #### Use Cases (8 arquivos)
+
 - `create.use-case.ts` - Criação com schema building
 - `list-paginated.use-case.ts` - Listagem com filtros
 - `get-by-slug.use-case.ts` - Busca individual
@@ -168,6 +180,7 @@ export default class {
 - `remove-from-trash.use-case.ts` - Restauração
 
 #### Dynamic Schema Building
+
 ```typescript
 // Processo de criação de coleção
 Create Collection
@@ -193,9 +206,11 @@ Create Collection
 ---
 
 ### 3. Fields Domain (5 endpoints)
+
 **Responsabilidade**: Gerenciamento de campos de coleções
 
 #### Controllers (5 arquivos)
+
 - `create.controller.ts` - Criar campo
 - `get-by-id.controller.ts` - Buscar campo
 - `update.controller.ts` - Atualizar configuração
@@ -203,6 +218,7 @@ Create Collection
 - `remove-from-trash.controller.ts` - Restaurar campo
 
 #### Field Type Mapping
+
 ```typescript
 const FieldTypeMapper = {
   TEXT_SHORT: 'String',
@@ -219,31 +235,35 @@ const FieldTypeMapper = {
 ```
 
 #### Field Configuration Options
+
 ```typescript
 interface FieldConfiguration {
-  required: boolean;           // Campo obrigatório
-  multiple: boolean;           // Múltiplos valores
-  format: FIELD_FORMAT;        // Formato específico
-  listing: boolean;            // Exibir em listagem
-  filtering: boolean;          // Permitir filtro
-  defaultValue: string;        // Valor padrão
-  relationship: {              // Configuração de relacionamento
-    collection: {_id, slug},
-    field: {_id, slug},
-    order: 'asc' | 'desc'
+  required: boolean; // Campo obrigatório
+  multiple: boolean; // Múltiplos valores
+  format: FIELD_FORMAT; // Formato específico
+  listing: boolean; // Exibir em listagem
+  filtering: boolean; // Permitir filtro
+  defaultValue: string; // Valor padrão
+  relationship: {
+    // Configuração de relacionamento
+    collection: { _id; slug };
+    field: { _id; slug };
+    order: 'asc' | 'desc';
   };
-  dropdown: string[];          // Opções de dropdown
-  category: Category[];        // Categorias hierárquicas
-  group: {_id, slug};         // Grupo de campos
+  dropdown: string[]; // Opções de dropdown
+  category: Category[]; // Categorias hierárquicas
+  group: { _id; slug }; // Grupo de campos
 }
 ```
 
 ---
 
 ### 4. Rows Domain - **NÚCLEO DO SISTEMA** (9 endpoints)
+
 **Responsabilidade**: Gerenciamento de dados dinâmicos das coleções
 
 #### Controllers (9 arquivos)
+
 - `create.controller.ts` - Criar registro
 - `list-paginated.controller.ts` - Listar com filtros avançados
 - `get-by-id.controller.ts` - Buscar com population
@@ -255,6 +275,7 @@ interface FieldConfiguration {
 - `evaluation.controller.ts` - Adicionar avaliações
 
 #### Use Cases (9 arquivos)
+
 - `create.use-case.ts` - Validação dinâmica + criação
 - `list-paginated.use-case.ts` - Query building + population
 - `get-by-id.use-case.ts` - Population estratégica
@@ -266,6 +287,7 @@ interface FieldConfiguration {
 - `evaluation.use-case.ts` - Gerenciamento de avaliações
 
 #### Advanced Query Building System
+
 ```typescript
 // Query Builder Features
 buildQuery(searchParams, fields) {
@@ -297,6 +319,7 @@ buildQuery(searchParams, fields) {
 ```
 
 #### Population Strategy (Recursive)
+
 ```typescript
 // buildPopulate() - Intelligent relationship loading
 await buildPopulate(fields)
@@ -328,6 +351,7 @@ await buildPopulate(fields)
 ```
 
 #### Social Features System
+
 ```typescript
 // Reactions (Like/Unlike)
 PATCH /collections/:slug/rows/:_id/reaction
@@ -354,15 +378,18 @@ PATCH /collections/:slug/rows/:_id/evaluation
 ---
 
 ### 5. Users Domain (4 endpoints)
+
 **Responsabilidade**: Gerenciamento de usuários do sistema
 
 #### Controllers (4 arquivos)
+
 - `create.controller.ts` - Criar usuário (admin)
 - `list-paginated.controller.ts` - Listar usuários
 - `get-by-id.controller.ts` - Buscar usuário
 - `update.controller.ts` - Atualizar usuário
 
 #### User Lifecycle
+
 ```
 Create User (Admin)
     │
@@ -383,9 +410,11 @@ Update User
 ---
 
 ### 6. User Groups Domain (5 endpoints)
+
 **Responsabilidade**: Gerenciamento de grupos e permissões
 
 #### Controllers (5 arquivos)
+
 - `create.controller.ts` - Criar grupo
 - `list.controller.ts` - Listar todos
 - `list-paginated.controller.ts` - Listar paginado
@@ -393,6 +422,7 @@ Update User
 - `update.controller.ts` - Atualizar grupo
 
 #### Permission System
+
 ```typescript
 interface UserGroup {
   name: string;
@@ -413,13 +443,16 @@ ResourceMiddleware('collections:read')
 ---
 
 ### 7. Storage Domain (2 endpoints)
+
 **Responsabilidade**: Upload e gerenciamento de arquivos
 
 #### Controllers (2 arquivos)
+
 - `upload.controller.ts` - Upload de arquivo (multipart)
 - `delete.controller.ts` - Deletar arquivo
 
 #### File Upload Flow
+
 ```
 POST /storage (multipart/form-data)
     │
@@ -439,13 +472,16 @@ GET /storage/:filename
 ---
 
 ### 8. Profile Domain (2 endpoints)
+
 **Responsabilidade**: Gerenciamento de perfil do usuário logado
 
 #### Controllers (2 arquivos)
+
 - `get.controller.ts` - Obter perfil atual
 - `update.controller.ts` - Atualizar perfil
 
 #### Profile Update Flow
+
 ```
 PUT /profile
     │
@@ -459,30 +495,37 @@ PUT /profile
 ---
 
 ### 9. Settings Domain (2 endpoints)
+
 **Responsabilidade**: Configurações do sistema
 
 #### Controllers (2 arquivos)
+
 - `get.controller.ts` - Obter configurações
 - `update.controller.ts` - Atualizar configurações
 
 ---
 
 ### 10. Permissions Domain (1 endpoint)
+
 **Responsabilidade**: Listagem de permissões disponíveis
 
 #### Controllers (1 arquivo)
+
 - `list.controller.ts` - Listar todas as permissões
 
 ---
 
 ### 11. Locales Domain (2 endpoints)
+
 **Responsabilidade**: Internacionalização
 
 #### Controllers (2 arquivos)
+
 - `list.controller.ts` - Listar idiomas disponíveis
 - `get-by-locale.controller.ts` - Obter traduções por idioma
 
 #### i18n System
+
 ```
 GET /locales → ['pt-br', 'en-us']
 GET /locales/pt-br → Properties file content
@@ -495,9 +538,11 @@ _system/locales/en-us.properties
 ---
 
 ### 12. System Endpoints (3 endpoints)
+
 **Responsabilidade**: Saúde e documentação da API
 
 #### Controllers (3 arquivos)
+
 - `welcome.controller.ts` - Redireciona para /documentation
 - `health-check.controller.ts` - Status da aplicação
 - `openapi.json` (kernel.ts) - OpenAPI specification
@@ -509,6 +554,7 @@ _system/locales/en-us.properties
 ### Model Files & Schema Details
 
 #### 1. **User Model** (`user.model.ts`)
+
 ```typescript
 {
   name: String (required),
@@ -523,6 +569,7 @@ _system/locales/en-us.properties
 ```
 
 #### 2. **UserGroup Model** (`user-group.model.ts`)
+
 ```typescript
 {
   name: String (required),
@@ -536,6 +583,7 @@ _system/locales/en-us.properties
 ```
 
 #### 3. **Permission Model** (`permission.model.ts`)
+
 ```typescript
 {
   name: String (required),
@@ -548,6 +596,7 @@ _system/locales/en-us.properties
 ```
 
 #### 4. **Collection Model** (`collection.model.ts`)
+
 ```typescript
 {
   _schema: Mixed (dynamic schema object),
@@ -575,6 +624,7 @@ _system/locales/en-us.properties
 ```
 
 #### 5. **Field Model** (`field.model.ts`)
+
 ```typescript
 {
   name: String (required),
@@ -603,6 +653,7 @@ _system/locales/en-us.properties
 ```
 
 #### 6. **Storage Model** (`storage.model.ts`)
+
 ```typescript
 {
   url: String (required),
@@ -615,6 +666,7 @@ _system/locales/en-us.properties
 ```
 
 #### 7. **ValidationToken Model** (`validation-token.model.ts`)
+
 ```typescript
 {
   user: ObjectId (ref: 'User', required),
@@ -627,6 +679,7 @@ _system/locales/en-us.properties
 ```
 
 #### 8. **Reaction Model** (`reaction.model.ts`)
+
 ```typescript
 {
   user: ObjectId (ref: 'User', required),
@@ -638,6 +691,7 @@ _system/locales/en-us.properties
 ```
 
 #### 9. **Evaluation Model** (`evaluation.model.ts`)
+
 ```typescript
 {
   user: ObjectId (ref: 'User', required),
@@ -649,15 +703,16 @@ _system/locales/en-us.properties
 ```
 
 #### Dynamic Row Models (Runtime)
+
 ```typescript
 // Created dynamically via buildCollection()
 Model['collection-slug'] = mongoose.model({
-  ...collection._schema,  // Dynamic fields
+  ...collection._schema, // Dynamic fields
   _id: ObjectId,
   createdAt: Date,
   updatedAt: Date,
   trashed: Boolean,
-  trashedAt: Date
+  trashedAt: Date,
 });
 ```
 
@@ -668,6 +723,7 @@ Model['collection-slug'] = mongoose.model({
 ### Middleware Stack
 
 #### 1. **AuthenticationMiddleware** (`authentication.middleware.ts`)
+
 ```typescript
 Purpose: Verificar JWT e extrair dados do usuário
 Flow:
@@ -680,6 +736,7 @@ Flow:
 ```
 
 #### 2. **ResourceMiddleware** (`resource.middleware.ts`)
+
 ```typescript
 Purpose: Verificar permissões específicas de recurso
 Factory Pattern: ResourceMiddleware('resource:action')
@@ -698,6 +755,7 @@ Flow:
 ### Validation System (Zod)
 
 #### Validation Files
+
 1. **authentication.validator.ts** - Auth schemas
 2. **collections.validator.ts** - Collection schemas
 3. **field-collection.validator.ts** - Field schemas
@@ -706,6 +764,7 @@ Flow:
 6. **users.ts** - User schemas
 
 #### Dynamic Validation Example
+
 ```typescript
 // Row validation adapts to collection fields
 const CreateRowCollectionSchema = z.record(
@@ -718,8 +777,8 @@ const CreateRowCollectionSchema = z.record(
     z.array(z.string()),
     z.array(z.number()),
     z.array(z.object({ _id: z.string().optional() }).loose()),
-    z.object({}).loose()
-  ])
+    z.object({}).loose(),
+  ]),
 );
 ```
 
@@ -730,6 +789,7 @@ const CreateRowCollectionSchema = z.record(
 ### Server Startup Sequence
 
 #### 1. **bin/server.ts** - Entry Point
+
 ```typescript
 1. Load environment variables (start/env.ts)
 2. Connect to MongoDB (config/database.config.ts)
@@ -740,6 +800,7 @@ const CreateRowCollectionSchema = z.record(
 ```
 
 #### 2. **start/kernel.ts** - Fastify Configuration
+
 ```typescript
 Plugin Registration Order:
 1. CORS (@fastify/cors)
@@ -761,6 +822,7 @@ Plugin Registration Order:
 ```
 
 #### 3. **start/env.ts** - Environment Validation
+
 ```typescript
 Validated Variables (Zod):
 - NODE_ENV: development | test | production
@@ -781,12 +843,14 @@ Validated Variables (Zod):
 ### Seeder Files (15 total)
 
 #### Core Data Seeds
+
 1. **1720448435-permissions.seed.ts** - Sistema de permissões
 2. **1720448445-user-group.seed.ts** - Grupos de usuários
 3. **1720465892-users.seed.ts** - Usuários do sistema
 4. **1720467123-collection-reset.seed.ts** - Reset de coleções
 
 #### Performance Test Seeds
+
 5. **1720468945-collection-professor-100K.seed.ts** - 100k professores
 6. **1720470267-collection-professor-1M.seed.ts** - 1M professores
 7. **1720471589-collection-professor-10M.seed.ts** - 10M professores
@@ -804,6 +868,7 @@ Validated Variables (Zod):
 ## 🐳 Docker & Deployment
 
 ### Docker Files
+
 - **Dockerfile.demo** - Demo environment
 - **Dockerfile.develop** - Development environment
 - **docker-compose.demo.yml** - Demo stack
@@ -813,6 +878,7 @@ Validated Variables (Zod):
 - **docker-compose.mongo.develop.yml** - Development MongoDB
 
 ### Traefik Integration (Demo/Develop)
+
 ```yaml
 labels:
   - traefik.enable=true
@@ -918,6 +984,7 @@ labels:
 ## 🧩 Utility Functions (Core)
 
 ### buildSchema(fields: Field[]): CollectionSchema
+
 ```typescript
 Purpose: Converter array de Fields em Mongoose schema
 Input: Array de Field entities
@@ -932,6 +999,7 @@ Logic:
 ```
 
 ### buildCollection(collection): Promise<Model>
+
 ```typescript
 Purpose: Criar modelo Mongoose dinâmico em runtime
 Input: Collection entity
@@ -946,6 +1014,7 @@ Logic:
 ```
 
 ### buildPopulate(fields): Promise<PopulateArray>
+
 ```typescript
 Purpose: Gerar estratégia de population recursiva
 Input: Array de Fields
@@ -968,6 +1037,7 @@ Logic:
 ```
 
 ### buildQuery(params, fields): MongoQuery
+
 ```typescript
 Purpose: Construir query MongoDB de parâmetros HTTP
 Input: Query params object, Fields array
@@ -982,6 +1052,7 @@ Features:
 ```
 
 ### buildOrder(params, fields): SortObject
+
 ```typescript
 Purpose: Construir ordenação MongoDB
 Input: Query params, Fields array
@@ -995,6 +1066,7 @@ Logic:
 ```
 
 ### normalize(search: string): string
+
 ```typescript
 Purpose: Normalizar texto para busca com acentos
 Input: "josé"
@@ -1010,6 +1082,7 @@ Supports:
 ## 📊 Performance Considerations
 
 ### Database Indexes
+
 ```typescript
 // Recommended indexes for collections
 Collection.index({ slug: 1 }, { unique: true });
@@ -1025,6 +1098,7 @@ DynamicModel.index({ createdAt: -1 });
 ```
 
 ### Population Optimization
+
 ```typescript
 // Avoid circular references in buildPopulate()
 // Limit population depth
@@ -1033,6 +1107,7 @@ DynamicModel.index({ createdAt: -1 });
 ```
 
 ### Query Optimization
+
 ```typescript
 // Use projection to limit returned fields
 // Apply pagination limits
@@ -1045,6 +1120,7 @@ DynamicModel.index({ createdAt: -1 });
 ## 🔍 Common Patterns & Best Practices
 
 ### 1. Error Handling Pattern
+
 ```typescript
 // All use cases follow Either pattern
 try {
@@ -1059,6 +1135,7 @@ try {
 ```
 
 ### 2. Controller Pattern
+
 ```typescript
 @Controller()
 export default class {
@@ -1066,8 +1143,8 @@ export default class {
     url: '/path',
     options: {
       schema: { body: ValidationSchema },
-      preHandler: [AuthenticationMiddleware]
-    }
+      preHandler: [AuthenticationMiddleware],
+    },
   })
   async handle(request: FastifyRequest, reply: FastifyReply) {
     const result = await useCase.execute(request.body);
@@ -1082,6 +1159,7 @@ export default class {
 ```
 
 ### 3. Dynamic Schema Building Pattern
+
 ```typescript
 // On collection create/update
 const schema = buildSchema(collection.fields);
@@ -1095,14 +1173,13 @@ await row.save();
 ```
 
 ### 4. Population Pattern
+
 ```typescript
 // Get fields with relationships
 const populate = await buildPopulate(collection.fields);
 
 // Query with population
-const rows = await Model.find(query)
-  .populate(populate)
-  .exec();
+const rows = await Model.find(query).populate(populate).exec();
 ```
 
 ---
@@ -1110,6 +1187,7 @@ const rows = await Model.find(query)
 ## 📚 Additional Resources
 
 ### Configuration Files
+
 - **tsconfig.json** - TypeScript configuration with path aliases
 - **package.json** - Dependencies and scripts
 - **.env.example** - Environment variables template
@@ -1119,8 +1197,9 @@ const rows = await Model.find(query)
 - **README.md** - Project documentation
 
 ### System Files
-- **_system/locales/** - i18n property files
-- **_storage/** - Uploaded files directory
+
+- **\_system/locales/** - i18n property files
+- **\_storage/** - Uploaded files directory
 - **database-data/** - MongoDB data directory (if using local Docker)
 
 ---
@@ -1151,6 +1230,7 @@ const rows = await Model.find(query)
    - Consider dynamic validation for row operations
 
 ### Testing Strategy
+
 - Use seeders for test data generation
 - Test with different data volumes (100K, 1M, 10M seeds available)
 - Verify population depth doesn't cause performance issues

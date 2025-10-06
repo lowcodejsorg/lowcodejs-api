@@ -2,7 +2,7 @@
 import type { FastifyReply, FastifyRequest } from 'fastify';
 import { Controller, getInstanceByToken, POST } from 'fastify-decorators';
 
-import { JWTPayload, Permission, UserGroup } from '@core/entity.core';
+import type { JWTPayload, Permission, UserGroup } from '@core/entity.core';
 import { AuthenticationMiddleware } from '@middlewares/authentication.middleware';
 import { Env } from '@start/env';
 import RefreshTokenUseCase from '@use-case/authentication/refresh-token.use-case';

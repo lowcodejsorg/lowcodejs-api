@@ -1,9 +1,11 @@
-import { JWTPayload, Permission, UserGroup } from '@core/entity.core';
+/* eslint-disable no-unused-vars */
+import type { FastifyReply, FastifyRequest } from 'fastify';
+import { Controller, GET, getInstanceByToken } from 'fastify-decorators';
+
+import type { JWTPayload, Permission, UserGroup } from '@core/entity.core';
 import { Env } from '@start/env';
 import MagicLinkUseCase from '@use-case/authentication/magic-link.use-case';
 import { AuthenticationMagicLinkSchema } from '@validators/authentication.validator';
-import type { FastifyReply, FastifyRequest } from 'fastify';
-import { Controller, GET, getInstanceByToken } from 'fastify-decorators';
 
 @Controller({
   route: '/authentication',
@@ -29,7 +31,7 @@ export default class {
           properties: {
             code: {
               type: 'string',
-              description: 'Magic link authentication code'
+              description: 'Magic link authentication code',
             },
           },
         },
@@ -43,7 +45,10 @@ export default class {
             description: 'Bad request - Invalid or expired magic link code',
             type: 'object',
             properties: {
-              message: { type: 'string', enum: ['Invalid magic link code', 'Magic link has expired'] },
+              message: {
+                type: 'string',
+                enum: ['Invalid magic link code', 'Magic link has expired'],
+              },
               code: { type: 'number', enum: [400] },
               cause: { type: 'string', enum: ['INVALID_CODE', 'CODE_EXPIRED'] },
             },
@@ -51,14 +56,14 @@ export default class {
               {
                 message: 'Invalid magic link code',
                 code: 400,
-                cause: 'INVALID_CODE'
+                cause: 'INVALID_CODE',
               },
               {
                 message: 'Magic link has expired',
                 code: 400,
-                cause: 'CODE_EXPIRED'
-              }
-            ]
+                cause: 'CODE_EXPIRED',
+              },
+            ],
           },
           500: {
             description: 'Internal server error',
@@ -72,9 +77,9 @@ export default class {
               {
                 message: 'Internal server error',
                 code: 500,
-                cause: 'INTERNAL_SERVER_ERROR'
-              }
-            ]
+                cause: 'INTERNAL_SERVER_ERROR',
+              },
+            ],
           },
         },
       },
