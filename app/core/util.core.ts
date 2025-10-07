@@ -277,9 +277,15 @@ export async function buildPopulate(
 
     if (field.type === FIELD_TYPE.FIELD_GROUP) {
       const groupId = field?.configuration?.group?._id?.toString();
+
       const group = await Collection.findOne({
         _id: groupId,
-      });
+      }).populate([
+        {
+          path: 'fields',
+          model: 'Field',
+        },
+      ]);
 
       if (group) {
         await buildCollection({
