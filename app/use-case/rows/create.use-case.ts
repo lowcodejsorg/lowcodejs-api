@@ -1,14 +1,17 @@
-import { Either, left, right } from '@core/either.core';
+/* eslint-disable @typescript-eslint/consistent-type-imports */
+import { Service } from 'fastify-decorators';
+import type z from 'zod';
+
+import type { Either } from '@core/either.core';
+import { left, right } from '@core/either.core';
 import { FIELD_TYPE } from '@core/entity.core';
 import { buildCollection, buildPopulate } from '@core/util.core';
 import ApplicationException from '@exceptions/application.exception';
 import { Collection } from '@model/collection.model';
-import {
+import type {
   CreateRowCollectionSchema,
   GetRowCollectionSlugSchema,
 } from '@validators/row-collection.validator';
-import { Service } from 'fastify-decorators';
-import z from 'zod';
 
 type Response = Either<ApplicationException, import('@core/entity.core').Row>;
 @Service()
@@ -52,6 +55,12 @@ export default class CreateRowUseCase {
         ]);
 
         if (!groupCollection) continue;
+
+        const hasGroupPayload = payload[group.slug];
+
+        console.log('hasGroupPayload', hasGroupPayload);
+
+        if (!hasGroupPayload) continue;
 
         const c = await buildCollection({
           ...groupCollection?.toJSON({
