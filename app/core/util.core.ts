@@ -312,7 +312,9 @@ export async function buildQuery(
   { search, trashed, ...payload }: Partial<Query>,
   fields: Field[] = [],
 ): Promise<Query> {
-  let query: Query = {};
+  let query: Query = {
+    ...(trashed && { trashed: trashed === 'true' }),
+  };
 
   for (const field of fields.filter((f) => f.type !== FIELD_TYPE.FIELD_GROUP)) {
     const slug = String(field.slug?.toString());
@@ -356,51 +358,58 @@ export async function buildQuery(
     }
   }
 
-  for (const field of fields.filter((f) => f.type === FIELD_TYPE.FIELD_GROUP)) {
-    const slug = String(field.slug?.toString());
+  const hasFieldGroupQuery = fields.some((f) => {
+    if (f.type !== FIELD_TYPE.FIELD_GROUP) return false;
+    const groupPrefix = f.slug.concat('-');
+    return Object.keys(payload).some((key) => key.startsWith(groupPrefix));
+  });
 
-    const group = await Collection.findOne({
-      slug: field?.configuration?.group?.slug,
-    }).populate([
-      {
-        path: 'fields',
-        model: 'Field',
-      },
-    ]);
+  if (hasFieldGroupQuery) {
+    for (const field of fields.filter(
+      (f) => f.type === FIELD_TYPE.FIELD_GROUP,
+    )) {
+      const slug = String(field.slug?.toString());
 
-    if (!group) continue;
+      const group = await Collection.findOne({
+        slug: field?.configuration?.group?.slug,
+      }).populate([
+        {
+          path: 'fields',
+          model: 'Field',
+        },
+      ]);
 
-    let groupPayload: Query = {};
+      if (!group) continue;
 
-    for (const fieldGroup of group?.fields as import('@core/entity.core').Field[]) {
-      const fieldGroupSlug = slug.concat('-').concat(String(fieldGroup.slug));
-      groupPayload[fieldGroup.slug] = payload[fieldGroupSlug];
-    }
+      let groupPayload: Query = {};
 
-    const queryGroup = await buildQuery(
-      { ...groupPayload, trashed },
-      group?.fields as import('@core/entity.core').Field[],
-    );
+      for (const fieldGroup of group?.fields as import('@core/entity.core').Field[]) {
+        const fieldGroupSlug = slug.concat('-').concat(String(fieldGroup.slug));
+        if (!(fieldGroupSlug in payload)) continue;
+        groupPayload[fieldGroup.slug] = payload[fieldGroupSlug];
+      }
 
-    if (Object.keys(queryGroup).length > 0 && group) {
-      const c = await buildCollection({
-        ...group?.toJSON({
-          flattenObjectIds: true,
-        }),
-        _id: group?._id.toString(),
-      });
+      const queryGroup = await buildQuery(
+        { ...groupPayload },
+        group?.fields as import('@core/entity.core').Field[],
+      );
 
-      const ids: string[] = await c?.find(queryGroup).distinct('_id');
+      if (Object.keys(queryGroup).length > 0 && group) {
+        const c = await buildCollection({
+          ...group?.toJSON({
+            flattenObjectIds: true,
+          }),
+          _id: group?._id.toString(),
+        });
 
-      if (ids.length === 0)
-        query[slug] = {
-          $in: [],
-        };
+        const ids: string[] = await c?.find(queryGroup).distinct('_id');
 
-      if (ids.length > 0)
+        if (ids.length === 0) continue;
+
         query[slug] = {
           $in: ids,
         };
+      }
     }
   }
 
@@ -427,9 +436,6 @@ export async function buildQuery(
       };
     }
   }
-
-  if (trashed && trashed === 'true') query.trashed = true;
-  else query.trashed = false;
 
   return query;
 }
