@@ -1,15 +1,18 @@
-import { Either, left, right } from '@core/either.core';
-import { FIELD_TYPE } from '@core/entity.core';
+/* eslint-disable @typescript-eslint/consistent-type-imports */
+import { Service } from 'fastify-decorators';
+import type z from 'zod';
+
+import type { Either } from '@core/either.core';
+import { left, right } from '@core/either.core';
+import { FIELD_TYPE, Row } from '@core/entity.core';
 import { buildCollection, buildPopulate } from '@core/util.core';
 import ApplicationException from '@exceptions/application.exception';
 import { Collection } from '@model/collection.model';
-import {
+import type {
   GetRowCollectionByIdSchema,
   GetRowCollectionSlugSchema,
   UpdateRowCollectionSchema,
 } from '@validators/row-collection.validator';
-import { Service } from 'fastify-decorators';
-import z from 'zod';
 
 type Response = Either<ApplicationException, import('@core/entity.core').Row>;
 
@@ -38,23 +41,12 @@ export default class UpdateRowCollectionUseCase {
           ),
         );
 
-      let c;
-      try {
-        c = await buildCollection({
-          ...collection?.toJSON({
-            flattenObjectIds: true,
-          }),
-          _id: collection?._id.toString(),
-        });
-      } catch (error) {
-        console.error('Model build error:', error);
-        return left(
-          ApplicationException.InternalServerError(
-            'Failed to build collection model',
-            'MODEL_BUILD_FAILED',
-          ),
-        );
-      }
+      const c = await buildCollection({
+        ...collection?.toJSON({
+          flattenObjectIds: true,
+        }),
+        _id: collection?._id.toString(),
+      });
 
       const row = await c.findOne({
         _id: payload._id,
@@ -83,25 +75,20 @@ export default class UpdateRowCollectionUseCase {
 
         if (!groupCollection) continue;
 
-        let cGroup;
-        try {
-          cGroup = await buildCollection({
-            ...groupCollection?.toJSON({
-              flattenObjectIds: true,
-            }),
-            _id: groupCollection?._id?.toString(),
-          });
-        } catch (error) {
-          console.error('Group model build error:', error);
-          return left(
-            ApplicationException.InternalServerError(
-              'Failed to build group collection model',
-              'GROUP_MODEL_BUILD_FAILED',
-            ),
-          );
-        }
+        const cGroup = await buildCollection({
+          ...groupCollection?.toJSON({
+            flattenObjectIds: true,
+          }),
+          _id: groupCollection?._id?.toString(),
+        });
 
-        const groupItems = payload[group.slug] as any[];
+        const hasGroupPayload = payload[group.slug];
+
+        console.log('hasGroupPayload on update', hasGroupPayload);
+
+        if (!hasGroupPayload) continue;
+
+        const groupItems = hasGroupPayload as Row[];
 
         for (const item of groupItems) {
           if (typeof item === 'string') {

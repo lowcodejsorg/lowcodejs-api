@@ -58,8 +58,6 @@ export default class CreateRowUseCase {
 
         const hasGroupPayload = payload[group.slug];
 
-        console.log('hasGroupPayload', hasGroupPayload);
-
         if (!hasGroupPayload) continue;
 
         const c = await buildCollection({
