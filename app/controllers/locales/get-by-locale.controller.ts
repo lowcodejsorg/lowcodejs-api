@@ -125,11 +125,11 @@ export default class {
           const [key, ...valueParts] = trimmed.split('=');
           if (key && valueParts.length > 0) {
             const value = valueParts.join('=').trim();
-            if (!value.includes(',')) {
+            if (!value.includes(';')) {
               translations[key.trim()] = value;
             } else {
               translations[key.trim()] = value
-                .split(',')
+                .split(';')
                 .filter(Boolean)
                 .map((v) => v.trim());
             }

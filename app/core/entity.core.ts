@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /**
  * Make some property optional an type
  *
@@ -82,6 +83,8 @@ export interface Storage extends Base {
   url: string;
   filename: string;
   type: string;
+  originalName: string;
+  size: number;
 }
 
 export interface Permission extends Base {

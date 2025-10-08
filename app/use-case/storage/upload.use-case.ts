@@ -1,8 +1,10 @@
+/* eslint-disable no-unused-vars */
 import type { MultipartFile } from '@fastify/multipart';
 import { getInstanceByToken, Service } from 'fastify-decorators';
 
-import { Either, left, right } from '@core/either.core';
-import { Storage as Entity, Optional } from '@core/entity.core';
+import type { Either } from '@core/either.core';
+import { left, right } from '@core/either.core';
+import type { Storage as Entity, Optional } from '@core/entity.core';
 import ApplicationException from '@exceptions/application.exception';
 import { Storage as Model } from '@model/storage.model';
 import StorageService from '@services/storage.service';

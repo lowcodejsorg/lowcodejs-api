@@ -52,6 +52,16 @@ export default class {
                   description: 'MIME type of the uploaded file',
                   examples: ['image/jpeg', 'application/pdf', 'text/plain'],
                 },
+                size: {
+                  type: 'number',
+                  description: 'File size in bytes',
+                  examples: [12345678],
+                },
+                originalName: {
+                  type: 'string',
+                  description: 'Original filename with extension',
+                  examples: ['12345678.jpg', '87654321.pdf'],
+                },
                 trashed: {
                   type: 'boolean',
                   enum: [false],

@@ -1,9 +1,10 @@
-import { Optional, Storage } from '@core/entity.core';
 import type { MultipartFile } from '@fastify/multipart';
-import { Env } from '@start/env';
 import { Service } from 'fastify-decorators';
 import { access, unlink, writeFile } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
+
+import type { Optional, Storage } from '@core/entity.core';
+import { Env } from '@start/env';
 
 type Response = Optional<
   Storage,
@@ -29,6 +30,8 @@ export default class StorageService {
       filename,
       type: part.mimetype,
       url: this.baseUrl.concat('/storage/').concat(filename),
+      originalName: part.filename,
+      size: buffer.length ?? part.file.bytesRead,
     };
   }
 
