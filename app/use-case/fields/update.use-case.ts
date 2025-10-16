@@ -1,17 +1,20 @@
-import { Either, left, right } from '@core/either.core';
+/* eslint-disable @typescript-eslint/consistent-type-imports */
+import { Service } from 'fastify-decorators';
+import slugify from 'slugify';
+import type z from 'zod';
+
+import type { Either } from '@core/either.core';
+import { left, right } from '@core/either.core';
 import { FIELD_TYPE } from '@core/entity.core';
 import { buildCollection, buildSchema } from '@core/util.core';
 import ApplicationException from '@exceptions/application.exception';
 import { Collection } from '@model/collection.model';
 import { Field } from '@model/field.model';
-import { GetCollectionBySlugSchema } from '@validators/collections.validator';
-import {
+import type { GetCollectionBySlugSchema } from '@validators/collections.validator';
+import type {
   GetFieldCollectionByIdSchema,
   UpdateFieldCollectionSchema,
 } from '@validators/field-collection.validator';
-import { Service } from 'fastify-decorators';
-import slugify from 'slugify';
-import z from 'zod';
 
 type Response = Either<ApplicationException, import('@core/entity.core').Field>;
 
@@ -46,6 +49,28 @@ export default class UpdateFieldCollectionUseCase {
         return left(
           ApplicationException.NotFound('Field not found', 'FIELD_NOT_FOUND'),
         );
+
+      console.log({
+        trashed: payload.trashed,
+        field: collection.slug,
+        length: collection?.fields?.filter(
+          (f) => !(f as import('@core/entity.core').Field).trashed,
+        ).length,
+      });
+
+      if (
+        collection?.fields?.filter(
+          (f) => !(f as import('@core/entity.core').Field).trashed,
+        ).length === 1 &&
+        payload.trashed
+      ) {
+        return left(
+          ApplicationException.Conflict(
+            'Last active field, should not be sent to trash',
+            'LAST_ACTIVE_FIELD',
+          ),
+        );
+      }
 
       const oldSlug = field.slug;
 

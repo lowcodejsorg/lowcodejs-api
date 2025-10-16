@@ -345,6 +345,28 @@ export default class {
               },
             ],
           },
+          409: {
+            description: 'Last active field, should not be sent to trash',
+            type: 'object',
+            properties: {
+              message: {
+                type: 'string',
+                enum: ['Last active field, should not be sent to trash'],
+              },
+              code: { type: 'number', enum: [409] },
+              cause: {
+                type: 'string',
+                enum: ['LAST_ACTIVE_FIELD'],
+              },
+            },
+            examples: [
+              {
+                message: 'Last active field, should not be sent to trash',
+                code: 409,
+                cause: 'LAST_ACTIVE_FIELD',
+              },
+            ],
+          },
           500: {
             description: 'Internal server error - Database or server issues',
             type: 'object',
